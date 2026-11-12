@@ -22,7 +22,7 @@ function renderInfo(tab){
         <div class="tl-row"><span class="tl-ch">${chLink(j.ch)}</span><p>${esc(j.d)}</p>${r?`<span class="tl-r" style="--c:${GBY[r.g].c}">${esc(r.name)}</span>`:''}</div></li>`}).join('')}</ol>`;
   }else{
     document.getElementById('infoTitle').textContent='Công pháp & bảo vật';
-    document.getElementById('infoSub').textContent='Công pháp, thần thông, thiên hỏa có xếp hạng và bảo vật chính của Lâm Phong.';
+    document.getElementById('infoSub').textContent='Công pháp, huyết mạch, thần thông, thiên hỏa có xếp hạng và bảo vật chính của Lâm Phong.';
     b.innerHTML=Object.entries(ARTS_GROUPS).map(([g,gn])=>{let as=S.arts.filter(a=>a.g===g);if(!as.length)return'';
       if(g==='th')as=[...as].sort((x,y)=>(x.rank||999)-(y.rank||999));
       return `<section class="sec"><h2 class="h-sec">${gn} <span class="meta">${as.length}</span></h2>${g==='th'?'<p class="meta">Thiên hỏa có thứ hạng. Truyện phân biệt thiên hỏa, địa hỏa và yêu hỏa (ch.175).</p>':''}<div class="cards">${as.map(a=>`<article class="card art">

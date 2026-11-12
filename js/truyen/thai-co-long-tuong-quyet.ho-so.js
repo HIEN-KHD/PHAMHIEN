@@ -100,9 +100,12 @@ const JOURNEY_RAW=[
   [8381,'thienchi','Biết bí mật Thiên chi giới và vì sao Thái Tây tộc bị diệt.'],
   [8851,'hoangchi','Vào Hoang chi địa tìm máu bản nguyên kẻ khai hoang.'],
   [8467,'dongphuong','Linh hồn đột phá khai hoang áo nghĩa cảnh giới.'],
+  [9512,'dongphuong','Quyết diệt Nam hải Yêu Long tộc.'],
+  [9792,'dongphuong','Ác ma chi chủ xúi Chư Lão điện tru sát Lâm Phong, truy sát hắn trong ác ma vực sâu.'],
   [9706,'dongphuong','Đột phá chuẩn Kẻ Khai Hoang nhờ Đại Thiên Đại Tự Tại Thần Công.','khaihoang'],
   [10363,'dongphuong','Linh hồn đạt tầng vũ trụ đại lão (100 tòa tiên điện).','vutrudailao'],
   [10379,'dongphuong','Thống nhất Nam hải thế giới.'],
+  [10458,'dongphuong','Nhiều thế lực liên thủ tru sát Lâm Phong.'],
   [10800,'dongphuong','Luyện hóa bản nguyên ba cường giả Cá Nhảy, đột phá chuẩn Cá Nhảy.','canhay'],
   [11192,'dongphuong','Thôi diễn nơi ẩn thân của bản nguyên phương Đông vũ trụ.'],
   [11220,'dongphuong','Chương cuối: Lục Tinh Thiên Mang Trận.']
@@ -115,6 +118,11 @@ const ARTS_RAW=[
   ['cp','Thôn phệ võ hồn','Võ hồn cực hiếm, hấp thu thiên địa năng lượng nhanh hơn người khác rất nhiều. Tiến hóa thành ba tòa lỗ đen thôn phệ.',[1,29]],
   ['cp','Đại Thiên Đại Tự Tại Thần Công','Do Lâm Bại Thiên tự sáng. Có cách trùng tu vô hạn, mỗi lần trùng tu chiến lực bạo tăng; rớt cảnh giới mà không rớt chiến lực. Giúp Lâm Phong đột phá chuẩn Kẻ Khai Hoang.',[5208,6488,9706]],
   ['cp','Cửu hoàng phân thân','Phân thân Lâm Phong luyện chế từ sớm. Về sau còn phục hồi các tôn Thái Cổ Thánh Hoàng phân thân.',[54,66,369]],
+  ['hm','Bất tử huyết mạch','Từ Bất Tử gia tộc qua cha Lâm Bại Thiên. Bất tử thần thể sơ hiện từ sớm; thức tỉnh lần thứ tư, rồi lần thứ năm tiến hóa cho năng lực khủng bố.',['~560',4470,5363]],
+  ['hm','Chúa Tể đế huyết','Phục hồi từ thời Thần cảnh, có năng lực thứ hai, về sau thức tỉnh tầng sâu. Vì nó mà Lâm Phong được gọi là "tội huyết chi vương".',['~1540','~1668',3727,4504]],
+  ['hm','Vận Mệnh huyết mạch','Từng bị phong ấn và phản kháng; gắn với Đại Mệnh Vận Thuật. Thức tỉnh lần thứ ba có năng lực khủng bố, lần thứ năm lột xác.',[3489,3667,4334,5366,6180]],
+  ['hm','Huyết mạch thứ tư','Lực lượng thứ tư trong cơ thể Lâm Phong; về sau hắn tìm được cách phục hồi nó.',[3489,6189]],
+  ['hm','Thánh Tổ huyết mạch','Huyết mạch Thánh Tổ cổ xưa thức tỉnh khi Lâm Phong còn ở Thiên Võ đại lục.',[462]],
   ['tt','Đại Tai Nạn Thuật','Hóa giải được lực lôi kiếp, vì lôi kiếp cũng là một loại tai nạn chi lực.',['~1590']],
   ['tt','Đại phóng trục thuật','Thần thông của Nữ Đế: ném kẻ địch và vật thể vào dòng thời không chảy ngược hoặc không gian song song.',['~1710',2654]],
   ['tt','Phần Thiên chi nộ','Thần thông Lâm Phong tự nghĩ ra.',[1412]],
@@ -139,6 +147,6 @@ const ARTS_RAW=[
   ['bv','Cửu Thiên Lôi Mẫu châu','Vũ khí khủng bố do luyện kim thuật sĩ Bùi Anh Tuấn chế tạo.',[5134,5167]],
   ['bv','Luân hồi thánh dịch & Chư Thiên Thạch','Giúp đột phá chuẩn Chúa Sáng Thế.',[6504]]
 ];
-const ARTS_GROUPS={cp:'Công pháp',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
+const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
 const ARTS=ARTS_RAW.map(([g,n,d,ch,rank])=>({g,n,d,ch,rank:rank||null}));
 STORIES[0].people=PEOPLE;STORIES[0].journey=JOURNEY;STORIES[0].arts=ARTS;
