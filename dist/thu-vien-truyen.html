@@ -267,6 +267,8 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .v3d-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#05060f}
 .v3d-canvas canvas{display:block;width:100%!important;touch-action:none}
 .v3d-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:15px}
+.v3d-tip{position:absolute;pointer-events:none;max-width:280px;background:rgba(10,11,34,.9);border:1px solid var(--gold);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted)}
+.v3d-tip b{font-size:14px;color:var(--ink)}
 .v3d-ctrl{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px}
 .v3d-ctrl .btn{padding:6px 12px;font-size:13px;background:rgba(10,11,34,.75);backdrop-filter:blur(6px)}
 .v3d-ctrl .btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
@@ -331,6 +333,7 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
     <div class="v3d-wrap">
       <div id="v3d" class="v3d-canvas"></div>
       <p class="v3d-msg meta" id="v3dMsg" hidden></p>
+      <div class="v3d-tip" id="v3dTip" hidden></div>
       <div class="v3d-ctrl">
         <button type="button" class="btn" data-v3d="rot" id="v3dRot" aria-pressed="true">Tự xoay</button>
         <button type="button" class="btn" data-v3d="top">Nhìn từ trên</button>
@@ -1998,7 +2001,11 @@ function build3D(){
     const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
     const h=ray.intersectObjects(pick,false)[0];if(h)select3D(h.object.userData.wid,true)});
   renderer.domElement.addEventListener('pointermove',e=>{const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
-    renderer.domElement.style.cursor=ray.intersectObjects(pick,false).length?'pointer':'grab'});
+    const h=ray.intersectObjects(pick,false)[0],tip=document.getElementById('v3dTip');renderer.domElement.style.cursor=h?'pointer':'grab';
+    if(h&&e.pointerType==='mouse'){const w=byId[h.object.userData.wid],top=[...w.places].sort((a,b)=>b.s-a.s)[0];
+      tip.innerHTML=`<b>${esc(w.name)}</b><span>Tầng ${w.tier} · ${w.places.length} địa danh${top?` · mạnh nhất: ${esc(top.n)}`:''}</span>`;
+      tip.style.left=(e.clientX-r.left+14)+'px';tip.style.top=(e.clientY-r.top+14)+'px';tip.hidden=false}else tip.hidden=true});
+  renderer.domElement.addEventListener('pointerleave',()=>{document.getElementById('v3dTip').hidden=true});
   window.addEventListener('resize',resize3D);
 }
 function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}

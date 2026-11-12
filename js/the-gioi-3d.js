@@ -155,7 +155,11 @@ function build3D(){
     const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
     const h=ray.intersectObjects(pick,false)[0];if(h)select3D(h.object.userData.wid,true)});
   renderer.domElement.addEventListener('pointermove',e=>{const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
-    renderer.domElement.style.cursor=ray.intersectObjects(pick,false).length?'pointer':'grab'});
+    const h=ray.intersectObjects(pick,false)[0],tip=document.getElementById('v3dTip');renderer.domElement.style.cursor=h?'pointer':'grab';
+    if(h&&e.pointerType==='mouse'){const w=byId[h.object.userData.wid],top=[...w.places].sort((a,b)=>b.s-a.s)[0];
+      tip.innerHTML=`<b>${esc(w.name)}</b><span>Tầng ${w.tier} · ${w.places.length} địa danh${top?` · mạnh nhất: ${esc(top.n)}`:''}</span>`;
+      tip.style.left=(e.clientX-r.left+14)+'px';tip.style.top=(e.clientY-r.top+14)+'px';tip.hidden=false}else tip.hidden=true});
+  renderer.domElement.addEventListener('pointerleave',()=>{document.getElementById('v3dTip').hidden=true});
   window.addEventListener('resize',resize3D);
 }
 function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
