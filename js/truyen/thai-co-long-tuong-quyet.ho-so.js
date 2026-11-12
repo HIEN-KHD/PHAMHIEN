@@ -4,7 +4,7 @@
 /* Nhân vật: [nhóm, tên, mô tả ngắn, [thế giới], [chương]] */
 const PEOPLE_RAW=[
   ['gd','Lâm Phong','Nhân vật chính. Thiếu niên sa sút ở trấn Thanh Vân, mang thôn phệ võ hồn, có được Thái Cổ Long Tượng Quyết rồi đi từ Võ Giả lên tới Cá Nhảy.',['thienvo','tamthien','phongtruc','cuuchau','battu','longgioi','magioi','thiengioi','dongphuong'],[1,26,11217]],
-  ['gd','Lâm Bại Thiên','Cha của Lâm Phong, thuộc Bất Tử gia tộc, mang huyết mạch tội huyết. Tự sáng ra Đại Thiên Đại Tự Tại Thần Công, được gọi là kỳ tài có một không hai.',['battu','toivuc'],[4381,4504,5208,5325,6488]],
+  ['gd','Lâm Bại Thiên','Cha của Lâm Phong, thuộc Bất Tử gia tộc, mang huyết mạch tội huyết. Tự sáng ra Đại Thiên Đại Tự Tại Thần Công, được gọi là kỳ tài có một không hai. Vừa đạt Chân Tiên thì bị bảy đại cổ thánh truy sát cướp khí vận.',['battu','toivuc'],[4381,4504,5208,5325,6488]],
   ['gd','Mẹ của Lâm Phong','Thuộc một tộc có các "tổ tiên" bí ẩn. Truyện có chương về việc mẹ con bị bỏ lại và về tung tích của bà.',[],[673,'~1166',6196,7803]],
   ['hn','Tô Nguyệt Tịch','Thanh mai trúc mã từ trấn Thanh Vân. Lâm Phong hút độc hỏa cho nàng đến mức tụt tu vi. Về sau xuất hiện lại với thân phận Cửu Thiên Huyền Nữ chuyển thế, từng quyết đấu với Lâm Phong.',['thienvo'],[1,4033,4037,6263,6598]],
   ['hn','Hồng Trần Tiên Tôn','Đệ nhất cường giả Cửu Châu đại thế giới, một vị Đại Đế từng độ đại đế kiếp. Người Lâm Phong trong lòng coi là "đại lão bà".',['cuuchau'],['~1662',1940,2816,9275]],
@@ -75,6 +75,7 @@ const JOURNEY_RAW=[
   [3881,'battu','Đến Bất Tử giới, tới tổ địa Nam Cung gia tộc.'],
   [4187,'phongtruc','Dùng tín ngưỡng lực từ thần miếu để đột phá Đế Tôn.','deton'],
   [4504,'toivuc','Tội huyết thức tỉnh, Tội vực dị biến, Bất Tử giới dậy sóng.'],
+  [4707,'battu','Lên Đế Chủ thập trọng thiên; linh hồn đạt Thiên Tiên bát trọng.','dechu'],
   [4751,'battu','Đột phá Tán Tiên, bước vào Tiên cảnh.','tantien'],
   [4959,'battu','Trọng thương Bất Tử giới chủ.'],
   [5156,'battu','Hóa giải kiếp "Các thần ngày diệt vong", thành Địa Tiên.','diatien'],
@@ -84,7 +85,8 @@ const JOURNEY_RAW=[
   [6025,'magioi','Đột phá Đại Thánh cảnh.','thanh'],
   [6041,'magioi','Diệt Thương Minh Thiên, ba đại cường giả thề thần phục.'],
   [6178,'thiengioi','Đến Thiên giới, đối mặt liên minh Long cung.'],
-  [6315,'thiengioi','Tu thành đệ lục trọng Thái Cổ Long Tượng Quyết.'],
+  [6315,'thiengioi','Tu thành đệ lục trọng Thái Cổ Long Tượng Quyết, nhảy từ Tiên Thánh tứ trọng lên lục trọng.'],
+  [6372,'thiengioi','Lên Tiên Thánh thập trọng thiên; linh hồn đạt Vạn Thánh cửu trọng.'],
   [6634,'thiengioi','Đột phá Siêu Việt giữa vòng vây, dùng lôi kiếp giết địch.','sieuviet'],
   [8381,'thienchi','Biết bí mật Thiên chi giới và vì sao Thái Tây tộc bị diệt.'],
   [8851,'hoangchi','Vào Hoang chi địa tìm máu bản nguyên kẻ khai hoang.'],

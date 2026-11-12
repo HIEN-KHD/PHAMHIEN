@@ -102,3 +102,15 @@ const REALMS=[
 const RIDX=Object.fromEntries(REALMS.map((r,i)=>[r.id,i]));
 const GBY=Object.fromEntries(GROUPS.map(g=>[g.id,g]));
 
+
+/* ===== Bổ sung từ đợt đọc thứ hai (theo nội dung chương) ===== */
+Object.assign(REALMS[RIDX.thanhde],{trait:'Bậc thứ sáu của Đại Đế. Có người tu đạo ba ngàn vạn năm mới bước vào Thánh Đế. Truyện có Tứ đại Thánh Đế và Thánh Cửu Cực, một Thánh Đế đỉnh phong.',tTrait:'t',ch:[3247,3248,3691]});
+Object.assign(REALMS[RIDX.dechu],{lv:'10 trọng thiên, có bậc Chuẩn Đế Chủ',tLv:'t',
+  how:'Lâm Phong đi từ Đế Chủ cửu trọng lên thập trọng thiên, rồi bước qua đại cảnh giới sang Tán Tiên. Nam Cung Mộ ở bậc Chuẩn Đế Chủ, "chỉ cần thêm thời gian là vào Đế Chủ".',tHow:'t',ch:[3732,3796,3999,4707,4751],lf:4707});
+Object.assign(REALMS[RIDX.thientien],{lv:'Có trọng thiên (linh hồn Lâm Phong từ Thiên Tiên thất trọng lên bát trọng)',tLv:'t',ch:[4665,4707]});
+Object.assign(REALMS[RIDX.chantien],{
+  trait:'Với tu sĩ thường, đột phá Chân Tiên vô cùng khó; người từng đạt cảnh giới này rồi trùng tu thì dễ hơn. Lâm Bại Thiên vừa vào Chân Tiên, lúc còn suy yếu, đã bị bảy đại cổ thánh truy sát để cướp khí vận. Ở Bất Tử giới hay Thiên giới, Chân Tiên rất hiếm.',
+  how:'Từ Hư Tiên lên Chân Tiên là đại cảnh giới. Trong Chân Tiên có bậc Chuẩn Kim Tiên; đột phá Kim Tiên "khó như lên trời". Tới Thánh Tiên còn có kiếp quang riêng.',ch:[4504,5108,5208,5677]});
+Object.assign(REALMS[RIDX.thanh],{lv:'Thánh cảnh cửu trọng: chín cảnh nhỏ như Đại Thánh, Tiên Thánh, Vạn Thánh…, mỗi cảnh có trọng thiên',tLv:'t',
+  trait:'Từ Tiên Thánh bước vào Vạn Thánh là từ trung giai lên cao giai của Thánh cảnh; bốn cảnh cuối là giai cao nhất. Hải Vương của Nam Hải thế giới đột phá Thánh Chủ.',tTrait:'t',
+  how:'Lâm Phong đột phá Đại Thánh ở Ma giới; khi tu thành đệ lục trọng Thái Cổ Long Tượng Quyết thì nhảy từ Tiên Thánh tứ trọng lên lục trọng; sau lên Tiên Thánh thập trọng, linh hồn đạt Vạn Thánh cửu trọng.',tHow:'t',ch:[6025,6315,6372,6570],lf:6025});
