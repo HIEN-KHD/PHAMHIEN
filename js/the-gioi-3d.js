@@ -2,7 +2,7 @@
    Dùng Three.js r128 + OrbitControls. Tải từ CDN khi mở màn này; nếu không có mạng thì dùng bản trong js/vendor/. */
 const V3D={ready:false,run:false};
 /* G: hệ số phóng to mỗi đảo (mô hình dựng theo đơn vị nhỏ rồi nhân G). TIER_R tính lại theo cỡ đảo để các đảo không chồng nhau. */
-const G=3.6,RM={},TIER_Y={1:0,2:40,3:86,4:132},TIER_R={1:24,2:72,3:46,4:52},SHELL={r:118,y:40,k:.62};
+const G=5.4,RM={},TIER_Y={1:0,2:60,3:129,4:198},TIER_R={1:36,2:108,3:69,4:78},SHELL={r:177,y:60,k:.62};
 const LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','js/vendor/three.min.js'],
   ['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js','js/vendor/OrbitControls.js']];
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s)});
@@ -173,15 +173,15 @@ function worldModel(w,R){
 /* Thế lực trên mặt đảo: vị trí lấy từ bản đồ vùng 2D (cùng thuật toán sắp xếp), cỡ theo quy mô.
    Thành: tường + 4 tháp + chính điện. Tông môn: bảo tháp nhiều tầng + điện phụ + cổng. Gia tộc: phủ đệ mái màu + cờ. */
 const roof=(r,h,c,em)=>{const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,4),mat(c,em));m.rotation.y=Math.PI/4;return m};
-function hall(g,x,z,w,c,k,em){const b=new THREE.Mesh(new THREE.BoxGeometry(w*k,.18*k,w*.7*k),mat('#d9cdb2'));b.position.set(x,.09*k,z);g.add(b);const r=roof(w*.78*k,.16*k,c,em);r.scale.z=.75;r.position.set(x,.26*k,z);g.add(r)}
+function hall(g,x,z,w,c,k,em){const b=new THREE.Mesh(new THREE.BoxGeometry(w*k,.18*k,w*.7*k),mat(shade(c,.45)));b.position.set(x,.09*k,z);g.add(b);const r=roof(w*.78*k,.16*k,c,em);r.scale.z=.75;r.position.set(x,.26*k,z);g.add(r)}
 function marker3D(p,c){
   const g=new THREE.Group(),k=.75+p.s*.18,em={emissive:hex(c),emissiveIntensity:.3};
-  if(p.t==='thanh'){const L=.62*k,wl=mat('#d9cba6');
+  if(p.t==='thanh'){const L=.62*k,wl=mat(shade(c,.3));
     [[0,-1],[0,1],[-1,0],[1,0]].forEach(([x,z])=>{const w=new THREE.Mesh(new THREE.BoxGeometry(x?.06*k:L*2,.16*k,z?.06*k:L*2),wl);w.position.set(x*L,.08*k,z*L);g.add(w)});
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([x,z])=>{const tw=new THREE.Mesh(new THREE.CylinderGeometry(.08*k,.09*k,.36*k,6),mat('#efe6cf'));tw.position.set(x*L,.18*k,z*L);g.add(tw);const r=cone(.12*k,.18*k,c,em);r.position.set(x*L,.45*k,z*L);g.add(r)});
-    hall(g,0,-.1*k,.5,c,k,em);const keep=new THREE.Mesh(new THREE.BoxGeometry(.3*k,.3*k,.3*k),mat('#e2d6ba'));keep.position.set(0,.3*k,-.1*k);g.add(keep);const kr=roof(.28*k,.22*k,c,em);kr.position.set(0,.56*k,-.1*k);g.add(kr);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([x,z])=>{const tw=new THREE.Mesh(new THREE.CylinderGeometry(.08*k,.09*k,.36*k,6),mat(shade(c,.5)));tw.position.set(x*L,.18*k,z*L);g.add(tw);const r=cone(.12*k,.18*k,c,em);r.position.set(x*L,.45*k,z*L);g.add(r)});
+    hall(g,0,-.1*k,.5,c,k,em);const keep=new THREE.Mesh(new THREE.BoxGeometry(.3*k,.3*k,.3*k),mat(shade(c,.55)));keep.position.set(0,.3*k,-.1*k);g.add(keep);const kr=roof(.28*k,.22*k,c,em);kr.position.set(0,.56*k,-.1*k);g.add(kr);
     for(let i=0;i<5;i++){hall(g,(i-2)*.22*k,.32*k,.16,shade(c,-.25),k,{})}}
-  else if(p.t==='tong'){[[.34,0],[.27,.17],[.2,.33],[.13,.48]].forEach(([r,y])=>{const body=new THREE.Mesh(new THREE.CylinderGeometry(r*.6*k,r*.6*k,.12*k,8),mat('#d9cdb2'));body.position.y=(y+.06)*k;g.add(body);
+  else if(p.t==='tong'){[[.34,0],[.27,.17],[.2,.33],[.13,.48]].forEach(([r,y])=>{const body=new THREE.Mesh(new THREE.CylinderGeometry(r*.6*k,r*.6*k,.12*k,8),mat(shade(c,.5)));body.position.y=(y+.06)*k;g.add(body);
       const rf=cone(r*k,.12*k,c,em);rf.position.y=(y+.16)*k;g.add(rf)});const sp=new THREE.Mesh(new THREE.CylinderGeometry(.015*k,.015*k,.25*k,4),mat('#f2c76e'));sp.position.y=.72*k;g.add(sp);
     hall(g,-.48*k,.15*k,.26,c,k,em);hall(g,.48*k,.15*k,.26,c,k,em);hall(g,0,-.5*k,.3,c,k,em);
     const gate=new THREE.Group();[-1,1].forEach(s=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(.025*k,.025*k,.3*k,5),mat('#c0392b'));post.position.set(s*.12*k,.15*k,0);gate.add(post)});
@@ -218,7 +218,7 @@ function paintFactions(P,w,pos,X,Z,FS){
       const mx=(a[0]+b[0])/2+(a[1]-b[1])*.12,my=(a[1]+b[1])/2+(b[0]-a[0])*.12;
       [[14,'rgba(60,40,20,.35)'],[8,'#e9d6a0']].forEach(([lw,c])=>{x.lineWidth=lw*s;x.strokeStyle=c;x.beginPath();x.moveTo(a[0],a[1]);x.quadraticCurveTo(mx,my,b[0],b[1]);x.stroke()});
       inT.push(b);rest.splice(bi,1)}}
-  w.places.forEach(p=>{const Q=pos.get(p);if(!Q||Q.terr)return;const[u,v]=C(Q.x,Q.y),c=PTYPE[p.t].c,rr=(.75+p.s*.17)*.58*FS/(2*P.S)*N*.62;
+  w.places.forEach(p=>{const Q=pos.get(p);if(!Q||Q.terr)return;const[u,v]=C(Q.x,Q.y),c=PTYPE[p.t].c,rr=(.75+p.s*.17)*(p.minor?.24:.36)*FS/(2*P.S)*N*.62;
     x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.arc(u+3*s,v+3*s,rr*.85,0,7);x.fill();x.fillStyle=c+'38';x.beginPath();x.arc(u,v,rr*.85,0,7);x.fill();
     x.lineWidth=2.5*s;x.strokeStyle=c+'aa';x.stroke()});
   x.restore();P.tex.needsUpdate=true;
@@ -241,9 +241,9 @@ function factions3D(grp,w,R,pick){
         post.position.set(cx+Math.cos(a)*sx,baseY+ht+.16*FS,cz+Math.sin(a)*sz);grp.add(post)}
       const lb=textSprite(p.n.toUpperCase(),c,(.3+p.s*.035)*LS);lb.center.set(.5,0);lb.position.set(X(P.x),baseY+.15,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
       zone.userData={wid:w.id,pi:i};pick.push(zone);return}
-    const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*.58);m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);
+    const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*(p.minor?.24:.36));m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);
     const hit=new THREE.Mesh(new THREE.SphereGeometry((.35+p.s*.07)*FS,8,6),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(X(P.x),baseY+.35*FS,Z(P.y));hit.userData={wid:w.id,pi:i};grp.add(hit);pick.push(hit);
-    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut||p.minor;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.5+p.s*.1)*FS,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
+    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut||p.minor;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.34+p.s*.065)*FS*(p.minor?.75:1),Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
   });
 }
 
@@ -273,15 +273,15 @@ function build3D(){
   const W=host.clientWidth||900,H=Math.round(Math.max(420,Math.min(980,window.innerHeight-120)));
   const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.setSize(W,H);renderer.setClearColor(0x05060f);
   host.appendChild(renderer.domElement);
-  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05060f,.0017);
-  const camera=new THREE.PerspectiveCamera(48,W/H,.3,4000);
-  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=1.5;controls.maxDistance=900;
+  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05060f,.0011);
+  const camera=new THREE.PerspectiveCamera(48,W/H,.3,6000);
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=1.5;controls.maxDistance=1400;
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;controls.autoRotate=!reduce;controls.autoRotateSpeed=.45;
   scene.add(new THREE.HemisphereLight(0xc7d6ff,0x1a1030,.7));const sun=new THREE.DirectionalLight(0xfff1d6,.95);sun.position.set(30,60,25);scene.add(sun);
   const top=new THREE.PointLight(0xffd76e,1.2,260);top.position.set(0,90,0);scene.add(top);
 
   // Sao
-  {const n=2500,p=new Float32Array(n*3),r=rng(9);for(let i=0;i<n;i++){const u=r()*2-1,a=r()*Math.PI*2,d=600+r()*700,s=Math.sqrt(1-u*u);p.set([Math.cos(a)*s*d,u*d,Math.sin(a)*s*d],i*3)}
+  {const n=2500,p=new Float32Array(n*3),r=rng(9);for(let i=0;i<n;i++){const u=r()*2-1,a=r()*Math.PI*2,d=900+r()*1000,s=Math.sqrt(1-u*u);p.set([Math.cos(a)*s*d,u*d,Math.sin(a)*s*d],i*3)}
    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xe8ecff,size:3,sizeAttenuation:true,fog:false})))}
   // Tinh vân
   [['rgba(91,80,220,1)',[-150,80,-230],360],['rgba(40,110,200,1)',[200,-20,-180],300],['rgba(160,60,160,1)',[30,130,280],330]].forEach(([c,p,s])=>{const n=glowSprite(c,s,.28);n.position.set(...p);n.material.fog=false;scene.add(n)});
@@ -321,11 +321,11 @@ function build3D(){
     [[A,.0],[B,1]].forEach(([N,u0])=>{let u=u0,pt;for(let s=0;s<40;s++){u=u0?u-.01:u+.01;pt=cv.getPoint(u);if(pt.distanceTo(N.position)>N.userData.R*1.25)break}
       const w=wormhole(.9+N.userData.R*.12,...col);w.position.copy(pt);w.lookAt(cv.getPoint(u0?u-.02:u+.02));scene.add(w);whs.push(w)})});
   // Trùng động lớn ở rìa vũ trụ
-  [[-185,80,-100,15,['rgba(190,120,255,.95)','rgba(70,20,140,.6)']],[200,25,80,13,['rgba(120,230,255,.95)','rgba(20,80,160,.6)']],[50,180,-190,17,['rgba(255,170,120,.95)','rgba(140,40,60,.6)']]].forEach(([x,y,z,s,c],i)=>{
-    const w=wormhole(s,...c);w.position.set(x,y,z);w.lookAt(0,18,0);scene.add(w);whs.push(w);const l=textSprite('Trùng động','#d9c8ff',5);l.position.set(x,y+s+5,z);scene.add(l)});
+  [[-280,120,-150,22,['rgba(190,120,255,.95)','rgba(70,20,140,.6)']],[300,38,120,20,['rgba(120,230,255,.95)','rgba(20,80,160,.6)']],[75,270,-285,26,['rgba(255,170,120,.95)','rgba(140,40,60,.6)']]].forEach(([x,y,z,s,c],i)=>{
+    const w=wormhole(s,...c);w.position.set(x,y,z);w.lookAt(0,18,0);scene.add(w);whs.push(w);const l=textSprite('Trùng động','#d9c8ff',7);l.position.set(x,y+s+7,z);scene.add(l)});
   // Hư không: vết nứt và vành đai đá vụn quanh từng tầng
-  [[-160,-30,80,0],[170,100,-50,1],[-80,160,130,2],[100,-50,-160,3]].forEach(([x,y,z,i])=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:riftTex(31+i),transparent:true,depthWrite:false,opacity:.95}));s.scale.set(84,42,1);s.position.set(x,y,z);s.material.rotation=(i-1.5)*.4;scene.add(s);
-    if(i===0){const l=textSprite('Hư không','#c9a6ff',5);l.position.set(x,y+24,z);scene.add(l)}});
+  [[-240,-45,120,0],[255,150,-75,1],[-120,240,195,2],[150,-75,-240,3]].forEach(([x,y,z,i])=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:riftTex(31+i),transparent:true,depthWrite:false,opacity:.95}));s.scale.set(126,63,1);s.position.set(x,y,z);s.material.rotation=(i-1.5)*.4;scene.add(s);
+    if(i===0){const l=textSprite('Hư không','#c9a6ff',7);l.position.set(x,y+36,z);scene.add(l)}});
   const belts=[];[1,2,3,4].forEach(t=>{const n=t===2?420:220,geo=new THREE.DodecahedronGeometry(.6,0),im=new THREE.InstancedMesh(geo,mat('#6d6680'),n),d=new THREE.Object3D(),r=rng(70+t);
     for(let i=0;i<n;i++){const a=r()*Math.PI*2,rad=TIER_R[t]+RM[t]+6+r()*12,s=.3+r()*1.1;d.position.set(Math.cos(a)*rad,TIER_Y[t]-6+(r()-.5)*6,Math.sin(a)*rad);d.rotation.set(r()*6,r()*6,r()*6);d.scale.setScalar(s);d.updateMatrix();im.setMatrixAt(i,d.matrix)}
     const bg=new THREE.Group();bg.add(im);bg.userData.spin=.04+t*.01;scene.add(bg);belts.push(bg)});
@@ -343,7 +343,7 @@ function build3D(){
   renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;
     const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
     const hs=ray.intersectObjects(pick,false),h=hs.find(x=>x.object.userData.pi!==undefined)||hs[0];if(!h)return;const u=h.object.userData;
-    if(u.pi!==undefined){const far=V3D.selWid!==u.wid;select3D(u.wid,far);placePanel3D(u.wid,u.pi)}else{select3D(u.wid,true);clearTimeout(V2.timer);V2.timer=setTimeout(()=>open2D(u.wid),1150)}});
+    if(u.pi!==undefined){const far=V3D.selWid!==u.wid;select3D(u.wid,far);placePanel3D(u.wid,u.pi)}else select3D(u.wid,true)});
   renderer.domElement.addEventListener('pointermove',e=>{const r=renderer.domElement.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,camera);
     const hs=ray.intersectObjects(pick,false),h=hs.find(x=>x.object.userData.pi!==undefined&&V3D.selWid===x.object.userData.wid)||hs[0],tip=document.getElementById('v3dTip');renderer.domElement.style.cursor=h?'pointer':'grab';
     if(h&&e.pointerType==='mouse'){const w=byId[h.object.userData.wid],pi=h.object.userData.pi,top=[...w.places].sort((a,b)=>b.s-a.s)[0];
@@ -359,50 +359,78 @@ function build3D(){
 }
 function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.H=document.fullscreenElement?window.innerHeight:Math.round(Math.max(420,Math.min(980,window.innerHeight-120)));V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
 let fly=null;
-function flyTo(pos,target,ms=1100){fly={p0:V3D.camera.position.clone(),t0:V3D.controls.target.clone(),p1:pos,t1:target,start:performance.now(),ms}}
+function flyTo(pos,target,ms=1100){V3D.arc=null;fly={p0:V3D.camera.position.clone(),t0:V3D.controls.target.clone(),p1:pos,t1:target,start:performance.now(),ms}}
 function setPivot(p,keep){const off=V3D.camera.position.clone().sub(V3D.controls.target);flyTo(keep?p.clone().add(off):V3D.camera.position.clone(),p.clone(),700);V3D.controls.autoRotate=false;const b=document.getElementById('v3dRot');if(b)b.setAttribute('aria-pressed','false');
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed','false'))}
-function pivotTier(t){const k=Math.max(1,1.35/V3D.camera.aspect);V3D.selWid=null;V3D.sel.visible=false;
-  if(t==='all'){flyTo(new THREE.Vector3(0,62*k,150*k),new THREE.Vector3(0,52,0))}
+function pivotTier(t){const k=Math.max(1,1.35/V3D.camera.aspect);V3D.selWid=null;open2DBtn(null);V3D.sel.visible=false;
+  if(t==='all'){flyTo(new THREE.Vector3(0,93*k,225*k),new THREE.Vector3(0,78,0))}
   else{const y=TIER_Y[t],r=TIER_R[t]+RM[t];flyTo(new THREE.Vector3(0,y+r*.8*k,r*1.5*k),new THREE.Vector3(0,y,0))}
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pivot===String(t)))}
-function resetView(){V3D.selWid=null;const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,62*k,150*k);V3D.controls.target.set(0,52,0);V3D.sel.visible=false;fly=null;panel3D(null)}
+function resetView(){V3D.selWid=null;open2DBtn(null);const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,93*k,225*k);V3D.controls.target.set(0,78,0);V3D.sel.visible=false;fly=null;panel3D(null)}
+function open2DBtn(wid){const b=document.getElementById('v3dOpen2d');if(!b)return;b.hidden=!wid;if(wid){b.dataset.wid=wid;b.querySelector('b').textContent=short(byId[wid].name)}}
 function select3D(wid,zoom){
-  V3D.selWid=wid;
+  V3D.selWid=wid;open2DBtn(wid);
   const g=V3D.nodes[wid];if(!g)return;const R=g.userData.R;
   V3D.sel.visible=true;V3D.sel.scale.setScalar(R*1.35);V3D.sel.position.copy(g.position).add(new THREE.Vector3(0,-.3,0));
   if(zoom){const dir=g.position.clone().setY(0).normalize();if(!dir.lengthSq())dir.set(0,0,1);const sp=byId[wid].kind==='sun'||byId[wid].kind==='galaxy'?1.45:1;flyTo(g.position.clone().add(dir.multiplyScalar((R*1.05+1.5)*sp)).add(new THREE.Vector3(0,(R*2.45+3)*sp,0)),g.position.clone().add(new THREE.Vector3(0,.3,0)));V3D.controls.autoRotate=false;document.getElementById('v3dRot').setAttribute('aria-pressed','false')}
   panel3D(wid);
 }
 function placePanel3D(wid,pi){
-  const w=byId[wid],p=w.places[pi],T=PTYPE[p.t],el=document.getElementById('v3dPanel');
-  el.innerHTML=`<span class="eyebrow" style="color:${T.c}">${T.name} · ${esc(short(w.name))}</span><h2 class="pname">${esc(p.n)}</h2>
+  const w=byId[wid],p=w.places[pi],T=PTYPE[p.t];
+  setPanel3D(esc(p.n),`<span class="eyebrow" style="color:${T.c}">${T.name} · ${esc(short(w.name))}</span><h2 class="pname">${esc(p.n)}</h2>
     <div class="pb" style="height:8px"><i style="width:${p.s*20}%;background:${T.c}"></i></div><p class="meta">Quy mô ${p.s}/5${p.in?` · thuộc ${esc(p.in)}`:''}</p>
     <p>${esc(p.d)}</p><div class="refs">${p.ch.map(chLink).join('')}</div>
-    <div class="actions"><button type="button" class="btn" data-v3dw="${wid}">← ${esc(short(w.name))}</button><a class="btn primary" href="#${S.id}--${wid}">Bản đồ vùng →</a></div>`;
+    <div class="actions"><button type="button" class="btn" data-v3dw="${wid}">← ${esc(short(w.name))}</button><a class="btn primary" href="#${S.id}--${wid}">Bản đồ vùng →</a></div>`);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-v3dw]');if(b)panel3D(b.dataset.v3dw)});
+/* Khung bên phải: có nút thu gọn (nhớ lựa chọn trên máy này) */
+const fold3D=()=>{try{return localStorage.getItem('v3dFold')==='1'}catch(e){return false}};
+function setPanel3D(title,html){const p=document.getElementById('v3dPanel'),f=fold3D();p.classList.toggle('folded',f);
+  p.innerHTML=`<button type="button" class="v3d-fold" data-v3dfold aria-expanded="${!f}"><span>${title}</span><i aria-hidden="true">${f?'▸ Mở':'▾ Thu gọn'}</i></button><div class="v3d-pbody">${html}</div>`;
+  p.querySelectorAll('svg[data-t]').forEach(s=>ICON[s.dataset.t](s,PTYPE[s.dataset.t].c))}
+/* Tổng quan: các thế giới theo tầng (bấm để bay tới) + các cảnh giới (bấm để làm nổi những thế giới có cảnh giới đó) */
 function panel3D(wid){
-  const p=document.getElementById('v3dPanel');
-  if(!wid){p.innerHTML=`<span class="eyebrow">Vũ trụ 3D</span><p class="meta">Bấm một thế giới để bay tới và xem chi tiết.</p><div class="v3d-legend">${[4,3,2,1].map(t=>`<div><i style="background:${t===4?'#f2c76e':'#8fd6ff'}"></i>Tầng ${t} · ${esc(S.tiers[t].name)} <b>${S.worlds.filter(w=>w.tier===t).length}</b></div>`).join('')}</div>`;return}
+  if(!wid){const R=V3D.realm,ri=R?RIDX[R]:-1,has=w=>{const[a,b]=rangeOf(w);return ri>=a&&ri<=b};
+    const worlds=[4,3,2,1].map(t=>`<div class="v3d-tier"><h4><i style="background:${t===4?'#f2c76e':'#8fd6ff'}"></i>Tầng ${t} · ${esc(S.tiers[t].name)}</h4><div class="v3d-wl">${
+      S.worlds.filter(w=>w.tier===t).map(w=>{const[a,b]=rangeOf(w),g=GBY[REALMS[b].g];return `<button type="button" class="wchip${R&&!has(w)?' dim':''}${R&&has(w)?' hit':''}" data-v3dgo="${w.id}" style="--c:${g.c}" title="${esc(REALMS[a].name)} → ${esc(REALMS[b].name)}"><b>${esc(short(w.name))}</b><span>${esc(REALMS[a].name)} → ${esc(REALMS[b].name)}</span></button>`}).join('')}</div></div>`).join('');
+    const realms=GROUPS.map(g=>{const rs=REALMS.map((r,i)=>({r,i})).filter(x=>x.r.g===g.id);if(!rs.length)return'';const open=rs.some(x=>x.r.id===R);
+      return `<details class="v3d-rg"${open?' open':''}><summary><i style="background:${g.c}"></i>${esc(g.name)}<b>${rs.length}</b></summary><div class="v3d-rl">${
+        rs.map(({r,i})=>`<button type="button" class="rchip" data-v3drealm="${r.id}" aria-pressed="${r.id===R}" style="--c:${g.c}"><span>${i+1}</span>${esc(r.name)}</button>`).join('')}</div></details>`}).join('');
+    const nHit=R?S.worlds.filter(has).length:0;
+    setPanel3D('Thế giới & cảnh giới',`<p class="meta">Bấm thế giới để bay tới. Bấm cảnh giới để xem những thế giới có cảnh giới đó.</p>
+      <section class="v3d-sec"><h3>Thế giới <span class="meta">${S.worlds.length}</span></h3>${worlds}</section>
+      <section class="v3d-sec"><h3>Cảnh giới <span class="meta">${REALMS.length} bậc</span></h3>${R?`<p class="v3d-hit">${esc(REALMS[ri].name)}: có ở ${nHit} thế giới <button type="button" class="linkish" data-v3drealm="">Bỏ chọn</button></p>`:''}${realms}</section>`);
+    // Làm mờ tên các đảo không có cảnh giới đang chọn
+    if(V3D.ready)Object.values(V3D.nodes).forEach(g=>{const t=g.userData.title;if(t)t.material.opacity=!R||has(byId[g.userData.wid])?1:.22});return}
   const w=byId[wid],[a,b]=rangeOf(w),tops=[...w.places].sort((x,y)=>y.s-x.s).slice(0,4);
-  p.innerHTML=`<span class="eyebrow">Tầng ${w.tier} · ${esc(S.tiers[w.tier].name)}</span><h2 class="pname">${esc(w.name)}</h2>
+  const ladder=REALMS.slice(a,b+1).map((r,k)=>({r,i:a+k})).reverse();
+  setPanel3D('Cảnh giới · '+esc(short(w.name)),`<div class="v3d-ladder"><span class="rb-range">${esc(REALMS[a].name)} → ${esc(REALMS[b].name)} · ${b-a+1} bậc</span>
+    <ol>${ladder.map(({r,i},k)=>`<li style="--c:${GBY[r.g].c}"><i></i><span class="n">${esc(r.name)}</span><span class="g">${esc(GBY[r.g].name)}</span><b>${i+1}</b></li>`).join('')}</ol></div>
+    <span class="eyebrow">Tầng ${w.tier} · ${esc(S.tiers[w.tier].name)}</span><h2 class="pname">${esc(w.name)}</h2>
     <div class="tiles"><div class="tile"><b>${w.places.length}</b><span>địa danh</span></div><div class="tile"><b>${b-a+1}</b><span>bậc cảnh giới</span></div></div>
-    <p class="meta">${esc(REALMS[a].name)} → ${esc(REALMS[b].name)}</p>
+
     ${tops.length?`<div class="power">${tops.map(x=>`<div class="pw"><svg viewBox="-16 -18 32 32" data-t="${x.t}" aria-hidden="true"></svg><span class="pn">${esc(x.n)}</span><span class="pb"><i style="width:${x.s*20}%;background:${PTYPE[x.t].c}"></i></span></div>`).join('')}</div>`:''}
-    <div class="actions"><button type="button" class="btn primary" data-v2d="open" data-wid="${wid}">Xem 2D phóng to</button><a class="btn" href="#${S.id}--${wid}">Trang thế giới →</a></div>`;
-  p.querySelectorAll('svg[data-t]').forEach(s=>ICON[s.dataset.t](s,PTYPE[s.dataset.t].c));
+    <div class="actions"><button type="button" class="btn" data-v3dall>← Tất cả</button><a class="btn" href="#${S.id}--${wid}">Trang thế giới →</a></div>`);
 }
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-v3dfold]')){const f=!fold3D();try{localStorage.setItem('v3dFold',f?'1':'0')}catch(x){}const p=document.getElementById('v3dPanel'),b=p.querySelector('.v3d-fold');
+    p.classList.toggle('folded',f);b.setAttribute('aria-expanded',!f);b.querySelector('i').textContent=f?'▸ Mở':'▾ Thu gọn';return}
+  const go=e.target.closest('[data-v3dgo]');if(go&&V3D.ready){select3D(go.dataset.v3dgo,true);return}
+  const rb=e.target.closest('[data-v3drealm]');if(rb){V3D.realm=rb.dataset.v3drealm&&rb.dataset.v3drealm!==V3D.realm?rb.dataset.v3drealm:null;panel3D(null);return}
+  if(e.target.closest('[data-v3dall]')&&V3D.ready){pivotTier('all');panel3D(null)}});
 function loop(t){
   if(!V3D.run)return;requestAnimationFrame(loop);
   const s=t/1000;
+  if(V3D.arc){const A=V3D.arc,k=Math.min(1,(t-A.start)/A.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,sp=new THREE.Spherical(A.s0.radius,A.s0.phi+A.dph*e,A.s0.theta+A.dth*e);
+    V3D.camera.position.copy(new THREE.Vector3().setFromSpherical(sp).add(A.t));if(k>=1)V3D.arc=null}
   if(fly){const k=Math.min(1,(t-fly.start)/fly.ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;V3D.camera.position.lerpVectors(fly.p0,fly.p1,e);V3D.controls.target.lerpVectors(fly.t0,fly.t1,e);if(k>=1)fly=null}
   Object.values(V3D.nodes).forEach(g=>{g.position.y=TIER_Y[byId[g.userData.wid].tier]+Math.sin(s*.8+g.userData.phase)*.6;g.traverse(o=>{if(o.userData.spin)o.rotation.y+=o.userData.spin*.01})});
   if(V3D.sel.visible){V3D.sel.rotation.z+=.01}
   V3D.piv.position.copy(V3D.controls.target);V3D.piv.scale.setScalar(Math.max(.6,V3D.camera.position.distanceTo(V3D.controls.target)/40));
   Object.values(V3D.nodes).forEach(g=>{const L=g.userData.labels;if(!L)return;const near=V3D.selWid?V3D.selWid===g.userData.wid:V3D.camera.position.distanceTo(g.position)<g.userData.R*3;
-    if(g.userData.lv!==near){g.userData.lv=near;L.forEach(l=>{l.visible=near&&!l.userData.minor})}
-    if(g.userData.title)g.userData.title.visible=!V3D.selWid;
+    // 3D chỉ hiện tên đại lục; tên khu vực xem trong bản đồ vùng (nút "Xem toàn cảnh")
+    if(g.userData.lv!==-1){g.userData.lv=-1;L.forEach(l=>{l.visible=false})}
+    if(g.userData.title)g.userData.title.visible=true;
     const D=g.userData.decor||(g.children[0]&&g.children[0].userData.decor);if(D){const show=V3D.selWid!==g.userData.wid;if(g.userData.dv!==show){g.userData.dv=show;D.forEach(d=>{d.visible=show})}}});
   V3D.flows.forEach(f=>{const u=(s*f.sp+f.o)%1;f.s.position.copy(f.curve.getPoint(u))});
   V3D.whs.forEach(w=>{w.children[0].rotation.z-=.02});V3D.belts.forEach(b=>{b.rotation.y+=b.userData.spin*.01});
@@ -423,8 +451,8 @@ document.addEventListener('click',e=>{const pv=e.target.closest('[data-pivot]');
   if(k==='rot'){V3D.controls.autoRotate=!V3D.controls.autoRotate;b.setAttribute('aria-pressed',V3D.controls.autoRotate)}
   else if(k==='reset')resetView();
   else if(k==='full'){const wrap=document.querySelector('.v3d-wrap');if(document.fullscreenElement)document.exitFullscreen();else if(wrap.requestFullscreen)wrap.requestFullscreen().catch(()=>{})}
-  else if(k==='top')flyTo(new THREE.Vector3(0,420,.1),new THREE.Vector3(0,40,0));
-  else if(k==='side')flyTo(new THREE.Vector3(0,62,300),new THREE.Vector3(0,62,0));});
+  else if(k==='top')flyTo(new THREE.Vector3(0,630,.1),new THREE.Vector3(0,60,0));
+  else if(k==='side')flyTo(new THREE.Vector3(0,93,450),new THREE.Vector3(0,93,0));});
 
 /* ===== Màn 2D phóng to: bấm một thế giới trong 3D → bay tới rồi mở bản đồ vùng toàn màn hình, phóng/kéo tự do ===== */
 const V2={wid:null,vb:null,timer:null};
@@ -458,3 +486,19 @@ function zoom2D(k,px,py){V2Z().zoom(k,px,py)}
 })();
 
 document.addEventListener('fullscreenchange',()=>{setTimeout(resize3D,50);const b=document.querySelector('[data-v3d="full"]');if(b)b.textContent=document.fullscreenElement?'Thoát toàn màn hình':'Toàn màn hình'});
+
+/* Xoay góc nhìn quanh tâm xoay hiện tại: dAz quanh trục đứng, dPol nghiêng lên/xuống; az/pol đặt hướng tuyệt đối */
+function orbit3D(dAz,dPol,abs){if(!V3D.ready)return;const c=V3D.camera,t=V3D.controls.target.clone(),sp=new THREE.Spherical().setFromVector3(c.position.clone().sub(t));
+  if(abs){if(abs.theta!==undefined)sp.theta=abs.theta;if(abs.phi!==undefined)sp.phi=abs.phi}
+  sp.theta+=dAz||0;sp.phi=Math.min(Math.PI-.06,Math.max(.06,sp.phi+(dPol||0)));
+  // Bay theo cung tròn (không cắt ngang qua tâm)
+  const s0=new THREE.Spherical().setFromVector3(c.position.clone().sub(t)),start=performance.now(),ms=650;fly=null;
+  V3D.controls.autoRotate=false;const rb=document.getElementById('v3dRot');if(rb)rb.setAttribute('aria-pressed','false');
+  let dth=sp.theta-s0.theta;dth=Math.atan2(Math.sin(dth),Math.cos(dth));
+  V3D.arc={s0,dth,dph:sp.phi-s0.phi,t,start,ms}}
+const ORB={left:[-Math.PI/4,0],right:[Math.PI/4,0],up:[0,-Math.PI/9],down:[0,Math.PI/9]};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-orb]');if(!b)return;const k=b.dataset.orb;
+  if(ORB[k])orbit3D(...ORB[k]);else if(k==='below')orbit3D(0,0,{phi:Math.PI-.35});
+  else{const th={S:0,E:Math.PI/2,N:Math.PI,W:-Math.PI/2}[k];orbit3D(0,0,{theta:th,phi:Math.PI/3})}});
+document.addEventListener('keydown',e=>{if(!V3D.run||document.getElementById('v3dView').hidden||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||(V2&&V2.wid))return;
+  const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'}[e.key];if(m){e.preventDefault();orbit3D(...ORB[m])}});

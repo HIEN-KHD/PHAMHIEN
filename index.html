@@ -67,6 +67,17 @@
         <button type="button" class="btn" data-v3d="reset">Góc ban đầu</button>
         <button type="button" class="btn" data-v3d="full">Toàn màn hình</button>
       </div>
+      <div class="v3d-orbit" role="group" aria-label="Xoay góc nhìn">
+        <button type="button" class="btn" data-orb="up" title="Nghiêng lên (↑)" aria-label="Nghiêng lên">↑</button>
+        <button type="button" class="btn" data-orb="left" title="Xoay trái 45° (←)" aria-label="Xoay trái">⟲</button>
+        <button type="button" class="btn" data-orb="right" title="Xoay phải 45° (→)" aria-label="Xoay phải">⟳</button>
+        <button type="button" class="btn" data-orb="down" title="Nghiêng xuống (↓)" aria-label="Nghiêng xuống">↓</button>
+        <button type="button" class="btn wide" data-orb="below" title="Nhìn từ dưới lên">Từ dưới</button>
+        <button type="button" class="btn" data-orb="N" title="Nhìn từ phía Bắc">B</button>
+        <button type="button" class="btn" data-orb="E" title="Nhìn từ phía Đông">Đ</button>
+        <button type="button" class="btn" data-orb="S" title="Nhìn từ phía Nam">N</button>
+        <button type="button" class="btn" data-orb="W" title="Nhìn từ phía Tây">T</button>
+      </div>
       <div class="v3d-pivots" role="group" aria-label="Tâm xoay">
         <span>Tâm xoay</span>
         <button type="button" class="btn" data-pivot="all" aria-pressed="true">Toàn vũ trụ</button>
@@ -75,6 +86,7 @@
         <button type="button" class="btn" data-pivot="2" aria-pressed="false">Tầng 2</button>
         <button type="button" class="btn" data-pivot="1" aria-pressed="false">Tầng 1</button>
       </div>
+      <button type="button" class="btn primary v3d-open2d" id="v3dOpen2d" data-v2d="open" hidden><span aria-hidden="true">⛰</span><span>Xem toàn cảnh<br><b></b></span></button>
       <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
     </div>
   </section>

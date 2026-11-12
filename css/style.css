@@ -304,3 +304,53 @@ svg .edge,svg .roads path{vector-effect:non-scaling-stroke}
 /* Địa danh nhỏ chỉ hiện khi phóng to */
 svg .place.minor{display:none}
 svg.lod-near .place.minor{display:inline}
+
+/* Khung phải của vũ trụ 3D: thu gọn được; danh sách thế giới theo tầng và cảnh giới */
+.v3d-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer;color:var(--gold);font:600 12px var(--body);letter-spacing:.12em;text-transform:uppercase;text-align:left}
+.v3d-fold i{font-style:normal;letter-spacing:0;text-transform:none;color:var(--muted);font-size:12px;white-space:nowrap}
+.v3d-fold:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+.v3d-pbody{display:flex;flex-direction:column;gap:10px}
+.v3d-panel.folded{width:auto;min-width:200px}
+.v3d-panel.folded .v3d-pbody{display:none}
+.v3d-sec h3{margin:4px 0 6px;font:600 14px var(--body);color:var(--ink);display:flex;gap:8px;align-items:baseline}
+.v3d-tier h4{margin:8px 0 4px;font:600 12px var(--body);color:var(--muted);display:flex;align-items:center;gap:6px}
+.v3d-tier h4 i,.v3d-rg summary i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.v3d-wl{display:flex;flex-direction:column;gap:4px}
+.wchip{display:grid;gap:1px;text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:8px;padding:5px 8px;color:var(--ink);cursor:pointer;font:500 13px var(--body)}
+.wchip b{font-weight:600}
+.wchip span{font-size:11px;color:var(--muted)}
+.wchip:hover{background:rgba(255,255,255,.09)}
+.wchip.dim{opacity:.32}
+.wchip.hit{border-color:var(--c);background:rgba(242,199,110,.1)}
+.v3d-rg{border-top:1px solid var(--line);padding:4px 0}
+.v3d-rg summary{cursor:pointer;display:flex;align-items:center;gap:8px;font:600 13px var(--body);color:var(--ink);padding:3px 0;list-style:none}
+.v3d-rg summary::-webkit-details-marker{display:none}
+.v3d-rg summary::after{content:'▸';margin-left:auto;color:var(--muted);font-size:11px}
+.v3d-rg[open] summary::after{content:'▾'}
+.v3d-rg summary b{color:var(--muted);font-weight:500;font-size:12px}
+.v3d-rl{display:flex;flex-wrap:wrap;gap:4px;padding:4px 0 2px}
+.rchip{display:inline-flex;align-items:center;gap:5px;font:500 12px var(--body);color:var(--ink);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:2px 9px 2px 3px;cursor:pointer}
+span.rchip{cursor:default}
+.rchip>span{min-width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;background:var(--c);color:#0a0b22}
+.rchip[aria-pressed="true"]{border-color:var(--c);background:rgba(255,255,255,.14)}
+.v3d-hit{margin:0 0 4px;font-size:13px;color:var(--gold)}
+
+/* Nút mở bản đồ vùng (bên trái, hiện khi đã chọn một thế giới) */
+.v3d-open2d{position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;text-align:left;padding:12px 16px;font-size:14px;line-height:1.25;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+.v3d-open2d>span:first-child{font-size:22px}
+.v3d-open2d b{font-weight:700}
+@media (max-width:720px){.v3d-open2d{top:auto;bottom:64px;transform:none}}
+/* Thang cảnh giới của thế giới đang chọn */
+.v3d-ladder{display:flex;flex-direction:column;gap:4px}
+.v3d-ladder .rb-range{font-size:12px;color:var(--muted)}
+.v3d-ladder ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.v3d-ladder li{display:grid;grid-template-columns:10px minmax(0,1fr) auto 22px;align-items:center;gap:8px;padding:4px 8px;border-radius:7px;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 22%,transparent),transparent);border-left:3px solid var(--c);font-size:13px}
+.v3d-ladder li i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.v3d-ladder li .g{font-size:11px;color:var(--muted)}
+.v3d-ladder li b{font-size:11px;color:var(--muted);text-align:right}
+
+/* Cụm nút xoay góc nhìn */
+.v3d-orbit{position:absolute;left:12px;bottom:56px;display:grid;grid-template-columns:repeat(4,34px);gap:5px}
+.v3d-orbit .btn{width:34px;height:34px;padding:0;justify-content:center;font-size:15px;background:rgba(8,9,30,.85)}
+.v3d-orbit .btn.wide{width:auto;grid-column:span 4;font-size:12px;height:28px}
+@media (max-width:720px){.v3d-orbit{bottom:auto;top:56px;grid-template-columns:repeat(4,30px)}.v3d-orbit .btn{width:30px;height:30px}}
