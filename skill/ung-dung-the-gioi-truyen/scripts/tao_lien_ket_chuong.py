@@ -1,7 +1,7 @@
 """Quét dữ liệu truyện, tìm mọi số chương được trích dẫn và tạo bảng liên kết tới trang chương.
 
 Cách dùng:  python tools/tao_lien_ket_chuong.py thai-co-long-tuong-quyet
-Kết quả:    js/truyen/<slug>.chuong.js  (const CH = {"số chương": "/đường-dẫn"})
+Kết quả:    js/truyen/<slug>.chuong.js  (CHAP[slug] = {"số chương": "/đường-dẫn"})
 """
 import glob, json, os, re, sys
 from chung import doc_danh_sach
@@ -32,7 +32,7 @@ def main():
             thieu.append(n)
     ra = os.path.join(GOC, "js", "truyen", slug + ".chuong.js")
     open(ra, "w", encoding="utf-8").write(
-        "/* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */\nconst CH=" + json.dumps(ch, ensure_ascii=False) + ";\n")
+        "/* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */\nvar CHAP=window.CHAP||(window.CHAP={});CHAP[" + json.dumps(slug) + "]=" + json.dumps(ch, ensure_ascii=False) + ";\n")
     print(f"{len(ch)} liên kết chương → {ra}" + (f"; không tìm thấy: {', '.join(thieu)}" if thieu else ""))
 
 

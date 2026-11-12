@@ -10,7 +10,7 @@ def tai(url, so_lan=3):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (thu-vien-truyen)"})
     for lan in range(so_lan):
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=90) as r:
                 return r.read().decode("utf-8", "replace")
         except Exception as e:  # noqa: BLE001
             if lan == so_lan - 1:

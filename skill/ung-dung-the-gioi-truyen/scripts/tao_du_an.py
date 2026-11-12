@@ -34,7 +34,11 @@ def main():
     tdir = os.path.join(dich, "js", "truyen")
     for f in os.listdir(tdir):
         if f.startswith(SLUG_MAU):
-            os.rename(os.path.join(tdir, f), os.path.join(tdir, slug + f[len(SLUG_MAU):]))
+            moi = os.path.join(tdir, slug + f[len(SLUG_MAU):])
+            os.rename(os.path.join(tdir, f), moi)
+            # CHAP['<slug>'], SIZES['<slug>'], id:'<slug>' trong dữ liệu cũng đổi theo
+            noi = open(moi, encoding="utf-8").read().replace(SLUG_MAU, slug)
+            open(moi, "w", encoding="utf-8").write(noi)
     p = os.path.join(dich, "index.html")
     s = open(p, encoding="utf-8").read().replace(SLUG_MAU, slug)
     open(p, "w", encoding="utf-8").write(s)

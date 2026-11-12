@@ -1,7 +1,11 @@
 /* ===== Trạng thái ===== */
+const HERO=()=>(S&&S.hero)||'Lâm Phong';
 let S,byId,adj,showAll=false,curWorld=null,curRealm=null;
 function useStory(id){
   S=STORIES.find(s=>s.id===id);if(!S)return false;
+  // Mỗi truyện có hệ cảnh giới riêng: thay nội dung GROUPS/REALMS/RIDX/GBY dùng chung
+  const rs=S.realmSet;if(rs&&REALMS!==rs.realms){GROUPS.length=0;GROUPS.push(...rs.groups);REALMS.length=0;REALMS.push(...rs.realms);
+    for(const k in RIDX)delete RIDX[k];REALMS.forEach((r,i)=>{RIDX[r.id]=i});for(const k in GBY)delete GBY[k];GROUPS.forEach(g=>{GBY[g.id]=g})}
   byId=Object.fromEntries(S.worlds.map(w=>[w.id,w]));
   adj=Object.fromEntries(S.worlds.map(w=>[w.id,[]]));S.links.forEach(([a,b])=>{adj[a].push(b);adj[b].push(a)});
   store.set('lastStory',id);return true;
@@ -45,9 +49,11 @@ function renderHome(){
   STORIES.forEach(st=>{
     const a=document.createElement('a');a.className='cover';a.href='#'+st.id;
     const c=el('svg',{viewBox:'0 0 300 400','aria-hidden':'true'});a.appendChild(c);coverArt(c,300,400,11);
-    [['sun',150,90,.8],['dragon',80,220,.7],['demon',225,225,.7],['start',150,330,.7]].forEach(([k,x,y,sc])=>ART[k](el('g',{transform:`translate(${x},${y}) scale(${sc})`},c)));
+    // Hình bìa lấy từ các thế giới của chính truyện đó (cao → thấp)
+    const ks=[...new Set([...st.worlds].sort((x,y)=>y.tier-x.tier).map(w=>w.kind))].filter(k=>ART[k]).slice(0,4);
+    [[150,90,.8],[80,220,.7],[225,225,.7],[150,330,.7]].forEach(([x,y,sc],i)=>{const k=ks[i]||ks[ks.length-1];if(k)ART[k](el('g',{transform:`translate(${x},${y}) scale(${sc})`},c))});
     const cap=document.createElement('div');cap.className='cap';
-    cap.innerHTML=`<span class="t">${esc(st.title)}</span><span class="meta">${esc(st.author)}</span><span class="meta">${st.worlds.length} thế giới · ${REALMS.length} cảnh giới</span>`;
+    cap.innerHTML=`<span class="t">${esc(st.title)}</span><span class="meta">${esc(st.author)}</span><span class="meta">${st.worlds.length} thế giới · ${(st.realmSet?st.realmSet.realms:REALMS).length} cảnh giới</span>`;
     a.appendChild(cap);shelf.appendChild(a);
   });
   const add=document.createElement('div');add.className='cover empty';
@@ -63,7 +69,7 @@ function showPreview(wid){
   const p=document.getElementById('preview');
   svgMap().querySelectorAll('.world').forEach(n=>n.classList.toggle('hl',n.dataset.id===wid));
   svgMap().querySelectorAll('.tunnel').forEach(n=>n.classList.toggle('on',!!wid&&(n.dataset.a===wid||n.dataset.b===wid)));
-  if(!wid){p.innerHTML=`<div class="sec"><span class="eyebrow">Xem trước</span><p>Rê chuột hoặc chạm vào một vùng trên bản đồ để xem nhanh. Bấm lần nữa để vào thế giới đó.</p></div><div class="sec"><h3>Gợi ý</h3><p class="meta">Hành trình bắt đầu ở ${esc(short(byId[S.start].name))}, góc dưới bản đồ. Đường hầm vàng dẫn ra ngoài Cửu Châu vũ trụ.</p></div>`;return}
+  if(!wid){p.innerHTML=`<div class="sec"><span class="eyebrow">Xem trước</span><p>Rê chuột hoặc chạm vào một vùng trên bản đồ để xem nhanh. Bấm lần nữa để vào thế giới đó.</p></div><div class="sec"><h3>Gợi ý</h3><p class="meta">Hành trình bắt đầu ở ${esc(short(byId[S.start].name))}, góc dưới bản đồ. Đường hầm vàng dẫn lên tầng cao hơn.</p></div>`;return}
   const w=byId[wid],[a,b]=rangeOf(w),steps=(route(S.start,wid)||[wid]).length-1;
   p.innerHTML=`<div class="sec"><span class="eyebrow">Tầng ${w.tier} · ${esc(S.tiers[w.tier].name)}</span><h2 class="pname">${esc(w.name)}</h2><p>${esc(w.about)}</p></div>
     <div class="stats"><div class="stat"><b>${steps}</b><span>bước từ khởi đầu</span></div><div class="stat"><b>${adj[wid].length}</b><span>đường hầm</span></div><div class="stat"><b>${b-a+1}</b><span>cảnh giới</span></div></div>
@@ -119,7 +125,7 @@ function renderLadder(w){
   const [a,b]=rangeOf(w),box=document.getElementById('ladder');
   document.getElementById('realmRange').textContent=w.rGuess
     ?`Từ ${REALMS[a].name} tới ${REALMS[b].name}. Ước lượng, vì chưa có chương nói rõ cảnh giới ở đây. Bấm một bậc để xem cách đột phá.`
-    :`Cảnh giới của Lâm Phong trong các chương ở thế giới này: ${REALMS[a].name} → ${REALMS[b].name}. Bấm một bậc để xem cách đột phá.`;
+    :`Cảnh giới của ${HERO()} trong các chương ở thế giới này: ${REALMS[a].name} → ${REALMS[b].name}. Bấm một bậc để xem cách đột phá.`;
   document.getElementById('towerBadge').innerHTML=w.rGuess?'<span class="badge guess">ước lượng</span>':'<span class="badge src">theo mốc chương</span>';
   const list=REALMS.map((r,i)=>({r,i})).filter(({i})=>showAll||(i>=a&&i<=b));
   const groups=[];list.forEach(x=>{const last=groups[groups.length-1];if(last&&last.g===x.r.g)last.items.push(x);else groups.push({g:x.r.g,items:[x]})});
@@ -144,7 +150,7 @@ function renderRealm(){
     <div class="sec"><span class="eyebrow" style="color:${G.c}">Bậc ${i+1}/${REALMS.length} · ${esc(G.name)}</span>
       <h2 class="rname">${esc(r.name)}<small>${esc(r.han)}</small></h2>
       <div class="flow">${prev?`<span>${esc(prev.name)}</span><span class="arrow" style="border:0;padding:0">→</span>`:''}<span class="me">${esc(r.name)}</span>${next?`<span class="arrow" style="border:0;padding:0">→</span><span>${esc(next.name)}</span>`:''}</div></div>
-    ${r.lf?`<p class="meta">Lâm Phong đạt cảnh giới này ở ${chLink(r.lf)}</p>`:''}
+    ${r.lf?`<p class="meta">${HERO()} đạt cảnh giới này ở ${chLink(r.lf)}</p>`:''}
     <div class="sec"><h3>Phân tầng ${tag(r.tLv)}</h3><p>${esc(r.lv)}</p>${levelViz(r,G.c)}</div>
     <div class="sec"><h3>Đặc điểm ${tag(r.tTrait)}</h3><p>${esc(r.trait)}</p></div>
     <div class="sec"><h3>Cách đột phá ${tag(r.tHow)}</h3>
@@ -172,11 +178,11 @@ function renderWorld(wid){
   requestAnimationFrame(()=>{if(!window.WZ)window.WZ=attachZoom(document.getElementById('wStage'),document.getElementById('scene'),{onChange:z=>{document.getElementById('mzLv').textContent=(Math.round(z.level()*10)/10)+'×'}});WZ.fit()});
   document.getElementById('dossier').innerHTML=
     `<figure class="quote" style="margin:0"><q>${esc(w.quote[0])}</q><figcaption class="meta">Nguyên văn bản convert, ${chLink(w.quote[1])}</figcaption></figure>`+
-    w.secs.map(([h,t,chs])=>`<section class="card clamp${h.startsWith('Lâm Phong')?' lp':''}" tabindex="0"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
+    w.secs.map(([h,t,chs])=>`<section class="card clamp${h.startsWith(HERO())?' lp':''}" tabindex="0"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
   const strong=[...w.places].sort((a,b)=>b.s-a.s)[0],nP=(S.people||[]).filter(p=>p.w.includes(wid)).length,nE=(S.journey||[]).filter(j=>j.w===wid).length;
   const tiles=[[w.places.length,'địa danh'],[hi-lo+1,'bậc cảnh giới'],[nP,'nhân vật'],[nE,'sự kiện'],[adj[wid].length,'đường hầm']];
   document.getElementById('wFacts').innerHTML=`<div class="tiles">${tiles.map(([v,k])=>`<div class="tile"><b>${v}</b><span>${k}</span></div>`).join('')}</div>
-    <p class="meta">${esc(w.type)} · ${w.tier===4?'Ngoài':'Trong'} Cửu Châu vũ trụ · ${esc(S.tiers[w.tier].name)}${strong?` · Mạnh nhất: <b style="color:var(--gold)">${esc(strong.n)}</b>`:''}</p>`;
+    <p class="meta">${esc(w.type)} · Tầng ${w.tier} · ${esc(S.tiers[w.tier].name)}${strong?` · Mạnh nhất: <b style="color:var(--gold)">${esc(strong.n)}</b>`:''}</p>`;
   const path=route(S.start,wid)||[wid],steps=path.length-1;
   document.getElementById('routeHead').textContent='Đường đi từ '+short(byId[S.start].name);
   let h='';path.forEach((p,i)=>{if(i){const up=linkType(path[i-1],p)==='up';h+=`<span class="arrow${up?' up':''}" aria-hidden="true">${up?'⇡':'→'}</span>`}h+=`<a class="chip${p===wid?' cur':''}" href="#${S.id}--${p}">${esc(short(byId[p].name))}</a>`});

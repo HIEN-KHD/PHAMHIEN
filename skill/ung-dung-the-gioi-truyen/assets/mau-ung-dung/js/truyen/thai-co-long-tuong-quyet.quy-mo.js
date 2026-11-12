@@ -1,5 +1,5 @@
 /* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */
-const PLACE_SIZE={
+var SIZES=window.SIZES||(window.SIZES={});SIZES["thai-co-long-tuong-quyet"]={
 "thienvo|Chân Võ quốc": 3,
 "thienvo|Thú Nhân Đế Quốc": 3,
 "thienvo|Cổ Man Quốc": 3,

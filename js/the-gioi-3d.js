@@ -294,10 +294,10 @@ function build3D(){
   // Tinh vân
   [['rgba(91,80,220,1)',[-150,80,-230],360],['rgba(40,110,200,1)',[200,-20,-180],300],['rgba(160,60,160,1)',[30,130,280],330]].forEach(([c,p,s])=>{const n=glowSprite(c,s,.28);n.position.set(...p);n.material.fog=false;scene.add(n)});
 
-  // Quả cầu Cửu Châu vũ trụ bao các tầng 1–3
+  // Quả cầu bao các tầng 1–3 (nhãn lấy từ S.ring.label của từng truyện)
   const shell=new THREE.Mesh(new THREE.SphereGeometry(SHELL.r,48,24),new THREE.MeshBasicMaterial({color:0x7b6cff,transparent:true,opacity:.05,side:THREE.BackSide,depthWrite:false}));shell.scale.set(1,SHELL.k,1);shell.position.y=SHELL.y;scene.add(shell);
   const shellW=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.SphereGeometry(SHELL.r,24,10)),new THREE.LineBasicMaterial({color:0x9b8cff,transparent:true,opacity:.12}));shellW.scale.copy(shell.scale);shellW.position.copy(shell.position);scene.add(shellW);
-  const sl=textSprite('CỬU CHÂU VŨ TRỤ','#d9d3ff',7);sl.position.set(0,SHELL.y+SHELL.r*SHELL.k+2,0);scene.add(sl);
+  const sl=textSprite(((S.ring&&S.ring.label)||'VŨ TRỤ').toUpperCase(),'#d9d3ff',7);sl.position.set(0,SHELL.y+SHELL.r*SHELL.k+2,0);scene.add(sl);
   // Mặt phẳng tầng
   [1,2,3,4].forEach(t=>{const ring=new THREE.Mesh(new THREE.RingGeometry(TIER_R[t]+RM[t]+2,TIER_R[t]+RM[t]+3,128),new THREE.MeshBasicMaterial({color:t===4?0xf2c76e:0x8fd6ff,transparent:true,opacity:.18,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=TIER_Y[t]-8;scene.add(ring);
     const lab=textSprite(`Tầng ${t} · ${S.tiers[t].name}`,t===4?'#f2c76e':'#8fd6ff',5);lab.position.set(-(TIER_R[t]+RM[t]+12),TIER_Y[t]-6,0);scene.add(lab)});
@@ -343,7 +343,7 @@ function build3D(){
 
   // Dấu tâm xoay hiện tại
   const piv=new THREE.Group();piv.add(new THREE.Mesh(new THREE.SphereGeometry(.35,16,12),glow('#ffffff')));piv.renderOrder=11;const pr=new THREE.Mesh(new THREE.RingGeometry(1.1,1.3,48),glow('#f2c76e',{transparent:true,opacity:.8,side:THREE.DoubleSide}));pr.rotation.x=-Math.PI/2;piv.add(pr);piv.add(glowSprite('rgba(255,230,160,1)',3,.7));scene.add(piv);
-  Object.assign(V3D,{renderer,scene,camera,controls,nodes,pick,flows,sel,W,H,piv,whs,belts,ready:true});reliefQueue();
+  Object.assign(V3D,{renderer,scene,camera,controls,nodes,pick,flows,sel,W,H,piv,whs,belts,ready:true,story:S.id});reliefQueue();
   resetView();
   // Bấm chọn (phân biệt với kéo xoay)
   const ray=new THREE.Raycaster(),mv=new THREE.Vector2();let down=null;
@@ -449,6 +449,8 @@ function loop(t){
 async function render3D(){
   setBar([['Thư viện','#thu-vien'],[S.title,'#'+S.id],['Vũ trụ 3D']],[['Bản đồ 2D','#'+S.id]]);
   const msg=document.getElementById('v3dMsg');msg.hidden=false;msg.textContent='Đang dựng vũ trụ 3D…';
+  // Đổi truyện thì dựng lại cả vũ trụ
+  if(V3D.ready&&V3D.story!==S.id){V3D.run=false;try{V3D.renderer.dispose()}catch(e){}V3D.ready=false;V3D.smokes=null;V3D.selWid=null;V3D.realm=null}
   try{await ensureThree();if(!V3D.ready)build3D();else resize3D();msg.hidden=true;V3D.run=true;requestAnimationFrame(loop);
     if(window.pend3D){const w=window.pend3D;window.pend3D=null;setTimeout(()=>select3D(w,true),150)}}
   catch(e){msg.textContent='Không mở được chế độ 3D trên thiết bị này (cần WebGL). Bạn vẫn xem được bản đồ 2D.';console.warn(e)}

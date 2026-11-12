@@ -475,4 +475,4 @@ const PLACES={
     ['gia','Trầm gia','Gia tộc đối đầu Lâm Phong trên Tam Nguyên Thượng Thanh đảo.',[11120],null,2]
   ]
 };
-STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||(typeof PLACE_SIZE!=='undefined'&&PLACE_SIZE[w.id+'|'+n])||2}))});
+STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||((window.SIZES&&SIZES['thai-co-long-tuong-quyet'])||{})[w.id+'|'+n]||2}))});

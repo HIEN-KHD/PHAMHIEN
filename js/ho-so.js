@@ -9,12 +9,12 @@ function renderInfo(tab){
   const b=document.getElementById('infoBody');
   if(tab==='nhan-vat'){
     document.getElementById('infoTitle').textContent='Nhân vật';
-    document.getElementById('infoSub').textContent=`${S.people.length} nhân vật quan trọng, chia theo quan hệ với Lâm Phong. Bấm thế giới để tới bản đồ, bấm số chương để đọc.`;
+    document.getElementById('infoSub').textContent=`${S.people.length} nhân vật quan trọng, chia theo quan hệ với ${HERO()}. Bấm thế giới để tới bản đồ, bấm số chương để đọc.`;
     b.innerHTML=Object.entries(PEOPLE_GROUPS).map(([g,gn])=>{const ps=S.people.filter(p=>p.g===g);if(!ps.length)return'';
       return `<section class="sec"><h2 class="h-sec">${gn} <span class="meta">${ps.length}</span></h2><div class="cards">${ps.map(p=>`<article class="card person clamp" tabindex="0">
         <div class="who"><span class="ava" style="--c:${GCOL[g]}">${esc(initials(p.n))}</span><h3>${esc(p.n)}</h3></div><p>${esc(p.d)}</p>${p.w.length?`<div class="chips">${p.w.map(worldChip).join('')}</div>`:''}${refs(p.ch)}</article>`).join('')}</div></section>`}).join('');
   }else if(tab==='hanh-trinh'){
-    document.getElementById('infoTitle').textContent='Hành trình của Lâm Phong';
+    document.getElementById('infoTitle').textContent='Hành trình của '+HERO();
     document.getElementById('infoSub').textContent=`${S.journey.length} mốc lớn từ chương 1 đến chương cuối: thế giới đặt chân tới, sự kiện, và cảnh giới đạt được.`;
     let prevW=null;
     b.innerHTML=realmChart()+`<ol class="tl">${S.journey.map(j=>{const w=byId[j.w],r=j.r?REALMS[RIDX[j.r]]:null,newW=j.w!==prevW;prevW=j.w;
@@ -22,7 +22,7 @@ function renderInfo(tab){
         <div class="tl-row"><span class="tl-ch">${chLink(j.ch)}</span><p>${esc(j.d)}</p>${r?`<span class="tl-r" style="--c:${GBY[r.g].c}">${esc(r.name)}</span>`:''}</div></li>`}).join('')}</ol>`;
   }else{
     document.getElementById('infoTitle').textContent='Công pháp & bảo vật';
-    document.getElementById('infoSub').textContent='Công pháp, huyết mạch, thần thông, thiên hỏa có xếp hạng và bảo vật chính của Lâm Phong.';
+    document.getElementById('infoSub').textContent='Công pháp, huyết mạch, thần thông, thiên hỏa có xếp hạng và bảo vật chính của '+HERO()+'.';
     b.innerHTML=Object.entries(ARTS_GROUPS).map(([g,gn])=>{let as=S.arts.filter(a=>a.g===g);if(!as.length)return'';if(g==='th')as=as.filter(a=>!a.rank);
       if(g==='th')as=[...as].sort((x,y)=>(x.rank||999)-(y.rank||999));
       return `<section class="sec"><h2 class="h-sec">${gn} <span class="meta">${as.length}</span></h2>${g==='th'?'<p class="meta">Thiên hỏa có thứ hạng. Truyện phân biệt thiên hỏa, địa hỏa và yêu hỏa (ch.175).</p>':''}<div class="cards">${as.map(a=>`<article class="card art clamp" tabindex="0">
@@ -37,20 +37,20 @@ const initials=n=>n.replace(/\(.*\)/,'').split(/\s+/).filter(Boolean).slice(-2).
 /* Biểu đồ tu vi theo chương: mỗi điểm là một lần đột phá, dải màu dưới là thế giới */
 function realmChart(){
   const pts=S.journey.filter(j=>j.r).map(j=>({x:+String(j.ch).replace('~',''),y:RIDX[j.r],r:REALMS[RIDX[j.r]],w:j.w}));
-  const W=1000,H=300,L=110,T=14,PW=W-L-20,PH=210,maxC=11220,maxR=REALMS.length-1;
+  const W=1000,H=300,L=110,T=14,PW=W-L-20,PH=210,maxC=S.chapters||11220,maxR=REALMS.length-1;
   const X=c=>L+c/maxC*PW,Y=i=>T+PH-i/maxR*PH;
   let s=`<figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ tu vi theo chương">`;
   GROUPS.forEach((g,gi)=>{const ids=REALMS.map((r,i)=>r.g===g.id?i:-1).filter(i=>i>=0);if(!ids.length)return;
     const y1=Y(Math.max(...ids)+.5),y2=Y(Math.min(...ids)-.5);
     s+=`<rect x="${L}" y="${y1}" width="${PW}" height="${y2-y1}" fill="${g.c}" opacity="${gi%2?.05:.1}"/><text x="${L-8}" y="${(y1+y2)/2+4}" class="ax" text-anchor="end" fill="${g.c}">${esc(g.name.replace(' & trên nữa',''))}</text>`});
-  [0,2000,4000,6000,8000,10000].forEach(c=>{s+=`<line x1="${X(c)}" x2="${X(c)}" y1="${T}" y2="${T+PH}" class="grid"/><text x="${X(c)}" y="${T+PH+16}" class="ax" text-anchor="middle">ch.${c||1}</text>`});
+  (()=>{const st=maxC>6000?2000:maxC>2500?500:maxC>1000?200:100,a=[];for(let c=0;c<=maxC;c+=st)a.push(c);return a})().forEach(c=>{s+=`<line x1="${X(c)}" x2="${X(c)}" y1="${T}" y2="${T+PH}" class="grid"/><text x="${X(c)}" y="${T+PH+16}" class="ax" text-anchor="middle">ch.${c||1}</text>`});
   let segs=[],cur=null;S.journey.forEach(j=>{const c=+String(j.ch).replace('~','');if(!cur||cur.w!==j.w){cur={w:j.w,a:c,b:c};segs.push(cur)}else cur.b=c});
   segs.forEach((sg,i)=>{const nx=segs[i+1]?+String(segs[i+1].a):maxC,x1=X(sg.a),x2=X(nx),wd=byId[sg.w];
     s+=`<a href="#${S.id}--${sg.w}"><rect x="${x1}" y="${T+PH+24}" width="${Math.max(2,x2-x1-1)}" height="16" rx="3" fill="${TERR_COLORS[(wd?wd.tier:0)%TERR_COLORS.length]}" opacity=".75"><title>${esc(wd?wd.name:sg.w)}: ch.${sg.a}–${nx}</title></rect>${x2-x1>70?`<text x="${(x1+x2)/2}" y="${T+PH+36}" class="seg" text-anchor="middle">${esc(short(wd?wd.name:''))}</text>`:''}</a>`});
   s+=`<path d="${pts.map((p,i)=>(i?`H${X(p.x)}V${Y(p.y)}`:`M${X(p.x)},${Y(p.y)}`)).join('')}H${X(maxC)}" fill="none" stroke="#f2c76e" stroke-width="2.5"/>`;
   pts.forEach(p=>{s+=`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="4.5" fill="${GBY[p.r.g].c}" stroke="#0a0b22" stroke-width="1.5"><title>${esc(p.r.name)} · ch.${p.x}</title></circle>`});
   const last=pts[pts.length-1];if(last)s+=`<text x="${X(last.x)-6}" y="${Y(last.y)-10}" class="ax" text-anchor="end" fill="#f2c76e">${esc(last.r.name)}</text>`;
-  return s+`</svg><figcaption class="meta">Đường vàng: cảnh giới Lâm Phong theo chương (rê chuột vào điểm để xem). Dải màu dưới: thế giới đang ở, bấm để mở bản đồ.</figcaption></figure>`;
+  return s+`</svg><figcaption class="meta">Đường vàng: cảnh giới ${HERO()} theo chương (rê chuột vào điểm để xem). Dải màu dưới: thế giới đang ở, bấm để mở bản đồ.</figcaption></figure>`;
 }
 /* Bảng thiên hỏa có thứ hạng: thanh càng dài thì hạng càng cao */
 function flameBars(){

@@ -90,9 +90,17 @@ const REALMS=[R(id, nhóm, tên, chữ Hán, 'số trọng thiên', 'đặc đi�
 
 ## 5. File tạo tự động (không sửa tay)
 
-- `<slug>.chuong.js`: `const CH={"số chương":"/đường-dẫn"}` — `python tools/tao_lien_ket_chuong.py <slug>` quét mọi số chương trong dữ liệu.
-- `<slug>.quy-mo.js`: `const PLACE_SIZE={"thếgiới|tên":quy mô}` — `python tools/tinh_quy_mo.py <slug>` (đếm số lần xuất hiện trong tên chương ×3 và trong chương đã tải). Chạy lại khi bộ chương tải về thay đổi nhiều; quy mô ghi tay trong `dia-danh.js` luôn thắng.
+- `<slug>.chuong.js`: `CHAP['<slug>']={"số chương":"/đường-dẫn"}` — `python tools/tao_lien_ket_chuong.py <slug>` quét mọi số chương trong dữ liệu.
+- `<slug>.quy-mo.js`: `SIZES['<slug>']={"thếgiới|tên":quy mô}` — `python tools/tinh_quy_mo.py <slug>` (đếm số lần xuất hiện trong tên chương ×3 và trong chương đã tải). Chạy lại khi bộ chương tải về thay đổi nhiều; quy mô ghi tay trong `dia-danh.js` luôn thắng.
 
-## 6. Thứ tự nạp trong `index.html`
+## 6. Nhiều truyện trong một ứng dụng
+
+Truyện đầu tiên khai báo `const STORIES=[{…}]`. Truyện thêm sau viết trong một hàm tự chạy và gọi `STORIES.push({...})`, kèm:
+- `hero:'Tên nhân vật chính'`, `chapters:<số chương>` (biểu đồ tu vi, nhãn "… tại đây");
+- `realmSet:{groups,realms}` — hệ cảnh giới riêng (dùng hàm `R()` của `canh-gioi.js`); khi chọn truyện, ứng dụng thay `GROUPS/REALMS/RIDX/GBY`;
+- `ring:{…,label}` — nhãn vòng bao trên bản đồ thế giới và trong 3D.
+Địa danh/hồ sơ gắn thẳng vào truyện đó: `STORIES.find(s=>s.id==='<slug>').worlds.forEach(w=>{w.places=…})`, `.people/.journey/.arts`. Link chương nằm ở `CHAP['<slug>']`, quy mô ở `SIZES['<slug>']` (hai công cụ tự tạo đúng dạng này). Ví dụ đầy đủ: `js/truyen/than-vo-chien-vuong.*.js` trong repo mẫu.
+
+## 7. Thứ tự nạp trong `index.html`
 
 `canh-gioi.js` → `<slug>.js` → `.chuong.js` → `.quy-mo.js` → `.dia-danh.js` → `.ho-so.js` → `tien-ich.js` → `hinh-ve.js` → `dia-hinh.js` → `ban-do-vung.js` → `thu-phong.js` → `ho-so.js` → `the-gioi-3d.js` → `app.js`. Thêm file mới thì thêm thẻ `<script>` đúng chỗ; `tools/build.py` gộp theo các thẻ này.

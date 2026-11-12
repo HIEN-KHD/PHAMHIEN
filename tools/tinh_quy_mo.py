@@ -40,7 +40,7 @@ def main():
         if t in ("quoc", "vung"): s = max(s, 3)
         out[f"{cur}|{n}"] = min(5, s)
     ra = os.path.join(GOC, "js", "truyen", slug + ".quy-mo.js")
-    open(ra, "w", encoding="utf-8").write("/* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */\nconst PLACE_SIZE=" + json.dumps(out, ensure_ascii=False, indent=0) + ";\n")
+    open(ra, "w", encoding="utf-8").write("/* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */\nvar SIZES=window.SIZES||(window.SIZES={});SIZES[" + json.dumps(slug) + "]=" + json.dumps(out, ensure_ascii=False, indent=0) + ";\n")
     from collections import Counter
     print(f"{len(out)} địa danh → {ra}; phân bố:", dict(sorted(Counter(out.values()).items())))
 
