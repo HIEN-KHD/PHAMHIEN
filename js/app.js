@@ -164,7 +164,7 @@ function renderWorld(wid){
   const w=byId[wid];curWorld=wid;
   const [lo,hi]=rangeOf(w);const saved=store.get(`realm:${S.id}:${wid}`);curRealm=saved&&saved in RIDX?saved:REALMS[lo].id;
   const order=S.worlds.map(x=>x.id),k=order.indexOf(wid),pw=byId[order[(k-1+order.length)%order.length]],nw=byId[order[(k+1)%order.length]];
-  setBar([['Thư viện','#thu-vien'],[S.title,'#'+S.id],[short(w.name)]],[['← '+short(pw.name),`#${S.id}--${pw.id}`],[short(nw.name)+' →',`#${S.id}--${nw.id}`]]);
+  setBar([['Thư viện','#thu-vien'],[S.title,'#'+S.id],[short(w.name)]],[['← '+short(pw.name),`#${S.id}--${pw.id}`],['Xem 3D',`#${S.id}--3d`],[short(nw.name)+' →',`#${S.id}--${nw.id}`]]);
   document.getElementById('wTier').textContent=`Tầng ${w.tier} · ${S.tiers[w.tier].name} · ${w.type}`;
   document.getElementById('wName').textContent=w.name;
   document.getElementById('wAbout').textContent=w.about;
@@ -203,5 +203,6 @@ function router(){
   }else{show('vHome');renderHome()}
   window.scrollTo(0,0);
 }
+document.addEventListener('click',e=>{const a=e.target.closest('a[href$="--3d"]');if(a&&curWorld&&!document.getElementById('vWorld').hidden)window.pend3D=curWorld});
 window.addEventListener('hashchange',router);
 router();

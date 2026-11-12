@@ -87,6 +87,16 @@ function worldModel(w,R){
   return g;
 }
 
+/* Cột sáng các thế lực mạnh nhất trên mặt đảo: cột cao/dày theo quy mô, màu theo loại */
+function beacons(grp,w,R){
+  const k=w.kind;if(k==='sun'||k==='galaxy')return;
+  const tops=[...w.places].sort((a,b)=>b.s-a.s).slice(0,5),baseY=k==='heaven'?1.7:k==='nine'?.7:.4,rad=k==='abyss'?R*1.08:R*.58;
+  tops.forEach((p,i)=>{const a=i/tops.length*Math.PI*2+.4,x=Math.cos(a)*rad,z=Math.sin(a)*rad,h=.5+p.s*.5,c=PTYPE[p.t].c;
+    const col=new THREE.Mesh(new THREE.CylinderGeometry(.06+p.s*.018,.09+p.s*.02,h,8),mat(c,{emissive:hex(c),emissiveIntensity:.55,flatShading:false}));col.position.set(x,baseY+h/2,z);grp.add(col);
+    const orb=new THREE.Mesh(new THREE.SphereGeometry(.12+p.s*.03,12,10),glow(c));orb.position.set(x,baseY+h+.12,z);grp.add(orb);
+    if(p.s>=4){const gsp=glowSprite('rgba(255,215,120,1)',.9+p.s*.2,.7);gsp.position.copy(orb.position);grp.add(gsp)}});
+}
+
 function build3D(){
   const host=document.getElementById('v3d');host.innerHTML='';
   const W=host.clientWidth||900,H=Math.round(Math.max(420,Math.min(700,window.innerHeight*.72)));
@@ -118,8 +128,9 @@ function build3D(){
   [1,2,3,4].forEach(t=>{const ws=S.worlds.filter(w=>w.tier===t).sort((a,b)=>Math.atan2(a.y-600,a.x-410)-Math.atan2(b.y-600,b.x-410));
     ws.forEach((w,i)=>{const a=-Math.PI/2+i*2*Math.PI/ws.length+(t%2?0:Math.PI/ws.length),R=1.5+Math.min(1.4,w.places.length/14);
       const grp=worldModel(w,R);grp.position.set(Math.cos(a)*TIER_R[t],TIER_Y[t],Math.sin(a)*TIER_R[t]);grp.userData={wid:w.id,R,phase:i*1.7+t};
+      beacons(grp,w,R);
       grp.traverse(o=>{if(o.isMesh||o.isPoints)o.userData.wid=w.id});scene.add(grp);
-      const lab=textSprite(short(w.name),t===4?'#f2c76e':'#ffffff',1);lab.center.set(.5,0);lab.position.set(0,(w.kind==='sun'?R*1.1:w.kind==='tree'?3.9:R*.55)+.6,0);grp.add(lab);
+      const lab=textSprite(short(w.name),t===4?'#f2c76e':'#ffffff',1);lab.center.set(.5,0);lab.material.depthTest=false;lab.renderOrder=10;lab.position.set(0,(w.kind==='sun'?R*1.1:w.kind==='tree'?3.9:R*.55)+.6,0);grp.add(lab);
       const hit=new THREE.Mesh(new THREE.SphereGeometry(R*1.5,10,8),new THREE.MeshBasicMaterial({visible:false}));hit.userData.wid=w.id;grp.add(hit);pick.push(hit);
       nodes[w.id]=grp})});
 
@@ -180,7 +191,8 @@ function loop(t){
 async function render3D(){
   setBar([['Thư viện','#thu-vien'],[S.title,'#'+S.id],['Vũ trụ 3D']],[['Bản đồ 2D','#'+S.id]]);
   const msg=document.getElementById('v3dMsg');msg.hidden=false;msg.textContent='Đang dựng vũ trụ 3D…';
-  try{await ensureThree();if(!V3D.ready)build3D();else resize3D();msg.hidden=true;V3D.run=true;requestAnimationFrame(loop)}
+  try{await ensureThree();if(!V3D.ready)build3D();else resize3D();msg.hidden=true;V3D.run=true;requestAnimationFrame(loop);
+    if(window.pend3D){const w=window.pend3D;window.pend3D=null;setTimeout(()=>select3D(w,true),150)}}
   catch(e){msg.textContent='Không mở được chế độ 3D trên thiết bị này (cần WebGL). Bạn vẫn xem được bản đồ 2D.';console.warn(e)}
 }
 function stop3D(){V3D.run=false}
