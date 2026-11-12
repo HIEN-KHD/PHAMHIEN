@@ -34,8 +34,8 @@ function renderHome(){
       <h1>${esc(s.title)}</h1>
       <span class="meta">${esc(s.author)} · ${esc(s.genre)} · <a class="chref" href="${s.source}" target="_blank" rel="noopener">đọc truyện</a></span>
       <p class="sub">${esc(s.sub)}</p>
-      <div class="stats"><div class="stat"><b>${s.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${s.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${REALMS.length}</b><span>cảnh giới</span></div></div>
-      <div class="actions"><a class="btn primary" href="#${s.id}">Mở bản đồ thế giới →</a><a class="btn" href="#${s.id}--${s.start}">Vào ${esc(short(byId[s.start].name))}</a></div>
+      <div class="stats"><div class="stat"><b>${s.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${s.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${REALMS.length}</b><span>cảnh giới</span></div><div class="stat"><b>${(s.people||[]).length}</b><span>nhân vật</span></div></div>
+      <div class="actions"><a class="btn primary" href="#${s.id}">Mở bản đồ thế giới →</a><a class="btn" href="#${s.id}--hanh-trinh">Hành trình</a><a class="btn" href="#${s.id}--nhan-vat">Nhân vật</a><a class="btn" href="#${s.id}--cong-phap">Công pháp</a></div>
     </div><a class="feature-art" href="#${s.id}" aria-label="Mở bản đồ ${esc(s.title)}"></a>`;
   const sv=el('svg',{viewBox:'0 0 560 420',preserveAspectRatio:'xMidYMid slice','aria-hidden':'true'});f.querySelector('.feature-art').appendChild(sv);
   coverArt(sv,560,420,5);
@@ -72,7 +72,7 @@ function showPreview(wid){
 }
 const svgMap=()=>document.getElementById('map');
 function renderMap(){
-  setBar([['Thư viện','#thu-vien'],[S.title]],[['Vào '+short(byId[S.start].name),`#${S.id}--${S.start}`]]);
+  setBar([['Thư viện','#thu-vien'],[S.title]],[['Nhân vật',`#${S.id}--nhan-vat`],['Hành trình',`#${S.id}--hanh-trinh`],['Công pháp',`#${S.id}--cong-phap`]]);
   document.getElementById('storyTitle').textContent=S.title;
   const ups=S.links.filter(l=>l[2]==='up').length;
   document.getElementById('stats').innerHTML=`<div class="stat"><b>${S.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${S.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${ups}</b><span>lối lên cấp cao</span></div>`;
@@ -181,7 +181,7 @@ function renderWorld(wid){
   const ups=path.slice(1).filter((p,i)=>linkType(path[i],p)==='up').length;
   document.getElementById('wRouteMeta').textContent=steps?`${steps} lần qua đường hầm${ups?`, trong đó ${ups} lần lên cấp cao hơn`:''}.`:'Đây là nơi hành trình bắt đầu.';
   document.getElementById('wNear').innerHTML=adj[wid].map(n=>`<a class="chip${linkType(wid,n)==='up'?' gold':''}" href="#${S.id}--${n}">${esc(short(byId[n].name))}</a>`).join('');
-  renderLadder(w);renderRealm();renderRealmBadge(w);
+  renderLadder(w);renderRealm();renderRealmBadge(w);renderWorldExtras(wid);
 }
 
 document.getElementById('realmBadge').addEventListener('click',e=>{const b=e.target.closest('[data-realm]');if(!b)return;curRealm=b.dataset.realm;store.set(`realm:${S.id}:${curWorld}`,curRealm);renderRealm();if(window.matchMedia('(max-width:720px)').matches)document.getElementById('realmPanel').scrollIntoView({behavior:'smooth',block:'start'})});
@@ -190,11 +190,12 @@ document.getElementById('realmPanel').addEventListener('click',e=>{const b=e.tar
 document.getElementById('toggleAll').addEventListener('click',()=>{showAll=!showAll;renderLadder(byId[curWorld]);renderRealm()});
 
 /* ===== Điều hướng theo #hash ===== */
-function show(v){['vHome','vMap','vWorld'].forEach(id=>document.getElementById(id).hidden=id!==v)}
+function show(v){['vHome','vMap','vWorld','vInfo'].forEach(id=>document.getElementById(id).hidden=id!==v)}
 function router(){
   const [sid,wid]=decodeURIComponent(location.hash.slice(1)).split('--');
   if(sid&&useStory(sid)){
-    if(wid&&byId[wid]){showAll=false;show('vWorld');renderWorld(wid)}
+    if(INFO_TABS.some(x=>x[0]===wid)){show('vInfo');renderInfo(wid)}
+    else if(wid&&byId[wid]){showAll=false;show('vWorld');renderWorld(wid)}
     else{show('vMap');renderMap()}
   }else{show('vHome');renderHome()}
   window.scrollTo(0,0);
