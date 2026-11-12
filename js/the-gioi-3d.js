@@ -205,20 +205,20 @@ function marker3D(p,c){
   return g;
 }
 /* Vẽ lãnh địa, đường nối các thành/tông môn, và nền quảng trường dưới mỗi thế lực lên tấm bản đồ mặt đảo */
-function paintFactions(P,w,pos,X,Z,FS){
+function paintFactions(P,w,pos,X,Z,FS,real){
   const{ctx:x,N}=P,s=N/1024,C=(bx,by)=>P.toC(X(bx),Z(by)),seed=w.id.length*131+w.y;x.save();outlinePath(P);x.clip();
   w.places.forEach((p,i)=>{const Q=pos.get(p);if(!Q||!Q.terr)return;const c=TERR_COLORS[Q.ci%TERR_COLORS.length],pts=blobPts(Q.bx,Q.by,Q.rx,Q.ry,seed+i*17+5,.1,22).map(([a,b])=>C(a,b));
     const path=()=>{x.beginPath();pts.forEach(([u,v],j)=>j?x.lineTo(u,v):x.moveTo(u,v));x.closePath()};
-    path();x.fillStyle=isWaterName(p.n)?'rgba(42,111,184,.55)':/băng/i.test(p.n)?'rgba(232,244,255,.8)':c+'40';x.fill();
+    if(!real){path();x.fillStyle=isWaterName(p.n)?'rgba(42,111,184,.55)':/băng/i.test(p.n)?'rgba(232,244,255,.8)':c+'40';x.fill()}else{path();x.fillStyle=c+'14';x.fill()}
     path();x.lineWidth=12*s;x.strokeStyle='rgba(10,11,34,.35)';x.stroke();
-    path();x.lineWidth=(4+p.s)*s;x.strokeStyle=c;x.setLineDash([22*s,9*s,5*s,9*s]);x.stroke();x.setLineDash([])});
+    path();x.lineWidth=(real?2+p.s*.5:4+p.s)*s;x.strokeStyle=real?c+'cc':c;x.setLineDash([22*s,9*s,5*s,9*s]);x.stroke();x.setLineDash([])});
   const hubs=w.places.map(p=>[p,pos.get(p)]).filter(([p,Q])=>Q&&!Q.terr&&['thanh','tong','quoc','gia'].includes(p.t)).map(([p,Q])=>C(Q.x,Q.y));
   if(hubs.length>1){const inT=[hubs[0]],rest=hubs.slice(1);x.lineCap='round';
     while(rest.length){let bi=0,bj=0,bd=1e9;rest.forEach((b,i)=>inT.forEach((a,j)=>{const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d<bd){bd=d;bi=i;bj=j}}));const a=inT[bj],b=rest[bi];
       const mx=(a[0]+b[0])/2+(a[1]-b[1])*.12,my=(a[1]+b[1])/2+(b[0]-a[0])*.12;
-      [[14,'rgba(60,40,20,.35)'],[8,'#e9d6a0']].forEach(([lw,c])=>{x.lineWidth=lw*s;x.strokeStyle=c;x.beginPath();x.moveTo(a[0],a[1]);x.quadraticCurveTo(mx,my,b[0],b[1]);x.stroke()});
+      (real?[[5,'rgba(60,40,20,.35)'],[2.6,'rgba(214,196,150,.85)']]:[[14,'rgba(60,40,20,.35)'],[8,'#e9d6a0']]).forEach(([lw,c])=>{x.lineWidth=lw*s;x.strokeStyle=c;x.beginPath();x.moveTo(a[0],a[1]);x.quadraticCurveTo(mx,my,b[0],b[1]);x.stroke()});
       inT.push(b);rest.splice(bi,1)}}
-  w.places.forEach(p=>{const Q=pos.get(p);if(!Q||Q.terr)return;const[u,v]=C(Q.x,Q.y),c=PTYPE[p.t].c,rr=(.75+p.s*.17)*(p.minor?.24:.36)*FS/(2*P.S)*N*.62;
+  if(!real)w.places.forEach(p=>{const Q=pos.get(p);if(!Q||Q.terr)return;const[u,v]=C(Q.x,Q.y),c=PTYPE[p.t].c,rr=(.75+p.s*.17)*(p.minor?.24:.36)*FS/(2*P.S)*N*.62;
     x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.arc(u+3*s,v+3*s,rr*.85,0,7);x.fill();x.fillStyle=c+'38';x.beginPath();x.arc(u,v,rr*.85,0,7);x.fill();
     x.lineWidth=2.5*s;x.strokeStyle=c+'aa';x.stroke()});
   x.restore();P.tex.needsUpdate=true;
@@ -232,17 +232,25 @@ function factions3D(grp,w,R,pick){
   const FS=Math.max(1,R/2.4),LS=Math.sqrt(FS)*.9,labels=[];grp.userData.labels=labels;const sv=[...w.places].map(p=>p.s).sort((a,b)=>b-a),cut=nP>10?sv[Math.min(sv.length-1,7)]:0;
   if(k==='sun'||k==='galaxy'){const disc=new THREE.Mesh(new THREE.RingGeometry(R*1.3,spread*1.08,64),new THREE.MeshBasicMaterial({color:k==='sun'?0xf2b54a:0x5b6cff,transparent:true,opacity:.12,side:THREE.DoubleSide,depthWrite:false}));disc.rotation.x=-Math.PI/2;disc.position.y=baseY;grp.add(disc)}
   if(grp.userData.paint)paintFactions(grp.userData.paint,w,pos,X,Z,FS);
+  // Trường địa hình thật cho đảo (dùng chung thuật toán bản đồ 2D); vẽ dần sau khi mở 3D, xem relief3D()
+  if(grp.userData.paint&&typeof reliefField==='function'){const P=grp.userData.paint,K=1000/P.N,toM=(x,z)=>{const[u,v]=P.toC(x,z);return[u*K,v*K]},sea=k==='sea'||k==='isles';
+    const shape='M'+P.out.map(([x,z])=>toM(x,z).map(n=>n.toFixed(1)).join(',')).join('L')+'Z',sc=1000/(2*P.S);
+    const spots=w.places.map(p=>[p,pos.get(p)]).filter(([p,Q])=>Q&&(!Q.terr||sea)&&!(Q.terr&&isWaterName(p.n))).map(([p,Q])=>{
+      if(Q.terr){const[cx,cy]=toM(X(Q.bx),Z(Q.by));return{x:cx,y:cy,rx:Q.rx/box.rx*spread*sc*.92,ry:Q.ry/box.ry*spread*sc*.92}}
+      const[x,y]=toM(X(Q.x),Z(Q.y));return{x,y,r:Q.minor?16:24,t:p.t}});
+    const half=R*sc;grp.userData.F3=reliefField(w,shape,{cx:500,cy:500,rx:half*.85,ry:half*.85},spots,sea,1000,1000);
+    grp.userData.facArgs=[w,pos,X,Z,FS];grp.userData.lift=[]}
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P)return;
     if(P.terr){const c=TERR_COLORS[P.ci%TERR_COLORS.length];
       const sx=P.rx/box.rx*spread,sz=P.ry/box.ry*spread,cx=X(P.bx),cz=Z(P.by),ht=.08+p.s*.03;
       const zone=new THREE.Mesh(new THREE.CylinderGeometry(1,1.04,ht,48),grp.userData.paint?new THREE.MeshBasicMaterial({visible:false}):mat(c,{transparent:true,opacity:.55,flatShading:false,emissive:hex(c),emissiveIntensity:.15}));
       zone.scale.set(sx,1,sz);zone.position.set(cx,baseY+ht/2,cz);grp.add(zone);
       const np=Math.round(6+(sx+sz)*2);for(let j=0;j<np;j++){const a=j/np*Math.PI*2,post=new THREE.Mesh(new THREE.CylinderGeometry(.03*FS,.04*FS,.26*FS,5),mat(c,{emissive:hex(c),emissiveIntensity:.6}));
-        post.position.set(cx+Math.cos(a)*sx,baseY+ht+.16*FS,cz+Math.sin(a)*sz);grp.add(post)}
+        post.position.set(cx+Math.cos(a)*sx,baseY+ht+.16*FS,cz+Math.sin(a)*sz);grp.add(post);post.userData.post=true;if(grp.userData.lift)grp.userData.lift.push([post,post.position.x,post.position.z,.11*FS])}
       const lb=textSprite(p.n.toUpperCase(),c,(.3+p.s*.035)*LS);lb.center.set(.5,0);lb.position.set(X(P.x),baseY+.15,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
       zone.userData={wid:w.id,pi:i};pick.push(zone);return}
-    const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*(p.minor?.24:.36));m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);
-    const hit=new THREE.Mesh(new THREE.SphereGeometry((.35+p.s*.07)*FS,8,6),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(X(P.x),baseY+.35*FS,Z(P.y));hit.userData={wid:w.id,pi:i};grp.add(hit);pick.push(hit);
+    const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*(p.minor?.24:.36));m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);if(grp.userData.lift)grp.userData.lift.push([m,X(P.x),Z(P.y),0]);
+    const hit=new THREE.Mesh(new THREE.SphereGeometry((.35+p.s*.07)*FS,8,6),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(X(P.x),baseY+.35*FS,Z(P.y));if(grp.userData.lift)grp.userData.lift.push([hit,X(P.x),Z(P.y),.35*FS]);hit.userData={wid:w.id,pi:i};grp.add(hit);pick.push(hit);
     const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut||p.minor;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.34+p.s*.065)*FS*(p.minor?.75:1),Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
   });
 }
@@ -335,7 +343,7 @@ function build3D(){
 
   // Dấu tâm xoay hiện tại
   const piv=new THREE.Group();piv.add(new THREE.Mesh(new THREE.SphereGeometry(.35,16,12),glow('#ffffff')));piv.renderOrder=11;const pr=new THREE.Mesh(new THREE.RingGeometry(1.1,1.3,48),glow('#f2c76e',{transparent:true,opacity:.8,side:THREE.DoubleSide}));pr.rotation.x=-Math.PI/2;piv.add(pr);piv.add(glowSprite('rgba(255,230,160,1)',3,.7));scene.add(piv);
-  Object.assign(V3D,{renderer,scene,camera,controls,nodes,pick,flows,sel,W,H,piv,whs,belts,ready:true});
+  Object.assign(V3D,{renderer,scene,camera,controls,nodes,pick,flows,sel,W,H,piv,whs,belts,ready:true});reliefQueue();
   resetView();
   // Bấm chọn (phân biệt với kéo xoay)
   const ray=new THREE.Raycaster(),mv=new THREE.Vector2();let down=null;
@@ -369,7 +377,7 @@ function pivotTier(t){const k=Math.max(1,1.35/V3D.camera.aspect);V3D.selWid=null
 function resetView(){V3D.selWid=null;open2DBtn(null);const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,93*k,225*k);V3D.controls.target.set(0,78,0);V3D.sel.visible=false;fly=null;panel3D(null)}
 function open2DBtn(wid){const b=document.getElementById('v3dOpen2d');if(!b)return;b.hidden=!wid;if(wid){b.dataset.wid=wid;b.querySelector('b').textContent=short(byId[wid].name)}}
 function select3D(wid,zoom){
-  V3D.selWid=wid;open2DBtn(wid);
+  V3D.selWid=wid;open2DBtn(wid);clearTimeout(V3D.relT);V3D.relT=setTimeout(()=>{const g=V3D.nodes[wid];if(g&&V3D.selWid===wid)try{relief3D(g,896)}catch(e){console.warn(e)}},1250);
   const g=V3D.nodes[wid];if(!g)return;const R=g.userData.R;
   V3D.sel.visible=true;V3D.sel.scale.setScalar(R*1.35);V3D.sel.position.copy(g.position).add(new THREE.Vector3(0,-.3,0));
   if(zoom){const dir=g.position.clone().setY(0).normalize();if(!dir.lengthSq())dir.set(0,0,1);const sp=byId[wid].kind==='sun'||byId[wid].kind==='galaxy'?1.45:1;flyTo(g.position.clone().add(dir.multiplyScalar((R*1.05+1.5)*sp)).add(new THREE.Vector3(0,(R*2.45+3)*sp,0)),g.position.clone().add(new THREE.Vector3(0,.3,0)));V3D.controls.autoRotate=false;document.getElementById('v3dRot').setAttribute('aria-pressed','false')}
@@ -430,8 +438,8 @@ function loop(t){
   Object.values(V3D.nodes).forEach(g=>{const L=g.userData.labels;if(!L)return;const near=V3D.selWid?V3D.selWid===g.userData.wid:V3D.camera.position.distanceTo(g.position)<g.userData.R*3;
     // 3D chỉ hiện tên đại lục; tên khu vực xem trong bản đồ vùng (nút "Xem toàn cảnh")
     if(g.userData.lv!==-1){g.userData.lv=-1;L.forEach(l=>{l.visible=false})}
-    if(g.userData.title)g.userData.title.visible=true;
-    const D=g.userData.decor||(g.children[0]&&g.children[0].userData.decor);if(D){const show=V3D.selWid!==g.userData.wid;if(g.userData.dv!==show){g.userData.dv=show;D.forEach(d=>{d.visible=show})}}});
+    if(g.userData.title){const T=g.userData.title;if(!T.userData.s0)T.userData.s0=T.scale.clone();const k=V3D.selWid===g.userData.wid?.38:1;if(T.userData.k!==k){T.userData.k=k;T.scale.copy(T.userData.s0).multiplyScalar(k)}T.visible=!V3D.selWid||V3D.selWid===g.userData.wid}
+    const D=g.userData.decor||(g.children[0]&&g.children[0].userData.decor);if(D){const show=!g.userData.realistic&&V3D.selWid!==g.userData.wid;if(g.userData.dv!==show){g.userData.dv=show;D.forEach(d=>{d.visible=show})}}});
   V3D.flows.forEach(f=>{const u=(s*f.sp+f.o)%1;f.s.position.copy(f.curve.getPoint(u))});
   V3D.whs.forEach(w=>{w.children[0].rotation.z-=.02});V3D.belts.forEach(b=>{b.rotation.y+=b.userData.spin*.01});
   if(!V3D.smokes){V3D.smokes=[];V3D.scene.traverse(o=>{if(o.userData.smoke)V3D.smokes.push(o)})}
@@ -504,3 +512,20 @@ document.addEventListener('keydown',e=>{if(!V3D.run||document.getElementById('v3
   const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'}[e.key];if(m){e.preventDefault();orbit3D(...ORB[m])}});
 
 foldify(document.querySelector('.v3d-orbit'),'orbit','Xoay');foldify(document.querySelector('.v3d-pivots'),'pivots','Tâm xoay');foldify(document.querySelector('.v3d-ctrl'),'ctrl','Góc nhìn');
+
+/* Mặt đảo chân thật: ảnh địa hình (độ cao, đổ bóng, rừng, sông hồ, ruộng) + lưới nổi khối theo độ cao.
+   Vẽ dần từng đảo sau khi mở 3D (res 512), đảo đang chọn vẽ lại nét hơn (res 896). */
+function relief3D(grp,res){const F=grp.userData.F3;if(!F||(grp.userData.relRes||0)>=res)return;grp.userData.relRes=res;
+  const P=grp.userData.paint,R=grp.userData.R/G,cv=reliefPaint(F,0,0,1000,1000,res,res);
+  const P2=Object.assign({},P,{ctx:cv.getContext('2d'),N:res,toC:(x,z)=>[(x/(2*P.S)+.5)*res,(z/(2*P.S)+.5)*res],tex:{}});
+  if(grp.userData.facArgs)paintFactions(P2,...grp.userData.facArgs,true);
+  const tex=new THREE.CanvasTexture(cv);tex.anisotropy=8;
+  const H=(x,z)=>{const u=(x/(2*P.S)+.5)*1000,v=(z/(2*P.S)+.5)*1000;if(F.dist(u,v)<=.5)return .36;return .37+(Math.max(F.lv,F.elev(u,v))-F.lv)*R*.42};
+  if(!grp.userData.relMesh){const seg=110,g=new THREE.PlaneGeometry(2*P.S,2*P.S,seg,seg);g.rotateX(-Math.PI/2);const pa=g.attributes.position;
+    for(let i=0;i<pa.count;i++)pa.setY(i,H(pa.getX(i),pa.getZ(i)));g.computeVertexNormals();
+    const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:tex,color:0xd6d6d6,alphaTest:.5,roughness:.95,metalness:0,flatShading:false}));m.userData.wid=grp.userData.wid;grp.add(m);grp.userData.relMesh=m;
+    (grp.userData.lift||[]).forEach(([o,x,z,dy])=>{o.position.y=H(x,z)+dy-.02;if(o.userData.post)o.visible=false});grp.userData.realistic=true;grp.userData.dv=undefined}
+  else{const old=grp.userData.relMesh.material.map;grp.userData.relMesh.material.map=tex;grp.userData.relMesh.material.needsUpdate=true;if(old)old.dispose()}
+}
+function reliefQueue(){if(!V3D.ready)return;const q=Object.values(V3D.nodes).filter(g=>g.userData.F3&&!g.userData.relRes).sort((a,b)=>a.position.distanceTo(V3D.camera.position)-b.position.distanceTo(V3D.camera.position));
+  const step=()=>{if(!V3D.ready)return;if(!V3D.run){setTimeout(step,600);return}const g=q.shift();if(!g)return;try{relief3D(g,512)}catch(e){console.warn(e)}setTimeout(step,80)};setTimeout(step,700)}

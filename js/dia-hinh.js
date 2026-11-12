@@ -15,6 +15,7 @@ const RPAL={
   tree:{deep:'#2a6a8a',water:'#6fc0e0',beach:'#e6f2e0',dry:'#bfe0c8',low:'#9fd0b0',wet:'#7fc0a0',forest:'#4f8f76',high:'#9ab0a6',rock:'#8a9a94',snow:'#ffffff'},
   ruins:{deep:'#2a4a6a',water:'#5a8ab8',beach:'#cfc8b0',dry:'#a8a890',low:'#8a9a78',wet:'#6a8466',forest:'#46604a',high:'#8a8a92',rock:'#70727e',snow:'#eef0f6'}};
 RPAL.sea=RPAL.isles=RPAL.start;
+RPAL.heaven={deep:'#6f9ad8',water:'#9dc0ee',beach:'#eef3ff',dry:'#f2f5fc',low:'#e8eef9',wet:'#dde5f3',forest:'#d3dcee',high:'#f7f9ff',rock:'#c9d1e3',snow:'#ffffff'};
 ['start','nine','dragon','gate','ruins','waste','sea','isles','tree'].forEach(k=>{RPAL[k].farm=1});
 function vnoise(seed){
   const r=rng(seed),P=new Uint8Array(512),V=new Float32Array(256);
@@ -28,11 +29,11 @@ const sstep=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-
 
 /* Trường địa hình của một thế giới: hàm độ cao/độ ẩm theo toạ độ bản đồ (1000×640), dùng chung cho ảnh nền và các mảnh phóng to.
    w: thế giới; shape: chuỗi path SVG của khối đất; box: khung bản đồ; spots: [{x,y,r} | {x,y,rx,ry}] chỗ cần đất bằng/nổi lên */
-function reliefField(w,shape,box,spots,sea){
+function reliefField(w,shape,box,spots,sea,MW=1000,MH=640){
   const pal=RPAL[w.kind]||RPAL.start,C={};Object.keys(pal).forEach(k=>{if(typeof pal[k]==='string')C[k]=hexRGB(pal[k])});
   const seed=w.id.length*977+w.x*13+w.y,n1=vnoise(seed),n2=vnoise(seed+1),n3=vnoise(seed+2),n4=vnoise(seed+3);
   // Khoảng cách tới bờ (lưới thô, nội suy song tuyến)
-  const q=4,GW=Math.ceil(1000/q),GH=Math.ceil(640/q),mc=document.createElement('canvas');mc.width=GW;mc.height=GH;const mx=mc.getContext('2d');
+  const q=4,GW=Math.ceil(MW/q),GH=Math.ceil(MH/q),mc=document.createElement('canvas');mc.width=GW;mc.height=GH;const mx=mc.getContext('2d');
   mx.scale(1/q,1/q);mx.fill(new Path2D(shape));const md=mx.getImageData(0,0,GW,GH).data,D=new Float32Array(GW*GH);
   for(let i=0;i<GW*GH;i++)D[i]=md[i*4+3]>127?1e6:0;
   const pass=(xs,ys,dx,dy)=>{for(let y of ys)for(let x of xs){const i=y*GW+x;if(!D[i])continue;let m=D[i];
@@ -59,7 +60,7 @@ function reliefField(w,shape,box,spots,sea){
     return e};
   // Thành, gia tộc, tông môn: quanh đó có ruộng và nhà (chỉ ở thế giới có đồng ruộng)
   const towns=pal.farm?spots.filter(s=>s.t&&['thanh','quoc','gia','tong'].includes(s.t)).map((s,i)=>{const R=s.t==='thanh'||s.t==='quoc'?70:48,a=hash2(s.x,s.y)*Math.PI;return{x:s.x,y:s.y,R,R2:R*R,ca:Math.cos(a),sa:Math.sin(a),big:s.t==='thanh'||s.t==='quoc'}}):[];
-  return{w,shape,box,sea,pal,C,n2,n4,elev,towns,moist:(x,y)=>fbm(n2,x/220,y/220,4),dist,lv:sea?.5:.2,seed};
+  return{w,shape,box,sea,pal,C,n2,n4,elev,towns,MW,MH,moist:(x,y)=>fbm(n2,x/220,y/220,4),dist,lv:sea?.5:.2,seed};
 }
 const FIELD=[[150,172,82],[188,180,98],[122,152,70],[206,192,118],[98,138,62],[170,160,90]];
 const hash2=(x,y)=>{const h=Math.sin(x*12.9898+y*78.233)*43758.5453;return h-Math.floor(h)};
@@ -98,9 +99,9 @@ function reliefPaint(F,x0,y0,vw,vh,W,H){
 }
 /* Sông: bắt đầu ở chỗ cao, đi theo hướng dốc nhất tới bờ hoặc hồ. Trả về đường (vẽ bằng SVG cho sắc nét khi phóng to) và chỗ thác đổ. */
 function reliefRivers(F){
-  const{box,lv,n2}=F,r=rng(F.seed+9),inside=(x,y)=>F.dist(x,y)>1.5,at=(x,y)=>x<0||y<0||x>1000||y>640||!inside(x,y)?-1:F.elev(x,y);
+  const{box,lv,n2}=F,r=rng(F.seed+9),inside=(x,y)=>F.dist(x,y)>1.5,at=(x,y)=>x<0||y<0||x>F.MW||y>F.MH||!inside(x,y)?-1:F.elev(x,y);
   const falls=[],rivers=[],cand=[];for(let t=0;t<600;t++){const x=box.cx+(r()*2-1)*box.rx,y=box.cy+(r()*2-1)*box.ry,e=at(x,y);if(e>.6)cand.push([x,y,e])}
-  cand.sort((a,b)=>b[2]-a[2]);const src=[];cand.forEach(c=>{if(src.length<(F.sea?0:4)&&src.every(s=>Math.hypot(s[0]-c[0],s[1]-c[1])>140))src.push(c)});
+  cand.sort((a,b)=>b[2]-a[2]);const src=[];cand.forEach(c=>{if(src.length<(F.sea||F.w.kind==='heaven'?0:4)&&src.every(s=>Math.hypot(s[0]-c[0],s[1]-c[1])>140))src.push(c)});
   src.forEach(([x0,y0])=>{let x=x0,y=y0;const pts=[[x,y]],st=6;let prev=null;
     for(let s=0;s<260;s++){const e=at(x,y);if(e<0||e<lv)break;let best=null;
       for(let a=0;a<16;a++){const ang=a/16*Math.PI*2;if(prev!==null&&Math.cos(ang-prev)<-.2)continue;const nx=x+Math.cos(ang)*st,ny=y+Math.sin(ang)*st,ne=at(nx,ny);const v=ne<0?-1:ne+(n2(nx/40,ny/40)-.5)*.02;

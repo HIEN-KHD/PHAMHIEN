@@ -176,14 +176,14 @@ function renderRegion(w,opt){
   const pos=layoutPlaces(w.places,box,avoid);
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   // Địa hình chân thật (ảnh sinh theo độ cao) cho lục địa và biển đảo; chỗ có thành/tông môn được san bằng
-  const real=(mode==='land'||mode==='sea')&&typeof reliefMap==='function'&&!!document.createElement('canvas').getContext;
+  const real=(mode==='land'||mode==='sea'||mode==='cloud')&&typeof reliefMap==='function'&&!!document.createElement('canvas').getContext;
   const rel=real?reliefMap(w,shape,box,w.places.map(p=>[p,pos.get(p)]).filter(([p,P])=>P&&(!P.terr||(mode==='sea'&&!isWaterName(p.n)))).map(([p,P])=>P.terr?{x:P.bx,y:P.by,rx:P.rx*.92,ry:P.ry*.92}:{x:P.x,y:P.y,r:mode==='sea'?34:(P.minor?28:42),t:p.t}),mode==='sea'):null;
   if(mode==='land'||mode==='cloud'){
     if(mode==='land'){
       el('path',{d:`M${box.cx-box.rx*.96},${box.cy+12} Q${box.cx-box.rx*.6},${box.cy+box.ry+70} ${box.cx-box.rx*.12},${box.cy+box.ry+125} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'url(#rock)'},land);
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
-    if(rel){el('path',{d:shape,fill:'#3b2e24',transform:'translate(0,12)'},land);el('path',{d:shape,fill:'#2a2019',opacity:.6,transform:'translate(0,6)'},land);
+    if(rel){el('path',{d:shape,fill:mode==='cloud'?'#aab8dc':'#3b2e24',transform:'translate(0,12)'},land);el('path',{d:shape,fill:mode==='cloud'?'#c8d2ee':'#2a2019',opacity:.6,transform:'translate(0,6)'},land);
       el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);el('g',{class:'detail'},land);riversSVG(land,rel,w);
       // Thác nước nơi sông chảy ra mép đảo phía trước
       rel.falls.filter(([x,y])=>y>box.cy).forEach(([x,y],k)=>{const h=70+k*25,id='fall'+sfx+k;
