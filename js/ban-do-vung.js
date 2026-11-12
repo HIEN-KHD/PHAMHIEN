@@ -218,7 +218,8 @@ function renderRegion(w){
     bindOpen(g,()=>go(`${S.id}--${n}`));
   });
   renderPlaceLists(w);applyFilter();
-  selectPlace(null,true);
+  const first=w.places.map((p,i)=>({p,i})).filter(x=>x.p.t!=='quoc'&&x.p.t!=='vung').sort((a,b)=>b.p.s-a.p.s)[0];
+  selectPlace(first?first.i:null,true);
 }
 
 function renderPlaceLists(w){
