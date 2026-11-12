@@ -22,7 +22,7 @@ const PLACES={
     ['gia','Thái cổ Khương gia','Có những phương thuốc do một vị Thánh Tổ truyền lại. Lão tổ Khương Hoàn về sau trấn giữ Trung Châu.',[318,'~1327']],
     ['thanh','Nhật Nguyệt thành','Một trong thập đại cổ thành của đông quận Thần Châu, ngang hàng Thiên Thánh thành, có thượng cổ thế lực tọa trấn, là thánh địa tu luyện.',[45,204]],
     ['hiem','Huyết Yêu sơn','Hơn một ngàn yêu ma do một con Hấp Huyết Ma Bức cầm đầu. Mây máu bao phủ, dơi máu tuần tra, nhiều thôn trấn xung quanh bị tàn sát.',[40]],
-    ['hiem','Lôi Đao bí cảnh','Nơi giết người không cần lý do. Cơ duyên lớn nhất là "hướng lên trời đoạt mệnh năm năm". Lâm Phong đột phá Võ Vương ở đây.',[568,602]],
+    ['hiem','Lôi Đao bí cảnh','Nơi giết người không cần lý do. Cơ duyên lớn nhất là "hướng lên trời đoạt mệnh năm năm". Lâm Phong đột phá Võ Vương ở đây.',[568,602],null,3],
     ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa, giúp tăng thực lực mạnh mẽ nhưng dược tính quá cuồng bạo.',[45,49]]
   ],
   tamthien:[
@@ -40,7 +40,7 @@ const PLACES={
     ['gia','Tần gia','Thái cổ thế gia của Tần Mộ Bạch, siêu cấp thiên kiêu cao cấp nhất ba ngàn châu, giỏi đàn cổ.',[279,'~1279']],
     ['thanh','Nộ Phủ thành','Nơi Lâm Phong gặp lại vị đoán tạo sư thần bí và bị Hoàng Phủ Sùng chặn đường.',['~881']],
     ['quoc','Dục Vọng quốc độ','Nắm toàn bộ Đông Hải và một phần Nam Hải.',['~1571','~1574'],'Đông Hải thế giới'],
-    ['tong','Tử Quang thánh địa','Một trong những thế lực xưa nhất ba ngàn châu, bá chủ hải ngoại ở Đông Hải. Tương truyền từng có người tu tới Thần cảnh.',[279],'Đông Hải thế giới'],
+    ['tong','Tử Quang thánh địa','Một trong những thế lực xưa nhất ba ngàn châu, bá chủ hải ngoại ở Đông Hải. Tương truyền từng có người tu tới Thần cảnh.',[279],'Đông Hải thế giới',4],
     ['toc','Đông Hải Long Cung','Thế lực mạnh nhất Đông Hải, cùng Hải tộc tồn tại thật dù ngoại giới chỉ biết qua truyền thuyết. Có Tà Long tam thái tử.',[691,'~1226'],'Đông Hải thế giới'],
     ['dao','Thần Bằng đảo','Đảo Yêu tộc của Thiên Bằng Thánh Vương, cùng Liệt Diễm Đảo và Kim Ô đảo.',[691,'~1203'],'Đông Hải thế giới'],
     ['hiem','Thiên kiếp yêu cảnh','Bí cảnh có cơ duyên, lối vào được tam hoàng tử mở ra.',['~915','~921']],
@@ -76,7 +76,7 @@ const PLACES={
     ['tong','Vạn Hoa Lâu','Có thánh nữ Diệu Khả Nhi, có phân nhánh ở Thiên Võ đại lục.',[1987]],
     ['toc','Kim Ô tộc','Yêu tộc có lãnh địa và đất phong hầu. Tộc trưởng rèn luyện các con để chọn người kế vị.',[1902,5642]],
     ['toc','Hắc Lân tộc','Tộc giao nhân hùng mạnh.',['~1641']],
-    ['toc','Cổ Thần Tộc','Có một vị đại đế từ thời viễn cổ tọa trấn Cửu Châu, mạnh hơn Tà Hình Đại Đế rất nhiều.',[2734,2739]],
+    ['toc','Cổ Thần Tộc','Có một vị đại đế từ thời viễn cổ tọa trấn Cửu Châu, mạnh hơn Tà Hình Đại Đế rất nhiều.',[2734,2739],null,4],
     ['toc','Huyết Dực Thiên Lang tộc','Chủng tộc có một tôn đại đế giáng lâm Cửu Châu.',[2734],'Nam Tiên Hải Vực'],
     ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực'],
     ['tong','Hồng Trần Tiên Tông','Tiên tông gắn với Hồng Trần Tiên Tôn; nơi Lâm Phong gặp lại cố nhân. Cửu Châu có thập đại tiên tông.',[1929,'~1672']],
@@ -287,4 +287,4 @@ const PLACES={
     ['tong','Vĩnh Sinh hoàng tộc','Tám hoàng gia của Vĩnh sinh chi môn; con trai vĩnh sinh chi chủ là Cơ Tương Thiên.',[10612,10683]]
   ]
 };
-STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn])=>({t,n,d,ch,in:inn||null}))});
+STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||(typeof PLACE_SIZE!=='undefined'&&PLACE_SIZE[w.id+'|'+n])||2}))});

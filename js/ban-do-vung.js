@@ -59,10 +59,20 @@ function terrain(g,mode,base,box,seed){
   if(mode==='land'||mode==='void'){
     for(let i=0;i<7;i++){const[x,y]=pick(.7);el('ellipse',{cx:x,cy:y,rx:50+R()*70,ry:22+R()*30,fill:shade(base,R()>.5?.12:-.18),opacity:.5,filter:'url(#soft)'},g)}
     if(mode==='land'){
-      const riv=el('path',{d:'',fill:'none',stroke:'#7cc4ff','stroke-width':2.2,opacity:.55,'stroke-linecap':'round'},g);
-      const[x0,y0]=pick(.5);riv.setAttribute('d',`M${x0},${y0} q${60+R()*40},${30+R()*30} ${130+R()*60},${10+R()*30} t${120+R()*60},${40+R()*30}`);
-      for(let i=0;i<22;i++){const[x,y]=pick(.82),s=7+R()*9;poly(g,`${x-s},${y} ${x},${y-s*1.3} ${x+s},${y}`,shade(base,-.32),{opacity:.75});poly(g,`${x},${y-s*1.3} ${x+s},${y} ${x+s*.15},${y}`,shade(base,-.5),{opacity:.6})}
-      for(let i=0;i<40;i++){const[x,y]=pick(.85);el('circle',{cx:x,cy:y,r:2.2+R()*2.4,fill:shade(base,-.28),opacity:.7},g)}
+      // Rừng: từng cụm cây
+      for(let k=0;k<7;k++){const[cx,cy]=pick(.72);for(let i=0;i<16;i++){const x=cx+(R()-.5)*90,y=cy+(R()-.5)*40;if(!inside(x,y,.85))continue;
+        el('circle',{cx:x,cy:y+1.5,r:3.4+R()*2,fill:'#000',opacity:.18},g);el('circle',{cx:x,cy:y,r:3+R()*2.2,fill:shade(base,-.32-R()*.12)},g)}}
+      // Dãy núi: các đỉnh nối nhau theo một đường cong, đỉnh phủ tuyết
+      for(let k=0;k<3;k++){let[x,y]=pick(.6);const dx=(R()>.5?1:-1)*(14+R()*8),dy=(R()-.5)*8;
+        for(let i=0;i<9;i++){x+=dx;y+=dy+(R()-.5)*8;if(!inside(x,y,.82))break;const s=10+R()*10,h=s*1.5;
+          poly(g,`${x-s},${y} ${x},${y-h} ${x+s},${y}`,shade(base,-.38));poly(g,`${x},${y-h} ${x+s},${y} ${x+s*.2},${y}`,shade(base,-.55),{opacity:.8});
+          poly(g,`${x-s*.32},${y-h*.68} ${x},${y-h} ${x+s*.32},${y-h*.68} ${x+s*.12},${y-h*.6} ${x-s*.1},${y-h*.64}`,'#f4f6ff',{opacity:.9})}}
+      // Sông: từ vùng núi chảy ra mép lục địa, rộng dần
+      for(let k=0;k<2;k++){const[x0,y0]=pick(.35),a=R()*Math.PI*2,L=box.rx*.95;let d=`M${x0},${y0}`,x=x0,y=y0;
+        for(let i=1;i<=6;i++){const nx=x0+Math.cos(a)*L*i/6+(R()-.5)*30,ny=y0+Math.sin(a)*L*.5*i/6+(R()-.5)*20;d+=` Q${(x+nx)/2+(R()-.5)*30},${(y+ny)/2+(R()-.5)*20} ${nx},${ny}`;x=nx;y=ny}
+        el('path',{d,fill:'none',stroke:'#5aa9e6','stroke-width':3.2,opacity:.7,'stroke-linecap':'round'},g);el('path',{d,fill:'none',stroke:'#a8dcff','stroke-width':1.2,opacity:.8},g)}
+      // Hồ
+      for(let k=0;k<2;k++){const[x,y]=pick(.6);el('path',{d:blob(x,y,18+R()*16,8+R()*6,Math.floor(R()*999),.2,12),fill:'#4f9fe0',stroke:'#cfeaff','stroke-width':1.2,opacity:.85},g)}
     }else{for(let i=0;i<50;i++){const[x,y]=pick(.9);el('circle',{cx:x,cy:y,r:1+R()*2,fill:R()>.5?'#ff8a3a':'#ffc04a',opacity:.6+R()*.4},g)}}
   }else if(mode==='sea'){
     for(let i=0;i<34;i++){const[x,y]=pick(.85),w=12+R()*16;el('path',{d:`M${x},${y} q${w/2},-5 ${w},0 t${w},0`,fill:'none',stroke:'#a8dcff','stroke-width':1.4,opacity:.45},g)}
@@ -83,41 +93,43 @@ function terrain(g,mode,base,box,seed){
 const ANCHORS={1:[[0,0]],2:[[-.45,0],[.45,0]],3:[[-.48,-.3],[.48,-.3],[0,.42]],4:[[-.45,-.38],[.45,-.38],[-.45,.4],[.45,.4]],
   5:[[0,0],[-.58,-.4],[.58,-.4],[-.58,.42],[.58,.42]],6:[[-.56,-.4],[0,-.45],[.56,-.4],[-.56,.42],[0,.45],[.56,.42]],
   7:[[0,0],[-.6,-.42],[0,-.55],[.6,-.42],[-.6,.42],[0,.55],[.6,.42]]};
-const markRect=(x,y,name)=>{const w=Math.max(44,name.length*7.7+10);return[x-w/2,y-21,x+w/2,y+36]};
-const labelRect=(x,y,name)=>{const w=name.length*11.5+24;return[x-w/2,y-16,x+w/2,y+8]};
+// Quy mô 1–5 quyết định cỡ biểu tượng, cỡ chữ và độ rộng chiếm chỗ
+const SZ=s=>({r:12+s*2.6,fs:11+s,ic:.6+s*.1});
+const markRect=(x,y,name,s=2)=>{const z=SZ(s),w=Math.max(z.r*2+8,name.length*z.fs*.6+10);return[x-w/2,y-z.r-5,x+w/2,y+z.r+z.fs+8]};
+const labelRect=(x,y,name,s=3)=>{const fs=12+s*1.6,w=name.length*fs*.78+24;return[x-w/2,y-fs,x+w/2,y+fs*.5]};
 const hit=(a,b,m=6)=>a[0]<b[2]+m&&b[0]<a[2]+m&&a[1]<b[3]+m&&b[1]<a[3]+m;
 function layoutPlaces(places,box,avoid){
   const out=new Map(),rects=avoid.map(a=>a.slice()),terr=places.filter(p=>(p.t==='quoc'||p.t==='vung')&&!p.in);
   const n=terr.length,A=ANCHORS[Math.min(n,7)]||[];
   terr.forEach((p,i)=>{let[ax,ay]=A[i]||[Math.cos(i*2.4)*.6,Math.sin(i*2.4)*.5];const x=box.cx+ax*box.rx,y=box.cy+ay*box.ry;
-    let X=x,Y=y,L=labelRect(X,Y,p.n);
-    for(let k=0;k<12&&rects.some(r=>hit(L,r));k++){X-=24;Y+=10;L=labelRect(X,Y,p.n)}
+    let X=x,Y=y,L=labelRect(X,Y,p.n,p.s);
+    for(let k=0;k<12&&rects.some(r=>hit(L,r));k++){X-=24;Y+=10;L=labelRect(X,Y,p.n,p.s)}
     out.set(p,{x:X,y:Y,terr:true,ci:i,L});rects.push(L)});
   const cand=[];for(let gy=-.95;gy<=.95;gy+=.07)for(let gx=-.96;gx<=.96;gx+=.035){
     if(gx*gx+gy*gy*1.02>.92)continue;cand.push([box.cx+gx*box.rx,box.cy+gy*box.ry])}
-  let margin=6;const free=(c,name)=>{const R=markRect(c[0],c[1],name);return rects.some(r=>hit(R,r,margin))?null:R};
+  let margin=6;const free=(c,p)=>{const R=markRect(c[0],c[1],p.n,p.sv);return rects.some(r=>hit(R,r,margin))?null:R};
   const put=(p,c,R)=>{out.set(p,{x:c[0],y:c[1],R});rects.push(R)};
   // Các vùng lần lượt chọn chỗ cho địa danh con (xen kẽ), ưu tiên gần tên vùng mình và xa vùng khác
-  const kidsOf=terr.map(T=>places.filter(q=>q.in===T.n)),maxK=Math.max(0,...kidsOf.map(k=>k.length));
+  const kidsOf=terr.map(T=>places.filter(q=>q.in===T.n).sort((a,b)=>b.s-a.s)),maxK=Math.max(0,...kidsOf.map(k=>k.length));
   for(let r=0;r<maxK;r++)terr.forEach((T,ti)=>{const q=kidsOf[ti][r];if(!q)return;const P=out.get(T);
     let best=null,bd=1e9,bR=null;
-    for(const c of cand){const R=free(c,q.n);if(!R)continue;
+    for(const c of cand){const R=free(c,q);if(!R)continue;
       const dOwn=Math.hypot(c[0]-P.x,(c[1]-P.y-28)*1.3);
       const dOther=Math.min(1e9,...terr.filter(U=>U!==T).map(U=>{const Q=out.get(U);return Math.hypot(c[0]-Q.x,(c[1]-Q.y-28)*1.3)}));
       const cost=dOwn+Math.max(0,dOwn-dOther)*2;if(cost<bd){bd=cost;best=c;bR=R}}
     if(best)put(q,best,bR)});
-  places.filter(p=>!out.has(p)).forEach(p=>{let best=null,bd=-1,bR=null;
+  places.filter(p=>!out.has(p)).sort((a,b)=>b.s-a.s).forEach(p=>{let best=null,bd=-1,bR=null;
     const pts=[...out.values()].map(v=>[v.x,v.y]);
-    for(const c of cand){const R=free(c,p.n);if(!R)continue;
+    for(const c of cand){const R=free(c,p);if(!R)continue;
       const d=pts.length?Math.min(...pts.map(u=>Math.hypot(u[0]-c[0],(u[1]-c[1])*1.4))):1;
       const edge=1-Math.min(1,((c[0]-box.cx)/box.rx)**2+((c[1]-box.cy)/box.ry)**2);
       const s=Math.min(d,170)+edge*40;if(s>bd){bd=s;best=c;bR=R}}
-    if(!best&&margin>0){margin=-4;for(const c of cand){const R=free(c,p.n);if(R){best=c;bR=R;break}}margin=6}
-    if(!best){let lo=1e9;for(const c of cand){const R=markRect(c[0],c[1],p.n),o=rects.filter(r=>hit(R,r,0)).length;if(o<lo){lo=o;best=c;bR=R}}}
+    if(!best&&margin>0){margin=-4;for(const c of cand){const R=free(c,p);if(R){best=c;bR=R;break}}margin=6}
+    if(!best){let lo=1e9;for(const c of cand){const R=markRect(c[0],c[1],p.n,p.sv),o=rects.filter(r=>hit(R,r,0)).length;if(o<lo){lo=o;best=c;bR=R}}}
     put(p,best,bR)});
   terr.forEach(T=>{const P=out.get(T),rs=[P.L,...places.filter(q=>q.in===T.n&&out.get(q)).map(q=>out.get(q).R)];
     const x1=Math.min(...rs.map(r=>r[0])),y1=Math.min(...rs.map(r=>r[1])),x2=Math.max(...rs.map(r=>r[2])),y2=Math.max(...rs.map(r=>r[3]));
-    P.bx=(x1+x2)/2;P.by=(y1+y2)/2;P.rx=Math.max(110,(x2-x1)/2*1.12+18);P.ry=Math.max(62,(y2-y1)/2*1.18+16)});
+    P.bx=(x1+x2)/2;P.by=(y1+y2)/2;P.rx=Math.max(60+T.s*22,(x2-x1)/2*1.12+18);P.ry=Math.max(34+T.s*13,(y2-y1)/2*1.18+16)});
   return out;
 }
 
@@ -142,6 +154,7 @@ function renderRegion(w){
       el('path',{d:`M${box.cx-box.rx*.96},${box.cy+12} Q${box.cx-box.rx*.6},${box.cy+box.ry+70} ${box.cx-box.rx*.12},${box.cy+box.ry+125} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'url(#rock)'},land);
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
+    if(mode==='land')el('path',{d:shape,fill:'none',stroke:'#e6d29a','stroke-width':9,opacity:.75},land);
     el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':'url(#landTop)',stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land);
   }else if(mode==='sea'){
     el('path',{d:blob(box.cx,box.cy+10,box.rx*1.04,box.ry*1.06,seed+1,.05),fill:'#071f44',opacity:.6,filter:'url(#soft)'},land);
@@ -162,9 +175,14 @@ function renderRegion(w){
   terrain(land,mode,base,box,seed+3);
 
   const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
+  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const pos=layoutPlaces(w.places,box,avoid);
   placeIndex=w.places;
-  const terrG=el('g',{},svg),markG=el('g',{},svg);
+  const roadG=el('g',{},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
+  if(mode==='land'||mode==='cloud'){const hubs=w.places.map(p=>pos.get(p)).filter((P,i)=>P&&['thanh','tong','quoc'].includes(w.places[i].t)&&!P.terr);
+    const inT=[hubs[0]],rest=hubs.slice(1);while(rest.length&&inT[0]){let bi=0,bj=0,bd=1e9;rest.forEach((b,i)=>inT.forEach((a,j)=>{const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<bd){bd=d;bi=i;bj=j}}));
+      const a=inT[bj],b=rest[bi];if(bd<330)el('path',{d:`M${a.x},${a.y} Q${(a.x+b.x)/2+(a.y-b.y)*.12},${(a.y+b.y)/2+(b.x-a.x)*.12} ${b.x},${b.y}`,fill:'none',stroke:'#e9d6a0','stroke-width':2,'stroke-dasharray':'5 5',opacity:.55},roadG);
+      inT.push(b);rest.splice(bi,1)}}
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P||!P.terr)return;
     const c=TERR_COLORS[P.ci%TERR_COLORS.length],water=isWaterName(p.n),g=el('g',{class:'terr place','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n},terrG);
     const d=blob(P.bx,P.by,P.rx,P.ry,seed+i*17+5,.1,22);
@@ -173,15 +191,19 @@ function renderRegion(w){
     else if(mode==='sea')el('path',{d,fill:'#4f9a46',stroke:'#e9d6a0','stroke-width':4,opacity:.95},g);
     else if(mode==='space'){[1,.7,.42].forEach((k,j)=>el('ellipse',{cx:P.bx,cy:P.by,rx:P.rx*k,ry:P.ry*.8*k,fill:'none',stroke:c,opacity:.3+j*.15,'stroke-width':1.4,transform:`rotate(-10 ${P.bx} ${P.by})`},g));el('path',{d,fill:c,opacity:.08},g)}
     else el('path',{d,fill:c,opacity:.16},g);
-    el('path',{class:'edge',d,fill:'none',stroke:c,'stroke-width':2,'stroke-dasharray':'7 5',opacity:.85},g);
-    el('text',{class:'tlabel',x:P.x,y:P.y,fill:c},g).textContent=p.n.toUpperCase();
+    el('path',{d,fill:'none',stroke:'#0a0b22','stroke-width':4.5,opacity:.35},g);
+    el('path',{class:'edge',d,fill:'none',stroke:c,'stroke-width':1.6+p.s*.3,'stroke-dasharray':'8 4 2 4',opacity:.9},g);
+    el('text',{class:'tlabel',x:P.x,y:P.y,fill:c,style:`font-size:${(12+p.s*1.6).toFixed(1)}px`},g).textContent=p.n.toUpperCase();
     bindOpen(g,()=>selectPlace(i));
   });
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P||P.terr)return;
     const c=PTYPE[p.t].c,g=el('g',{class:'place mk','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
-    el('circle',{class:'bg',cx:0,cy:-2,r:18,fill:'#0a0b22',opacity:.62,stroke:c,'stroke-width':1.5},g);
-    ICON[p.t](el('g',{transform:'translate(0,-1) scale(.85)'},g),c);
-    el('text',{class:'plabel',x:0,y:31},g).textContent=p.n;
+    const z=SZ(p.sv);
+    el('ellipse',{cx:2,cy:z.r*.75,rx:z.r*.9,ry:z.r*.3,fill:'#000',opacity:.35,filter:'url(#soft)'},g);
+    if(p.s>=4)el('circle',{cx:0,cy:-2,r:z.r+5,fill:'none',stroke:'#f2c76e','stroke-width':p.s>=5?2.6:1.6,opacity:.85,filter:'url(#glow)'},g);
+    el('circle',{class:'bg',cx:0,cy:-2,r:z.r,fill:'#0a0b22',opacity:.7,stroke:c,'stroke-width':1.5+p.s*.25},g);
+    ICON[p.t](el('g',{transform:`translate(0,-1) scale(${z.ic.toFixed(2)})`},g),c);
+    el('text',{class:'plabel',x:0,y:z.r+z.fs+2,style:`font-size:${z.fs}px${p.s>=4?';font-weight:700':''}`},g).textContent=p.n;
     bindOpen(g,()=>selectPlace(i));
   });
 
