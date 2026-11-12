@@ -502,3 +502,5 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-orb]');if(
   else{const th={S:0,E:Math.PI/2,N:Math.PI,W:-Math.PI/2}[k];orbit3D(0,0,{theta:th,phi:Math.PI/3})}});
 document.addEventListener('keydown',e=>{if(!V3D.run||document.getElementById('v3dView').hidden||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||(V2&&V2.wid))return;
   const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'}[e.key];if(m){e.preventDefault();orbit3D(...ORB[m])}});
+
+foldify(document.querySelector('.v3d-orbit'),'orbit','Xoay');foldify(document.querySelector('.v3d-pivots'),'pivots','Tâm xoay');foldify(document.querySelector('.v3d-ctrl'),'ctrl','Góc nhìn');

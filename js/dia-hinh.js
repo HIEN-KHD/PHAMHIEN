@@ -15,6 +15,7 @@ const RPAL={
   tree:{deep:'#2a6a8a',water:'#6fc0e0',beach:'#e6f2e0',dry:'#bfe0c8',low:'#9fd0b0',wet:'#7fc0a0',forest:'#4f8f76',high:'#9ab0a6',rock:'#8a9a94',snow:'#ffffff'},
   ruins:{deep:'#2a4a6a',water:'#5a8ab8',beach:'#cfc8b0',dry:'#a8a890',low:'#8a9a78',wet:'#6a8466',forest:'#46604a',high:'#8a8a92',rock:'#70727e',snow:'#eef0f6'}};
 RPAL.sea=RPAL.isles=RPAL.start;
+['start','nine','dragon','gate','ruins','waste','sea','isles','tree'].forEach(k=>{RPAL[k].farm=1});
 function vnoise(seed){
   const r=rng(seed),P=new Uint8Array(512),V=new Float32Array(256);
   for(let i=0;i<256;i++){P[i]=i;V[i]=r()}for(let i=255;i>0;i--){const j=Math.floor(r()*(i+1)),t=P[i];P[i]=P[j];P[j]=t}for(let i=0;i<256;i++)P[i+256]=P[i];
@@ -28,7 +29,7 @@ const sstep=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-
 /* Trường địa hình của một thế giới: hàm độ cao/độ ẩm theo toạ độ bản đồ (1000×640), dùng chung cho ảnh nền và các mảnh phóng to.
    w: thế giới; shape: chuỗi path SVG của khối đất; box: khung bản đồ; spots: [{x,y,r} | {x,y,rx,ry}] chỗ cần đất bằng/nổi lên */
 function reliefField(w,shape,box,spots,sea){
-  const pal=RPAL[w.kind]||RPAL.start,C={};Object.keys(pal).forEach(k=>{if(k!=='lava')C[k]=hexRGB(pal[k])});
+  const pal=RPAL[w.kind]||RPAL.start,C={};Object.keys(pal).forEach(k=>{if(typeof pal[k]==='string')C[k]=hexRGB(pal[k])});
   const seed=w.id.length*977+w.x*13+w.y,n1=vnoise(seed),n2=vnoise(seed+1),n3=vnoise(seed+2),n4=vnoise(seed+3);
   // Khoảng cách tới bờ (lưới thô, nội suy song tuyến)
   const q=4,GW=Math.ceil(1000/q),GH=Math.ceil(640/q),mc=document.createElement('canvas');mc.width=GW;mc.height=GH;const mx=mc.getContext('2d');
@@ -56,8 +57,11 @@ function reliefField(w,shape,box,spots,sea){
     for(const s of spots){const rx=s.rx||s.r,ry=s.ry||s.r,u=(x-s.x)/rx,v=(y-s.y)/ry,qd=u*u+v*v;if(qd>9)continue;const k=s.rx?Math.exp(-qd*qd*qd):Math.exp(-qd);
       e=sea?Math.max(e,e*(1-k)+(s.rx?.55+e*.3:.62)*k):e*(1-k*.7)+.42*k*.7}
     return e};
-  return{w,shape,box,sea,pal,C,n2,n4,elev,moist:(x,y)=>fbm(n2,x/220,y/220,4),dist,lv:sea?.5:.2,seed};
+  // Thành, gia tộc, tông môn: quanh đó có ruộng và nhà (chỉ ở thế giới có đồng ruộng)
+  const towns=pal.farm?spots.filter(s=>s.t&&['thanh','quoc','gia','tong'].includes(s.t)).map((s,i)=>{const R=s.t==='thanh'||s.t==='quoc'?70:48,a=hash2(s.x,s.y)*Math.PI;return{x:s.x,y:s.y,R,R2:R*R,ca:Math.cos(a),sa:Math.sin(a),big:s.t==='thanh'||s.t==='quoc'}}):[];
+  return{w,shape,box,sea,pal,C,n2,n4,elev,towns,moist:(x,y)=>fbm(n2,x/220,y/220,4),dist,lv:sea?.5:.2,seed};
 }
+const FIELD=[[150,172,82],[188,180,98],[122,152,70],[206,192,118],[98,138,62],[170,160,90]];
 const hash2=(x,y)=>{const h=Math.sin(x*12.9898+y*78.233)*43758.5453;return h-Math.floor(h)};
 /* Vẽ vùng (x0,y0,vw,vh) của bản đồ ra canvas W×H. Khi phóng to (k lớn) thêm octave để thấy chi tiết. */
 function reliefPaint(F,x0,y0,vw,vh,W,H){
@@ -70,9 +74,18 @@ function reliefPaint(F,x0,y0,vw,vh,W,H){
   for(let py=0;py<H;py++)for(let px=0;px<W;px++){const i=py*W+px;if(E[i]===-9)continue;const e=E[i],m=M[i],x=x0+(px+.5)/kx,y=y0+(py+.5)/ky;let c,water=false;
     if(e<lv){water=true;c=mixC(C.deep,C.water,sstep(lv-.18,lv,e))}
     else if(F.sea?e<lv+.02:(F.dist(x,y)<4||e<lv+.012))c=C.beach;
-    else{c=mixC(mixC(C.dry,C.wet,sstep(.28,.6,m)),C.low,.4);
+    else{c=mixC(mixC(C.dry,C.wet,sstep(.25,.55,m)),C.low,.45);
       if(m>.5&&e<.68){const tex=n4(x*.42+.37,y*.48+.71)*.45+n4(x*2.1+3,y*2.1+7)*.25+hash2(x*7,y*7)*.3;c=mixC(c,C.forest,sstep(.5,.58,m)*(.7+.3*tex));if(tex>.6)c=mixC(c,C.forest,.4)}
-      c=mixC(c,C.high,sstep(.56,.68,e));c=mixC(c,C.rock,sstep(.68,.8,e));c=mixC(c,C.snow,sstep(.86,.92,e+(n4(x*.144,y*.144)-.5)*.05));
+      c=mixC(c,C.high,sstep(.6,.72,e));c=mixC(c,C.rock,sstep(.7,.82,e));
+      // Sườn dốc lộ đá
+      {const sx=((px+1<W&&E[i+1]!==-9?E[i+1]:e)-(px>0&&E[i-1]!==-9?E[i-1]:e))*kx*95,sy=((py+1<H&&E[i+W]!==-9?E[i+W]:e)-(py>0&&E[i-W]!==-9?E[i-W]:e))*ky*95,sl=Math.hypot(sx,sy)/(kx/1.3);
+        c=mixC(c,C.rock,sstep(1.1,2.6,sl)*.6)}
+      // Ruộng bậc ô và nhà cửa quanh thành trì
+      for(const T of F.towns){const dx=x-T.x,dy=y-T.y,d2=dx*dx+dy*dy;if(d2>T.R2)continue;const d=Math.sqrt(d2),wg=(1-d/T.R)*(1-sstep(.55,.68,e));if(wg<=0)continue;
+        const u=dx*T.ca-dy*T.sa,v=dx*T.sa+dy*T.ca,fu=u/5.5,fv=v/3.6,cu=Math.floor(fu),cv=Math.floor(fv),h=hash2(cu+T.x*.1,cv+T.y*.1);
+        const fc=FIELD[Math.floor(h*FIELD.length)],line=(fu-cu<.09||fv-cv<.12)?.78:1;c=mixC(c,[fc[0]*line,fc[1]*line,fc[2]*line],Math.min(.85,wg*1.6));
+        if(d<T.R*(T.big?.32:.2)){const hu=Math.floor(x*1.5),hv=Math.floor(y*1.5),hh=hash2(hu*1.7+.3,hv*2.3+.1);if(hh>(T.big?.5:.66))c=hh>.86?[168,74,58]:hh>.74?[120,92,70]:[214,206,192]}
+        break}c=mixC(c,C.snow,sstep(.86,.92,e+(n4(x*.144,y*.144)-.5)*.05));
       const g=(hash2(Math.floor(x*5),Math.floor(y*5))-.5)*12;c=[c[0]+g,c[1]+g,c[2]+g]}
     // Đổ bóng theo độ dốc thật (đơn vị bản đồ), nên phóng to vẫn đúng hướng sáng
     const gx=water?0:((px+1<W&&E[i+1]!==-9?E[i+1]:e)-(px>0&&E[i-1]!==-9?E[i-1]:e))*kx*95,gy=water?0:((py+1<H&&E[i+W]!==-9?E[i+W]:e)-(py>0&&E[i-W]!==-9?E[i-W]:e))*ky*95;

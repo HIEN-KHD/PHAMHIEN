@@ -34,7 +34,22 @@ const PLACES={
     ['gia','Thượng Quan gia tộc','Gia tộc truyền bảy tám trăm năm, đứng sau dong binh hiệp hội; nhà của Thượng Quan Phi Nhi.',[326],'Chân Võ quốc',2],
     ['thanh','Bắc Hoang thành','Thành nằm ngoài phạm vi thế lực Thanh Vân Tông; Vũ Văn gia tộc có thế lực ở đây.',[626, 676],null,2],
     ['hiem','Hỏa Diệm Sơn','Núi lửa sâu trong sơn mạch, lãnh địa thượng cổ hung thú Cửu Đầu Xích Diễm Sư, nơi mọc Xích Viêm hoa.',[176],null,2],
-    ['thanh','Băng Diễm trấn','Thị trấn có chợ đêm ở góc tây nam; Lâm Phong và Điền Trung Đạo về đây bán chiến lợi phẩm.',[501],null,1]
+    ['thanh','Băng Diễm trấn','Thị trấn có chợ đêm ở góc tây nam; Lâm Phong và Điền Trung Đạo về đây bán chiến lợi phẩm.',[501],null,1],
+    ['vung','U Vân mười sáu châu','Vùng có ba thế lực thái cổ, trong đó có Vạn Cổ Thần Tông.',[661],null,3],
+    ['tong','Vạn Cổ Thần Tông','Một trong ba thế lực thái cổ của U Vân mười sáu châu; cường giả cưỡi cự long.',[661, 663],'U Vân mười sáu châu',4],
+    ['tong','Trường Sinh Điện','Thế lực lớn; cường giả của điện cũng kéo tới khiến Lâm Phong bất ngờ.',[661],'U Vân mười sáu châu',3],
+    ['tong','Thần Võ Tông','Tông môn từng vang danh khắp Thiên Võ đại lục; lão tổ tưởng đã tọa hóa ba ngàn năm trước bỗng xuất hiện.',[663],'U Vân mười sáu châu',3],
+    ['vung','Đông Vực','Vùng giáp Đông Hải; có Ngạo Lai tiên quốc là cố đô lừng lẫy.',[683, 688],null,3],
+    ['quoc','Ngạo Lai tiên quốc','Cố đô lừng lẫy của Đông Vực, nơi Lâm Phong gặp lại cố nhân.',[683],'Đông Vực',3],
+    ['thanh','Già Lam thành','Thành có Già Lam học viện; Bạch gia rất có thế lực ở đây.',[12, 56],'Chân Võ quốc',3],
+    ['gia','Bạch gia','Gia tộc lớn ở Già Lam thành, có thế lực cả trong học viện; Lâm Phong giết Bạch Nhất Phi nên kết thù.',[12, 13],'Chân Võ quốc',3],
+    ['gia','Tô gia','Gia tộc của Tô Nguyệt Tịch, bám vào quan hệ với Bạch gia.',[89, 111],'Chân Võ quốc',2],
+    ['gia','Vương gia','Gia tộc đứng về phía Lâm gia trong trận đại chiến giữa các gia tộc.',[111, 138],'Chân Võ quốc',1],
+    ['hiem','Đại Liệt Cốc','Hẻm vực thông xuống lòng đất ở bình nguyên bão lốc, cạnh vùng sa mạc.',[176, 650],null,2],
+    ['hiem','Vĩnh Sinh Thần Điện','Thần điện có một tôn Ma Thần bị đóng đinh chết bên trong.',[309, 313],null,3],
+    ['tong','Vọng Thiên Tông','Tông môn có người xuất hiện giúp Lâm Phong thoát khỏi Phong Ma truy đuổi.',[386, 562],null,2],
+    ['tong','Thiên Phong Học Viện','Học viện có đệ tử giỏi đao, cùng dự khảo hạch với Lâm Phong.',[113],null,2],
+    ['tong','Tế Vũ lâu','Một trong năm thế lực lớn của thiên tài doanh, chỉ nhận nữ học viên.',[166],null,2]
   ],
   tamthien:[
     ['vung','Đông quận Thần Châu','Vùng có trăm quốc và thập đại cố đô. Chân Võ quốc cũng nằm trong vùng này.',[239,437]],
@@ -61,7 +76,8 @@ const PLACES={
     ['thanh','Hàn Thành','Thành có thành chủ treo thưởng lớn tìm luyện dược sư.',[840],null,2],
     ['toc','Hải Tộc','Chủng tộc biển chiếm vùng Thâm Hải; Lâm Phong cùng bốn nữ thoát khỏi địa bàn của họ.',[1220],'Đông Hải thế giới',3],
     ['toc','Cự Hùng Tộc','Một tộc thuộc yêu tộc, nổi tiếng thân thể cường đại, người cao hơn hai mét.',[1120],null,2],
-    ['toc','Man tộc','Tộc người ở trần, mặc da thú; cử cường giả trẻ tới thử 99 bậc thang đá.',[1120],null,2]
+    ['toc','Man tộc','Tộc người ở trần, mặc da thú; cử cường giả trẻ tới thử 99 bậc thang đá.',[1120],null,2],
+    ['quoc','Đại Chu đế quốc','Đế quốc có Hư Hoàng kinh, ghi thần thông Huyễn Hư chưởng.',[870],null,3]
   ],
   phongtruc:[
     ['vung','Long Môn vực','Vực do Lâm Phong lập ra, biến hắn thành vị Vực Chủ thứ mười ba và trẻ nhất. Tín ngưỡng lực từ đây giúp hắn thành Đại Đế.',['~1471','~1481',4187]],
@@ -119,7 +135,18 @@ const PLACES={
     ['thanh','Trọng Lê Thành','Thành có thần tượng Xích Đế, thủy tổ nhân tộc; nhiều thánh tử tới bái.',[1772],null,2],
     ['hiem','Nguyên Khư Giới','Bí giới có thiên đạo trật tự riêng; vong hồn của sinh linh chết trong đó bị thu lại.',[2335, 2350],null,3],
     ['toc','Thần Nhật Tộc','Tộc mang thể chất nóng bỏng; Bạch Uyển Du là cháu gái một cường giả cấp Thánh Đế của tộc.',[2410],null,2],
-    ['quoc','Hỗn Độn Cổ Quốc','Cổ quốc mờ ảo giam người trong một vùng biển nhỏ; phía tây bắc có thời không vặn vẹo.',[2920, 2930],null,3]
+    ['quoc','Hỗn Độn Cổ Quốc','Cổ quốc mờ ảo giam người trong một vùng biển nhỏ; phía tây bắc có thời không vặn vẹo.',[2920, 2930],null,3],
+    ['tong','Thiên Tiên cốc','Cốc chỉ nhận nữ đệ tử, giống Hồng Trần Tiên Tông.',[2163],null,2],
+    ['thanh','Thánh Yêu Thành','Thành của vạn tộc; Cự Nhân Tộc từng hạ lệnh tàn sát dân trong thành.',[2748],null,3],
+    ['toc','Cự Nhân Tộc','Thuộc hàng Vương tộc trong vạn tộc, thực lực rất mạnh.',[2748],null,3],
+    ['thanh','Nam Vực thành','Cổ thành gần Lâm Phong nhất khi hắn chạy khỏi một đại đế.',[2793],null,2],
+    ['quoc','Lý Đường quốc','Có hầm rượu; trong một bình sứ phong ấn một tôn Thiên Sứ.',[2208],null,2],
+    ['thanh','Lôi Thành','Thành hay rung lắc vì bên dưới trấn áp một tồn tại đáng sợ.',[1915],null,2],
+    ['hiem','Đại Hạp Cốc','Hẻm núi dưới lòng đất gần Trọng Lê Thành, nguy hiểm khi trời đất biến động.',[1772, 1798],null,2],
+    ['hiem','Huyễn Cảnh Hải','Cửa thử thứ hai của khảo hạch: biển ảo cảnh, phải tự thoát ra.',[1762],null,1],
+    ['hiem','Tâm Ma Hải','Cửa thử thứ ba của khảo hạch: biển tâm ma, thử ý chí.',[1762],null,1],
+    ['toc','Thôn Thiên Mãng tộc','Tộc mãng xà tinh không, có đại đế tham chiến.',[2912],null,2],
+    ['toc','Cửu Đầu Trùng tộc','Tộc của Tà Hình Đại Đế, kẻ từng muốn giết Hồng Trần Tiên Tôn.',[2912, 2932],null,2]
   ],
   cohoang:[
     ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],
@@ -140,7 +167,13 @@ const PLACES={
     ['dao','Phù Tang Đảo','Thế lực hải ngoại cỡ lớn, ngang Tà Long Cung.',[1964],null,3],
     ['quoc','Đà Xá Tiên Quốc','Tiên quốc cổ; quốc chủ dùng Thánh Đế hoàng kim đúc Đà Xá cổ tệ, nghe nói có thọ nguyên bất tử.',[1971],null,2],
     ['dao','Vạn Tinh Đảo','Đảo có Cự Kình Bang; đệ tử nhiều thế lực lớn đi ngang qua.',[1957],null,2],
-    ['dao','Tiên Tuyết Đảo','Đảo nơi Tiết tiền bối ở; Lâm Phong tới xin gặp.',[2013],null,2]
+    ['dao','Tiên Tuyết Đảo','Đảo nơi Tiết tiền bối ở; Lâm Phong tới xin gặp.',[2013],null,2],
+    ['tong','Cổ Tà Tông','Tông trong dãy Cổ Tà, quanh mấy ngàn dặm là rừng nguyên thủy.',[2002],null,3],
+    ['hiem','Vũ Nguyên Tiên Phủ','Tiên phủ có thể còn giữ Chấn Thiên Thạch Bi; mọi người tranh nhau xông vào.',[1995, 2006],null,3],
+    ['dao','Tà Long đảo','Đảo của phe Tà Long; Lâm Phong rời thuyền khi còn cách đảo một nghìn dặm.',[2107],null,2],
+    ['tong','Trường Sinh Tiên Tông','Tiên tông có Trường Sinh Doanh; Diệu Khả Nhi vô tình biết chuyện.',[1988],null,2],
+    ['toc','Tam Nhãn Tộc','Tộc ba mắt rất mạnh; Thiên Nhãn Tộc giống nhưng kém xa.',[2048],null,2],
+    ['hiem','Minh Giới Môn','Cổng về Minh giới; Hồng Trần Tiên Tôn đưa vong hồn trở về qua đây.',[1981],null,2]
   ],
   minhgioi:[
     ['vung','Minh Hải','Có tứ đại thế lực, gọi là "một quốc gia ba đảo".',['~1659']],
@@ -165,7 +198,9 @@ const PLACES={
     ['bau','Ngũ Sát Bi','Bia đá Lâm Phong gặp khi làm sứ giả Minh giới.',[2340]],
     ['thanh','Minh Vương Thành','Thành lớn của Minh giới, nhà ở rất đắt; nữ Quỷ vương có trạch viện ở đây.',[5955],null,3],
     ['dao','Quần Ma Đảo','Thế lực chiếm gần hết Minh Hải sau khi Minh Hải Thần Quốc và giao nhân đế quốc thất thủ.',[2275],'Minh Hải',3],
-    ['quoc','Giao nhân đế quốc','Đế quốc của giao nhân ở Minh Hải, thất thủ trước Quần Ma Đảo.',[2275],'Minh Hải',2]
+    ['quoc','Giao nhân đế quốc','Đế quốc của giao nhân ở Minh Hải, thất thủ trước Quần Ma Đảo.',[2275],'Minh Hải',2],
+    ['tong','Thiên Hải minh quân','Minh quân truy đuổi Lâm Phong tới tận Minh Vương Thành.',[5972],null,3],
+    ['thanh','Yêu Thi Thành','Thành có tu sĩ quân chống đại quân Diêm La Vương.',[5952],null,2]
   ],
   battu:[
     ['vung','Cửu Linh vực','Do Cửu Linh Tông nắm giữ.',[3632]],
@@ -204,7 +239,25 @@ const PLACES={
     ['thanh','Hạ gia thôn','Sơn thôn cổ xưa; lão thôn trưởng cụt một chân, dân làng săn được hung thú rất mạnh.',[4524, 4530],null,1],
     ['tong','Cửu U Ma Cung','Ma cung có Huyết U công tử bị Lâm Phong giết; U Ma tôn chủ muốn liên lạc.',[4548],null,2],
     ['tong','Thiên Nhạc Lâu','Lầu nơi thiên kiêu tụ hội.',[4536],null,1],
-    ['bau','Hậu Nghệ Cung','Chí bảo là cây cung lớn; nhiều thế lực tranh, Lâm Phong quyết đoạt lấy.',[4500, 4506],null,3]
+    ['bau','Hậu Nghệ Cung','Chí bảo là cây cung lớn; nhiều thế lực tranh, Lâm Phong quyết đoạt lấy.',[4500, 4506],null,3],
+    ['tong','Thiên Đình','Triều đình của Thiên Đế; cổng vào là Nam Thiên Môn, Thiên Đế tu luyện ở Đế Cung.',[4540, 4605],null,5],
+    ['hiem','Nam Thiên Môn','Cổng vào Thiên Đình, không phải ai cũng vào được.',[4605],null,3],
+    ['toc','Bạch Khổng Tước tộc','Tộc yêu của mẹ Thiên Đế.',[4611],null,2],
+    ['hiem','Yêu Hoàng bí cảnh','Bí cảnh nơi Lâm Phong từng thấy năm mũi thần tiễn bị phong ấn.',[4509],null,2],
+    ['thanh','Thiên Nhạc Thành','Thành có Thiên Nhạc Lâu là quán rượu lớn nhất.',[4533, 4539],null,2],
+    ['tong','Văn Thiên Lâu','Thương hội có nhiều chi nhánh.',[4563],null,2],
+    ['tong','Đồ Thiên các','Thế lực có nhiều cao tầng bàn tán về chiến tích của Lâm Phong.',[4630],null,2],
+    ['hiem','Hắc Thạch Sơn mạch','Dãy núi rộng năm sáu chục dặm, nhiều hang động lớn nhỏ.',[4930],null,2],
+    ['tong','Vạn Tiên Tông','Tông môn đáng sợ đối đầu nhóm Lâm Phong.',[4150],null,3],
+    ['hiem','Phan Dương hồ','Vùng hồ phủ sương trắng; chỗ sâu nhất rất nguy hiểm.',[5650],null,3],
+    ['toc','Cổ Ma tộc','Một trong ba thế lực mạnh tranh đoạt ở Phan Dương hồ, cùng Di tộc và Kim Ô tộc.',[5650],null,3],
+    ['hiem','Bạch Xà Lĩnh','Dãy núi gần Vọng Thiên trại.',[5590],null,2],
+    ['thanh','Vọng Thiên trại','Trại nơi Lam Doanh Doanh và Lam Phượng ở.',[5590],null,1],
+    ['tong','Nho môn','Đạo thống Nho gia; Chu phu tử dẫn Lâm Phong tới Thánh Nhân cung.',[4810],null,3],
+    ['hiem','Thánh Nhân cung','Cung điện thờ chín cuốn thơ cổ của Nho môn.',[4810],null,2],
+    ['dao','Liệt Diễm Đảo','Đảo phủ khói đen; phong ấn sâu trong đảo đã rạn nứt.',[4990],null,2],
+    ['thanh','Vạn Yêu thành','Thành thuộc Yêu tộc tổ địa.',[5050],null,2],
+    ['tong','Thánh Chiến liên minh','Liên minh vạn tộc muốn Lâm Phong phải chết.',[4000],null,3]
   ],
   toivuc:[
     ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
@@ -241,7 +294,15 @@ const PLACES={
     ['toc','Thánh Long tộc','Tổ địa có nhiều đảo quanh để thu xếp gia quyến của tu sĩ quân.',[5850, 5866],null,3],
     ['tong','Thiên Tượng Thần Cung','Cung ở trung tâm tinh cầu Thiên Tượng, nơi Thiên Tượng chân quân ở.',[5802],null,2],
     ['vung','Hắc Hải','Vùng biển đen; Lâm Phong cùng Long Thế U bay vào chỗ sâu.',[5858],null,3],
-    ['toc','Trùng tộc','Đại quân do ba Trùng Hoàng dẫn, tàn phá vùng biển.',[5866, 5874],null,3]
+    ['toc','Trùng tộc','Đại quân do ba Trùng Hoàng dẫn, tàn phá vùng biển.',[5866, 5874],null,3],
+    ['tong','Cổ Long liên minh','Liên minh Long tộc mời Lâm Phong gia nhập.',[5710, 5714],null,3],
+    ['tong','Cửu Châu Các','Tổ chức sát thủ tồn tại vượt kỷ nguyên.',[5718],null,3],
+    ['thanh','Cổ Long thành','Thành nơi Long hoàng phong tước cho Lâm Phong.',[5710, 5870],null,3],
+    ['tong','Tà Long liên minh','Liên minh dưới trướng Tà Long tộc, có hai trăm vạn ác linh chiến sĩ.',[5870, 5886],null,3],
+    ['gia','Minh Thần gia tộc','Gia tộc "mười ba trọng" của một sinh linh xương trắng.',[5766],null,2],
+    ['thanh','Hắc Long thành','Thành Lâm Phong để Nhân Hoàng bút ở lại chủ trì.',[5710],null,2],
+    ['thanh','Chân Long thành','Thành có nơi đóng quân của Thánh Long tộc.',[5750],null,2],
+    ['toc','Bá Long tộc','Long tộc rất cổ xưa, có nhiều cường giả đỉnh cấp.',[5750],null,3]
   ],
   magioi:[
     ['vung','Ma Thiên vực','Vùng Lâm Phong nắm được ngay khi tới Ma giới, sau khi thu phục Đại Ma Thiên.',[6014]],
@@ -262,7 +323,10 @@ const PLACES={
     ['tong','Tắc Hạ Học Cung','Học cung Nho đạo hiển hách; muốn vào phải đối được câu đối.',[6016],null,3],
     ['hiem','Đạo thống Nho môn','Di tích Nho môn trong rừng nguyên thủy năm mươi dặm phía tây bắc thành, đã bị phong tỏa.',[6016],null,2],
     ['vung','Lăng Thiên vực','Vực bị hải ma tàn phá.',[6068, 6076],null,3],
-    ['vung','Ma Hỏa vực','Vực lớn gấp ba Lăng Thiên vực, ít người lui tới vì địa hình khắc nghiệt.',[6076],null,3]
+    ['vung','Ma Hỏa vực','Vực lớn gấp ba Lăng Thiên vực, ít người lui tới vì địa hình khắc nghiệt.',[6076],null,3],
+    ['toc','Băng Ma tộc','Tộc bị tiêu diệt, lộ ra bí mật về Trấn Ma Bia.',[6056],null,2],
+    ['hiem','Luân Hồi Điện','Điện có phong ấn rất mạnh; Lâm Phong đánh nhiều lần chưa mở được.',[6090],null,2],
+    ['hiem','Ma Thiên Điện','Nơi bế quan của Đại Ma Thiên, cần cách đặc biệt mới vào được.',[6012, 6014],null,2]
   ],
   thiengioi:[
     ['vung','Ba mươi ba trọng thiên','Thiên Giới có 33 tầng trời và 33 vị thiên chủ.',[3475,6174]],
@@ -296,7 +360,23 @@ const PLACES={
     ['toc','Diệt Thiên tộc','Cấu kết với hoàng tộc phía sau màn phá chư thiên vạn giới, khiến Nữ Oa phải vá trời.',[6394],null,3],
     ['toc','Hắc Bào tộc','Tộc mạnh hơn Hắc Vụ tộc, đóng quân ở tầng thứ hai Thiên giới.',[6202, 6394],null,3],
     ['toc','Hắc Vụ tộc','Tộc bị Lâm Phong diệt toàn quân.',[6202],null,2],
-    ['hiem','Hắc Phong Ma vực','Vùng nguy hiểm trong vực sâu ác ma.',[6602],null,2]
+    ['hiem','Hắc Phong Ma vực','Vùng nguy hiểm trong vực sâu ác ma.',[6602],null,2],
+    ['tong','Bách Hoa Cốc','Cốc giữ di vật của tổ tiên Kỷ Thần.',[6482],null,2],
+    ['hiem','Hoàng Thiên bí cảnh','Bí cảnh sinh ra những sinh linh đáng sợ như tà thi.',[6322, 6338],'Hoàng Thiên vực',3],
+    ['hiem','Huyền Hoàng Sơn','Núi có động phủ của một nữ tử thần bí.',[6274],null,2],
+    ['gia','Giang gia','Gia tộc của Giang Ninh vực.',[6450, 6458],null,2],
+    ['hiem','Vương Ốc Sơn','Núi nơi Đông Hoàng kiếm nằm hút sức mạnh qua vô tận năm tháng.',[6226, 6234],null,3],
+    ['hiem','Tàng Kiếm Cốc','Cốc Hạ Đông Hoàng dẫn vào lấy kiếm.',[6226],null,2],
+    ['hiem','Thương Thiên Hồ','Hồ mưa gió sấm sét; tu sĩ kéo tới xem dị tượng.',[6434],null,2],
+    ['toc','Thiên Yêu Xà tộc','Tộc của Ách bà bà.',[6210],null,2],
+    ['hiem','Cửu Huyền Cổ Sơn','Núi cổ mà Lâm Phong biết tin sau khi cứu Vô Lượng đạo sĩ.',[6250],null,2],
+    ['hiem','Tần Lĩnh','Dãy núi nghe đồn sinh linh đã vào thì không ra được.',[6426],null,3],
+    ['dao','Kim Ưng Đảo','Đảo Lâm Phong bế quan trước khi đột phá Thánh Chủ.',[6570],null,2],
+    ['thanh','Ngọc Ma Thành','Thành có phủ đệ hơn ngàn mẫu của gia tộc Yêu Tử Di.',[6370],null,2],
+    ['hiem','Hỏa Diễm Sơn','Núi lửa gần Vạn tiên quốc gia.',[6490],null,2],
+    ['thanh','Hỗn Độn Thành','Thành cổ lừng danh của Hỗn Độn vực, có truyền tống trận.',[6506],'Hỗn Độn vực',3],
+    ['thanh','Sát Ma thành','Thành đen dưới lòng đất, có thông đạo lên mặt đất.',[6482],null,2],
+    ['vung','Chúc Thần vực','Vực của Chúc Nhất Kiếm, kẻ bị Lâm Phong giết.',[6474],null,2]
   ],
   phetho:[
     ['tong','Phế thổ liên minh','Liên minh của Phế thổ thế giới. Nhiều thế lực theo dõi xem nó sẽ phát triển ra sao.',[7165,7178]],
@@ -387,7 +467,12 @@ const PLACES={
     ['dao','Cửu Yêu đảo','Phe đối địch Chư đảo liên minh trong đại chiến.',[9740],'Nam hải thế giới',2],
     ['tong','Vấn Thiên các','Đồng minh của Cửu Yêu đảo, thua Chư đảo liên minh.',[9740],'Nam hải thế giới',2],
     ['tong','Chư đảo liên minh','Liên minh các đảo, chia cắt và tiêu diệt quân của Cửu Yêu đảo.',[9740],'Nam hải thế giới',3],
-    ['toc','Linh tộc Lý thị','Tộc của Lý Mộ Nguyệt, được Lâm Phong cứu.',[9980],null,2]
+    ['toc','Linh tộc Lý thị','Tộc của Lý Mộ Nguyệt, được Lâm Phong cứu.',[9980],null,2],
+    ['hiem','Bất Tử Sơn','Núi Bất Tử của yêu tộc, rất khó tìm.',[10160, 10280],null,3],
+    ['dao','Phong Thần đảo','Đảo có đảo chủ quản lý Ác ma vực sâu.',[9800],null,2],
+    ['hiem','Táng Thiên cốc','Cốc vô cùng đáng sợ; Lâm Phong cùng vong linh quân đoàn tấn công.',[8240],null,3],
+    ['dao','Tam Nguyên Thượng Thanh đảo','Đảo nơi Trầm gia đối đầu Lâm Phong.',[11120],null,2],
+    ['gia','Trầm gia','Gia tộc đối đầu Lâm Phong trên Tam Nguyên Thượng Thanh đảo.',[11120],null,2]
   ]
 };
 STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||(typeof PLACE_SIZE!=='undefined'&&PLACE_SIZE[w.id+'|'+n])||2}))});

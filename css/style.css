@@ -294,7 +294,7 @@ svg .edge,svg .roads path{vector-effect:non-scaling-stroke}
 .v2d-stage.drag{cursor:grabbing}
 .v2d-stage svg{display:block;width:100%;height:100%}
 .v2d .realm-badge{max-height:calc(100% - 90px)}
-.v2d .realm-badge button{pointer-events:none}
+.v2d .realm-badge li button{pointer-events:none}
 .v2d-card{position:absolute;left:16px;bottom:16px;width:min(360px,calc(100% - 32px));max-height:min(46vh,420px);overflow:auto}
 .v2d-card .x{position:absolute;top:8px;right:8px}
 .v2d-hint{position:absolute;right:16px;bottom:10px;margin:0;padding:4px 10px;border-radius:999px;background:rgba(8,9,30,.7);font-size:12px;pointer-events:none}
@@ -354,3 +354,16 @@ span.rchip{cursor:default}
 .v3d-orbit .btn{width:34px;height:34px;padding:0;justify-content:center;font-size:15px;background:rgba(8,9,30,.85)}
 .v3d-orbit .btn.wide{width:auto;grid-column:span 4;font-size:12px;height:28px}
 @media (max-width:720px){.v3d-orbit{bottom:auto;top:56px;grid-template-columns:repeat(4,30px)}.v3d-orbit .btn{width:30px;height:30px}}
+
+.w-map:fullscreen{border-radius:0;border:0}
+.w-map:fullscreen .w-stage{height:100vh;aspect-ratio:auto;max-height:none}
+
+/* Nút thu gọn chung cho các khung */
+.fold-btn{flex:none;align-self:flex-end;font:600 11px var(--body);color:var(--muted);background:rgba(8,9,30,.85);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.fold-btn:hover{color:var(--ink)}
+.fold-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.foldable.folded>:not(.fold-btn){display:none!important}
+.foldable.folded{width:auto!important;min-width:0!important;padding:0!important;background:none!important;border:0!important;backdrop-filter:none!important;box-shadow:none!important}
+.foldable.folded .fold-btn{color:var(--gold);padding:5px 12px}
+.v3d-orbit .fold-btn,.map-zoom .fold-btn{grid-column:1/-1;align-self:stretch}
+.place-legend .fold-btn{align-self:center}

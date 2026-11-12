@@ -209,4 +209,9 @@ window.addEventListener('hashchange',router);
 router();
 
 /* Nút phóng to/thu nhỏ bản đồ vùng */
-document.addEventListener('click',e=>{const b=e.target.closest('[data-mz]');if(!b||!window.WZ)return;const k=b.dataset.mz;if(k==='in')WZ.zoom(.6);else if(k==='out')WZ.zoom(1/.6);else WZ.fit()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mz]');if(!b||!window.WZ)return;const k=b.dataset.mz;if(k==='in')WZ.zoom(.6);else if(k==='out')WZ.zoom(1/.6);
+  else if(k==='full'){const m=document.querySelector('.w-map');if(document.fullscreenElement)document.exitFullscreen();else if(m.requestFullscreen)m.requestFullscreen().catch(()=>{})}else WZ.fit()});
+document.addEventListener('fullscreenchange',()=>{if(window.WZ&&!document.getElementById('vWorld').hidden)setTimeout(()=>WZ.fit(),60)});
+
+/* Các cụm nút luôn có: thu gọn được */
+foldify(document.querySelector('.map-zoom'),'mapzoom','Phóng');

@@ -177,7 +177,7 @@ function renderRegion(w,opt){
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   // Địa hình chân thật (ảnh sinh theo độ cao) cho lục địa và biển đảo; chỗ có thành/tông môn được san bằng
   const real=(mode==='land'||mode==='sea')&&typeof reliefMap==='function'&&!!document.createElement('canvas').getContext;
-  const rel=real?reliefMap(w,shape,box,w.places.map(p=>[p,pos.get(p)]).filter(([p,P])=>P&&(!P.terr||(mode==='sea'&&!isWaterName(p.n)))).map(([p,P])=>P.terr?{x:P.bx,y:P.by,rx:P.rx*.92,ry:P.ry*.92}:{x:P.x,y:P.y,r:mode==='sea'?34:42}),mode==='sea'):null;
+  const rel=real?reliefMap(w,shape,box,w.places.map(p=>[p,pos.get(p)]).filter(([p,P])=>P&&(!P.terr||(mode==='sea'&&!isWaterName(p.n)))).map(([p,P])=>P.terr?{x:P.bx,y:P.by,rx:P.rx*.92,ry:P.ry*.92}:{x:P.x,y:P.y,r:mode==='sea'?34:(P.minor?28:42),t:p.t}),mode==='sea'):null;
   if(mode==='land'||mode==='cloud'){
     if(mode==='land'){
       el('path',{d:`M${box.cx-box.rx*.96},${box.cy+12} Q${box.cx-box.rx*.6},${box.cy+box.ry+70} ${box.cx-box.rx*.12},${box.cy+box.ry+125} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'url(#rock)'},land);
@@ -221,7 +221,7 @@ function renderRegion(w,opt){
     const c=TERR_COLORS[P.ci%TERR_COLORS.length],water=isWaterName(p.n),g=el('g',{class:'terr place','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n},terrG);
     const d=blob(P.bx,P.by,P.rx,P.ry,seed+i*17+5,.1,22);
     if(/băng/i.test(p.n))el('path',{d,fill:'#e8f4ff',stroke:'#ffffff','stroke-width':3,opacity:.92},g);
-    else if(water)el('path',{d,fill:'#2a6fb8',opacity:.55},g);
+    else if(water)el('path',{d,fill:'#2a6fb8',opacity:rel?0:.55},g);
     else if(mode==='sea'&&!rel)el('path',{d,fill:'#4f9a46',stroke:'#e9d6a0','stroke-width':4,opacity:.95},g);
     else if(rel)el('path',{d,fill:c,opacity:.08},g);
     else if(mode==='space'){[1,.7,.42].forEach((k,j)=>el('ellipse',{cx:P.bx,cy:P.by,rx:P.rx*k,ry:P.ry*.8*k,fill:'none',stroke:c,opacity:.3+j*.15,'stroke-width':1.4,transform:`rotate(-10 ${P.bx} ${P.by})`},g));el('path',{d,fill:c,opacity:.08},g)}
@@ -263,6 +263,7 @@ function renderPlaceLists(w){
   document.getElementById('placeCount').textContent=`${w.places.length} địa danh`;
   document.getElementById('placeLegend').innerHTML=PORDER.filter(t=>cnt[t]).map(t=>`<button type="button" class="lg" data-ft="${t}" aria-pressed="false"><svg viewBox="-16 -18 32 32" aria-hidden="true"></svg>${PTYPE[t].name} <b>${cnt[t]}</b></button>`).join('');
   document.querySelectorAll('#placeLegend .lg').forEach(b=>ICON[b.dataset.ft](b.querySelector('svg'),PTYPE[b.dataset.ft].c));
+  foldify(document.getElementById('placeLegend'),'legend','Chú thích');
   const ranked=w.places.map((p,i)=>({p,i})).sort((a,b)=>b.p.s-a.p.s||a.p.n.localeCompare(b.p.n));
   box.innerHTML=ranked.length?`<div class="power">${ranked.map(({p,i})=>`<button type="button" class="pw pchip" data-pi="${i}" data-t="${p.t}"><svg viewBox="-16 -18 32 32" aria-hidden="true"></svg><span class="pn">${esc(p.n)}</span><span class="pb"><i style="width:${p.s*20}%;background:${PTYPE[p.t].c}"></i></span></button>`).join('')}</div>`:'<p class="meta">Chưa có địa danh cho thế giới này.</p>';
   box.querySelectorAll('.pw').forEach(b=>ICON[b.dataset.t](b.querySelector('svg'),PTYPE[b.dataset.t].c));
@@ -298,4 +299,5 @@ function renderRealmBadge(w,box){
   box.innerHTML=`<span class="rb-h">Cảnh giới ở đây${w.rGuess?' <em>(ước lượng)</em>':''}</span>
     <span class="rb-range">${esc(REALMS[a].name)} → ${esc(REALMS[b].name)} · ${b-a+1} bậc</span>
     <ol>${rows.map(({r,i})=>`<li><button type="button" data-realm="${r.id}" aria-pressed="${r.id===curRealm}"><i style="background:${GBY[r.g].c}"></i>${esc(r.name)}<span>${i+1}</span></button></li>`).join('')}</ol>`;
+  foldify(box,'realm','Cảnh giới');
 }
