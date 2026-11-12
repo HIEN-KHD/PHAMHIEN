@@ -83,7 +83,12 @@ const PLACES={
     ['dao','Hỏa Hạt Đảo','Thế lực đảo cho người dò xét Long Môn, định diệt môn. Sau phải quỳ trước Vạn Hoa Lâu.',[1964,1987]],
     ['dao','Ác Giao đảo','Bị Long Môn tiêu diệt, chấn động Cổ Hoang hải vực.',[2000,1987]],
     ['tong','Tán Tu Liên Minh','Đại diện các thế lực Cổ Hoang tới quy phục Lâm Phong. Bốn trưởng lão ủng hộ hắn vào hội nghị bàn tròn.',[2106,1987]],
-    ['hiem','Vùng hung thú biển','Nơi hung thú biển tụ tập, rất nguy hiểm nên trở thành đất không ai quản.',[1964]]
+    ['hiem','Vùng hung thú biển','Nơi hung thú biển tụ tập, rất nguy hiểm nên trở thành đất không ai quản.',[1964]],
+    ['hiem','Thâm Hải Ma Huyệt','Hang ma dưới biển sâu.',[1966]],
+    ['hiem','Tà Long Ma ngục','Ngục của Tà Long. Lâm Phong diệt Tà Long đời thứ tám, đối mặt Thủy Tổ Tà Long.',[2100,2101,2105]],
+    ['bau','Nguyền rủa chi thuyền','Con thuyền bị nguyền rủa, từng trở lại dương gian.',[1972,1974]],
+    ['bau','Tinh Không Cổ Thuyền','Cổ thuyền vô địch của Hiên Viên.',[1962]],
+    ['gia','Hậu nhân Cơ Phát','Hậu nhân của văn võ Thánh Nhân Cơ Phát, giúp Lâm Phong xem bói.',[2096,2097]]
   ],
   minhgioi:[
     ['vung','Minh Hải','Có tứ đại thế lực, gọi là "một quốc gia ba đảo".',['~1659']],
@@ -96,7 +101,16 @@ const PLACES={
     ['tong','Thập điện Diêm vương','Thống trị Minh giới. Từ khi Minh Chủ biến mất, nhiều sinh linh mạnh bắt đầu không phục.',[2584]],
     ['tong','Thiên Phủ minh quân','Kéo quân tới Long giới khi thông đạo Minh giới mở rộng. Nói về "thiên nhân ngũ suy".',[5879,5880]],
     ['toc','Minh binh & âm binh','Phần lớn vong linh thành vật tiếp tế cho cường giả Minh giới. Số ít mạnh hoặc có quan hệ được bổ sung vào minh binh, âm binh.',[6234]],
-    ['hiem','Ba mươi ba trọng Minh giới','Minh giới có 33 tầng, giống 33 trọng thiên của Thiên Giới.',[3475]]
+    ['hiem','Ba mươi ba trọng Minh giới','Minh giới có 33 tầng, giống 33 trọng thiên của Thiên Giới.',[3475]],
+    ['tong','Ngũ phương Quỷ Đế','Cùng Thập điện Diêm vương cai quản Minh giới.',[2584]],
+    ['gia','Diêm La Vương','Một trong Thập điện Diêm vương.',[2588]],
+    ['tong','Địa Tạng Vương Bồ Tát','Cùng thần thú Đế Thính; từng ra điều đình khi Lâm Phong đến Địa phủ lần nữa.',[2586,5985],'Phong Đô'],
+    ['thanh','Liệt Ngục Thành','Nơi ngũ đại quân đoàn trưởng tụ họp. Liệt ngục liên minh bị Lâm Phong tiêu diệt.',[5975,5979]],
+    ['toc','Âm Thi Vương','Sinh linh Minh giới Lâm Phong gặp khi mới vào.',[2335]],
+    ['toc','Hắc Ngục Ma Quân','Cường giả Minh giới, xuất hiện cùng Khô Lâu Tà Quân.',[2336]],
+    ['toc','Tử Vong Kỵ Sĩ','Kỵ sĩ của Minh giới, cùng Long kỵ sĩ.',[2587]],
+    ['bau','Minh Vương Chung','Chuông của Minh Vương.',[2585]],
+    ['bau','Ngũ Sát Bi','Bia đá Lâm Phong gặp khi làm sứ giả Minh giới.',[2340]]
   ],
   battu:[
     ['vung','Cửu Linh vực','Do Cửu Linh Tông nắm giữ.',[3632]],
@@ -112,14 +126,12 @@ const PLACES={
     ['gia','Bất Tử gia tộc','Truyền thừa cổ xưa từ bảy vị cường giả. Lâm Phong mang huyết mạch gia tộc này qua cha là Lâm Bại Thiên.',[3183,3286]],
     ['gia','Nam Cung gia tộc','Có tổ địa riêng. Nam Cung Huyên Nhi đưa Lâm Phong tới bằng cổ thuyền.',[3881]],
     ['gia','Mộ Dung gia tộc','Một trong hai thế lực Lâm Phong đặc biệt chú ý, cùng Ninh gia.',[4082]],
-    ['gia','Quách gia','Một thế lực cực kỳ bất phàm.',[4396]],
     ['tong','Thánh Tà Tông','Một trong bảy đại thế lực tà đạo, không ai dám trêu.',[4778]],
     ['toc','Thiên Nhân tộc','Từ khi huyết mạch Tiên Thiên Nhân tộc lắng xuống, thiên nhân huyết mạch mới nổi bật lên.',[4475]],
     ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]],
-    ['tong','Huyết Ngục sát thủ vương triều','Tổ chức sát thủ khủng bố.',[4512,4564]],
+    ['tong','Huyết Ngục sát thủ','Huyết Ngục sát thủ vương triều, tổ chức sát thủ khủng bố.',[4512,4564]],
     ['hiem','Thiên Tàn Cốc','Thung lũng đáng sợ của Thiên Tàn tứ quái.',[4541,4543,4544]],
-    ['toc','Diệt Long kỵ sĩ quân đoàn','Quân đoàn kỵ sĩ chuyên diệt rồng.',[4579]],
-    ['bau','Nghiêu Đế thần tượng','Bên trong có một hình người bí ẩn.',[4573,4574]]
+    ['toc','Diệt Long kỵ sĩ','Diệt Long kỵ sĩ quân đoàn.',[4579]]
   ],
   toivuc:[
     ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
@@ -192,7 +204,11 @@ const PLACES={
     ['bau','Hài cốt Chân Long','Xương thủy tổ long nằm trong địa ngục, Lâm Phong từng thử kéo ra nhưng thất bại.',[1756,8238]],
     ['toc','Cửu U quỷ mẫu','Chủ nhân nơi đây, việc gì trong địa ngục cũng không giấu được bà.',[8238]],
     ['tong','Cửu U sát thủ','Kẻ nào bị Cửu U sát thủ để mắt tới thì không có kết cục tốt.',[333,602]],
-    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa.',[45]]
+    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa.',[45]],
+    ['toc','Mặc lão','Người mở thông đạo đưa linh hồn Lâm Phong vào Cửu U địa ngục để kéo hài cốt Chân Long.',[1755,1756]],
+    ['toc','Đời thứ hai Thủy Tổ Long','Liên quan hài cốt rồng trong Cửu U địa ngục.',[1757,8238]],
+    ['toc','Hoàng Tuyền công tử','Nhân vật Lâm Phong chạm trán ngay trước khi vào Cửu U.',[1750]],
+    ['bau','Luân Hồi Bất Diệt hỏa','Ngọn lửa Lâm Phong gặp trong đoạn này; về sau Quy gia giao hắn luyện hóa.',[1751,6564]]
   ],
   thienchi:[
     ['toc','Thái Tây tộc','Từng thống trị Cửu Châu vũ trụ, phát hiện và tiến vào Thiên Chi Giới, rồi bị Mạc Hậu Hắc Thủ thế giới tiêu diệt.',[7723,8381]],

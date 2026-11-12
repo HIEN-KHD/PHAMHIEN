@@ -83,7 +83,7 @@ function terrain(g,mode,base,box,seed){
 const ANCHORS={1:[[0,0]],2:[[-.45,0],[.45,0]],3:[[-.48,-.3],[.48,-.3],[0,.42]],4:[[-.45,-.38],[.45,-.38],[-.45,.4],[.45,.4]],
   5:[[0,0],[-.58,-.4],[.58,-.4],[-.58,.42],[.58,.42]],6:[[-.56,-.4],[0,-.45],[.56,-.4],[-.56,.42],[0,.45],[.56,.42]],
   7:[[0,0],[-.6,-.42],[0,-.55],[.6,-.42],[-.6,.42],[0,.55],[.6,.42]]};
-const markRect=(x,y,name)=>{const w=Math.max(44,name.length*7.2+8);return[x-w/2,y-21,x+w/2,y+36]};
+const markRect=(x,y,name)=>{const w=Math.max(44,name.length*7.7+10);return[x-w/2,y-21,x+w/2,y+36]};
 const labelRect=(x,y,name)=>{const w=name.length*11.5+24;return[x-w/2,y-16,x+w/2,y+8]};
 const hit=(a,b,m=6)=>a[0]<b[2]+m&&b[0]<a[2]+m&&a[1]<b[3]+m&&b[1]<a[3]+m;
 function layoutPlaces(places,box,avoid){
