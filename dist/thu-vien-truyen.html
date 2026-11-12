@@ -37,7 +37,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .crumbs a{color:var(--muted);text-decoration:none}.crumbs a:hover{color:var(--ink)}
 .crumbs b{color:var(--ink);font-weight:500}
 .crumbs .sep{opacity:.5}
-.bar-nav{margin-left:auto;display:flex;gap:6px}
+.bar-nav{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+@media (max-width:600px){.bar-nav a{white-space:normal}}
 .bar-nav a{font-size:13px;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;white-space:nowrap}
 .bar-nav a:hover{border-color:var(--gold)}
 
@@ -211,6 +212,26 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .nav2{display:flex;justify-content:space-between;gap:8px}
 .nav2 button{font:500 13px var(--body);color:var(--ink);background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
 .nav2 button:disabled{opacity:.35;cursor:default}
+/* Hồ sơ */
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:500 15px var(--body);color:var(--muted);text-decoration:none;padding:8px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--gold)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.cards .card h3{font-family:var(--display);font-size:24px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--ink);display:block;padding-right:36px}
+.card.art{position:relative}
+.rank{position:absolute;top:12px;right:14px;font:700 15px var(--body);color:#ffb45a;font-variant-numeric:tabular-nums}
+.tl{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:6px;max-width:900px}
+.tl li{position:relative}
+.tl li.neww{margin-top:14px}
+.tl-w{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px -27px}
+.tl-w .chip{background:var(--gold);color:#241a05;border-color:var(--gold);font-weight:600}
+.tl-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:6px 10px;border-radius:8px}
+.tl-row:hover{background:rgba(255,255,255,.04)}
+.tl-row p{margin:0}
+.tl-r{font-size:12px;font-weight:600;color:var(--c);border:1px solid var(--c);border-radius:6px;padding:1px 7px;white-space:nowrap}
+@media (max-width:600px){.tl-row{grid-template-columns:60px minmax(0,1fr)}.tl-r{grid-column:2;justify-self:start}}
+.evs{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.evs li{line-height:1.45}
 @media (prefers-reduced-motion:reduce){.tunnel .core{animation:none}.cover{transition:none}.place{transition:none}}
 </style>
 </head>
@@ -252,6 +273,13 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
     </div>
   </section>
 
+  <!-- Màn hồ sơ: nhân vật / hành trình / công pháp -->
+  <section class="view" id="vInfo" hidden>
+    <header class="w-head"><span class="eyebrow">Hồ sơ truyện</span><h1 id="infoTitle"></h1><p class="sub" id="infoSub"></p></header>
+    <nav class="tabs" id="infoTabs" aria-label="Hồ sơ"></nav>
+    <div id="infoBody" class="view"></div>
+  </section>
+
   <!-- Màn 3: Thế giới -->
   <section class="view" id="vWorld" hidden>
     <header class="w-head"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></header>
@@ -274,6 +302,8 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
         <div class="sec"><h3>Thông tin cơ bản</h3><dl class="facts" id="wFacts"></dl></div>
         <div class="sec"><h3 id="routeHead"></h3><div class="chips" id="wRoute"></div><p class="meta" id="wRouteMeta"></p></div>
         <div class="sec"><h3>Thế giới kề bên</h3><div class="chips" id="wNear"></div></div>
+        <div class="sec"><h3>Nhân vật ở đây</h3><div class="chips" id="wPeople"></div></div>
+        <div class="sec"><h3>Sự kiện ở đây</h3><ul class="evs" id="wEvents"></ul></div>
       </div>
       <div class="a-tower sec">
         <h3>Tháp cảnh giới <span id="towerBadge"></span></h3>
@@ -392,6 +422,28 @@ const REALMS=[
 const RIDX=Object.fromEntries(REALMS.map((r,i)=>[r.id,i]));
 const GBY=Object.fromEntries(GROUPS.map(g=>[g.id,g]));
 
+
+/* ===== Bổ sung từ đợt đọc thứ hai (theo nội dung chương) ===== */
+Object.assign(REALMS[RIDX.thanhde],{trait:'Bậc thứ sáu của Đại Đế. Có người tu đạo ba ngàn vạn năm mới bước vào Thánh Đế. Truyện có Tứ đại Thánh Đế và Thánh Cửu Cực, một Thánh Đế đỉnh phong.',tTrait:'t',ch:[3247,3248,3691]});
+Object.assign(REALMS[RIDX.dechu],{lv:'10 trọng thiên, có bậc Chuẩn Đế Chủ',tLv:'t',
+  how:'Lâm Phong đi từ Đế Chủ cửu trọng lên thập trọng thiên, rồi bước qua đại cảnh giới sang Tán Tiên. Nam Cung Mộ ở bậc Chuẩn Đế Chủ, "chỉ cần thêm thời gian là vào Đế Chủ".',tHow:'t',ch:[3732,3796,3999,4707,4751],lf:4707});
+Object.assign(REALMS[RIDX.thientien],{lv:'Có trọng thiên (linh hồn Lâm Phong từ Thiên Tiên thất trọng lên bát trọng)',tLv:'t',ch:[4665,4707]});
+Object.assign(REALMS[RIDX.chantien],{
+  trait:'Với tu sĩ thường, đột phá Chân Tiên vô cùng khó; người từng đạt cảnh giới này rồi trùng tu thì dễ hơn. Lâm Bại Thiên vừa vào Chân Tiên, lúc còn suy yếu, đã bị bảy đại cổ thánh truy sát để cướp khí vận. Ở Bất Tử giới hay Thiên giới, Chân Tiên rất hiếm.',
+  how:'Từ Hư Tiên lên Chân Tiên là đại cảnh giới. Trong Chân Tiên có bậc Chuẩn Kim Tiên; đột phá Kim Tiên "khó như lên trời". Tới Thánh Tiên còn có kiếp quang riêng.',ch:[4504,5108,5208,5677]});
+Object.assign(REALMS[RIDX.thanh],{lv:'Thánh cảnh cửu trọng: chín cảnh nhỏ như Đại Thánh, Tiên Thánh, Vạn Thánh…, mỗi cảnh có trọng thiên',tLv:'t',
+  trait:'Từ Tiên Thánh bước vào Vạn Thánh là từ trung giai lên cao giai của Thánh cảnh; bốn cảnh cuối là giai cao nhất. Hải Vương của Nam Hải thế giới đột phá Thánh Chủ.',tTrait:'t',
+  how:'Lâm Phong đột phá Đại Thánh ở Ma giới; khi tu thành đệ lục trọng Thái Cổ Long Tượng Quyết thì nhảy từ Tiên Thánh tứ trọng lên lục trọng; sau lên Tiên Thánh thập trọng, linh hồn đạt Vạn Thánh cửu trọng.',tHow:'t',ch:[6025,6315,6372,6570],lf:6025});
+
+/* Các bậc trên Siêu Việt tìm thêm được: Hợp Đạo, Hỗn Nguyên, vũ trụ đại lão */
+REALMS.splice(RIDX.chuasangthe,0,
+  R('hopdao','sieuviet','Hợp Đạo','合道','10 trọng thiên','Cảnh giới sau Siêu Việt.','Lâm Phong tu tới Hợp Đạo thập trọng thiên rồi bế quan xung kích Hỗn Nguyên.',{tLv:'t',tTrait:'t',tHow:'t',ch:[6834]}),
+  R('honnguyen','sieuviet','Hỗn Nguyên','混元','Có trọng thiên','Bậc ngay dưới chuẩn Chúa Sáng Thế. Phế Thổ chúa tể Thiên Tử Ức chưa vào chuẩn Chúa Sáng Thế nhưng chiến lực ngang bậc đó.','Lâm Phong trở lại Long Đằng Các bế quan, đột phá từ Hợp Đạo thập trọng lên Hỗn Nguyên nhất trọng. Sau đó xung kích chuẩn Chúa Sáng Thế.',{tLv:'t',tTrait:'t',tHow:'t',ch:[6834,7189,7190],lf:6834}));
+REALMS.splice(REALMS.findIndex(r=>r.id==='canhay'),0,
+  R('vutrudailao','sieuviet','Vũ trụ đại lão','宇宙大佬','Tính bằng tiên điện: 100 tòa','Chuẩn Kẻ Khai Hoang tối đa 99 tòa tiên điện; tòa thứ 100 là ranh giới để thành vũ trụ đại lão.','Phải độ kiếp. Năm cường giả từ 99 tiên điện cùng độ kiếp thành công. Bất Diệt kiếm chủ cũng xung kích bậc này. Linh hồn Lâm Phong đạt tầng vũ trụ đại lão, lợi ích toàn diện.',{tLv:'t',tTrait:'t',tHow:'t',ch:[9891,10085,10363]}));
+for(const k in RIDX)delete RIDX[k];REALMS.forEach((r,i)=>{RIDX[r.id]=i});
+Object.assign(REALMS[RIDX.chuasangthe],{how:'Phải độ Chúa Sáng Thế kiếp. Lôi kiếp càng mạnh, nuốt mảnh vỡ lôi kiếp càng được nhiều lợi. Lâm Phong chọn đột phá ở hải ngoại thế giới vì động tĩnh quá lớn. Có lần hai người cùng độ, một chết một thành.',ch:[6504,6611,7189,7729,7732],lf:7729});
+Object.assign(REALMS[RIDX.khaihoang],{lv:'Chuẩn Kẻ Khai Hoang tính bằng tiên điện, tối đa 99 tòa',tLv:'t',ch:[8381,8467,9706,10363,11034]});
 </script>
 <script>
 /* ===== Truyện =====
@@ -436,7 +488,7 @@ const STORIES=[{
       secs:[['Cư dân','Long tộc thuần huyết rất hiếm, phần lớn là long tộc tạp huyết. Chân Long phải trải qua trăm lần thiên kiếp mới xưng bá được Long Giới.',[5698,3207]],
         ['Thế lực','Sau khi lão tổ tự phong của Long giới ra ngoài, các cường giả tranh ngôi Long giới chi chủ, vì chỉ người này mới câu thông được bản nguyên thế giới. Long giới chia thành năm phe: Kim Long, Dực Long, Thiên Long, Tà Long và Cổ Long.',[5698]],
         ['Hiểm địa','Long giới đang rơi vào thời kỳ đại loạn, nhiều thế lực đã bỏ đi. Vùng biển của Long giới rất nguy hiểm. Về sau thông đạo Minh giới mở rộng và Thiên Phủ minh quân kéo đến.',[5698,5753,5879]],
-        ['Lâm Phong tại đây','Lâm Phong tìm hiểu tình hình rồi đi tới Long giới. Sau này có tin đồn có người đã thống nhất Long giới.',[5696,5698,6014]]]},
+        ['Lâm Phong tại đây','Lâm Phong tìm hiểu tình hình rồi đi tới Long giới, có được Chân Long sách cổ, Hồng Quân tiên kinh, Trảm Long Kiếm. Cuối cùng các phe quỳ xuống nhận chủ và hắn dung hợp Long giới; tin "có người thống nhất Long giới" lan tới tận Ma giới.',[5696,5700,5775,5860,5890,5898,6014]]]},
     {id:'thiengioi',name:'Thiên Giới (nhiều tầng)',tier:3,x:408,y:362,kind:'heaven',type:'Giới nhiều tầng',r:['thientien','chantien'],rGuess:true,sym:'Nhiều tầng mây chồng lên nhau, trên có đền vàng.',
       about:'Đứng đầu tam giới (Thiên Giới, Minh giới, Hỗn Độn Huyền Hoàng giới), chia làm ba mươi ba trọng thiên.',
       quote:['Thiên Giới chia làm ba mươi ba trọng thiên, bởi vậy ra đời ba mươi ba vị thiên chủ.',3475],
@@ -473,7 +525,7 @@ const STORIES=[{
         ['Thế lực & nơi chốn','Ma Thiên vực, Thương Minh thành, các ma đầu như Si ma, Oán ma, Hận ma, và Ngũ Tu Nhân của Ma giới.',[5471,6014,6035]],
         ['Bảo vật','Ma giới bản nguyên, Ngũ đại chí bảo, Ma giới chi nguyên và tin tức về thiên hỏa.',[4287,6014,6076]],
         ['Cổ Ma giới','Một bảo vật ma đạo cực kỳ tà ác, nhìn lâu sẽ mất phương hướng. Về sau nó nhiều lần kéo Lâm Phong vào giấc mộng.',[551,6008,6024]],
-        ['Lâm Phong tại đây','Vừa tới Ma giới, Lâm Phong đã thu phục Đại Ma Thiên và nắm Ma Thiên vực, làm kinh động nhiều thế lực.',[6014]]]},
+        ['Lâm Phong tại đây','Vừa tới Ma giới, Lâm Phong đã độ hóa Đại Ma Thiên và nắm Ma Thiên vực, đột phá Đại Thánh cảnh, rồi diệt Thương Minh Thiên khiến ba đại cường giả thề thần phục.',[6013,6014,6025,6040,6041]]]},
     {id:'minhgioi',name:'Minh Giới',tier:2,x:672,y:528,kind:'nether',type:'Giới (tam giới)',r:['chanthan','thienthan'],sym:'Đảo tím sẫm với những luồng u khí phát sáng.',
       about:'Một trong tam giới, nơi vong hồn đi về. Hung hiểm vạn phần.',
       quote:['Minh giới cái chỗ này, khắp nơi đều hung hiểm vạn phần, hơi không cẩn thận, thân tử đạo tiêu',2334],
@@ -493,7 +545,7 @@ const STORIES=[{
       secs:[['Đặc điểm','Phế Thổ nối với dị vực, Thiên Giới, Huyền Hoàng giới và cả Minh giới. Luật mạnh được yếu thua bị đẩy tới cực hạn, sinh linh từ đây đi ra mạnh đến khó tưởng tượng.',[2883,3311]],
         ['Lai lịch','Phế Thổ chứng kiến từng kỷ nguyên ra đời và hủy diệt, cất giữ vô số bí mật kỷ nguyên nên nhiều cường giả tìm cách vào.',[2883]],
         ['Sự kiện','Đại đế Quân Mạc Tiếu chết ở Phế Thổ. Ngạc Tổ suýt bước vào Cánh Cổng Vĩnh Sinh thì bị sinh linh Phế Thổ đánh trọng thương. Trớ chú oa oa (nguyền rủa nhóc con) đến từ đây.',[2883]],
-        ['Lâm Phong tại đây','Lôi kiếp của Lâm Phong từng ngưng ra hư ảnh Phế Thổ. Hắn nhập Thánh Hoàng để áp chế sinh linh Phế Thổ, và về sau gặp hậu nhân tội huyết ở đây.',[3317,3665,6902]]]},
+        ['Lâm Phong tại đây','Lôi kiếp của Lâm Phong từng ngưng ra hư ảnh Phế Thổ. Hắn nhập Thánh Hoàng để áp chế sinh linh Phế Thổ, làm chi chủ Long Đằng Các, luyện hóa Chấn Thiên Thạch Bi thứ chín và bế quan đột phá Hỗn Nguyên cảnh ở đây.',[3317,3665,6834,7107,7182]]]},
     {id:'toivuc',name:'Tội Vực',tier:2,x:492,y:685,kind:'sin',type:'Vực',r:['deton','tantien'],sym:'Đảo đỏ thẫm với các gai đỏ.',
       about:'Nơi ý chí của vô số hậu nhân tội huyết đã chết hòa vào pháp tắc.',
       quote:['Tội vực so sánh đặc thù, chết đi quá nhiều tội huyết hậu nhân, ý chí của bọn hắn dung nhập tội vực bên trong.',4504],
@@ -541,7 +593,7 @@ const SKY={galaxy:['#0b0d3a','#1b2a6b','#5b6cff'],sun:['#2a1a3d','#7a4a2a','#f2b
 </script>
 <script>
 /* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */
-const CH={"1": "/thai-co-long-tuong-quyet/chuong-1-5kmMvinMC62R", "19": "/thai-co-long-tuong-quyet/chuong-19-tzcsU8izgajS", "26": "/thai-co-long-tuong-quyet/chuong-26-FvjNK0aTo0Zz", "40": "/thai-co-long-tuong-quyet/chuong-40-vpwO0mJS5qG4", "45": "/thai-co-long-tuong-quyet/chuong-45-JMRKkP4wS0ZA", "49": "/thai-co-long-tuong-quyet/chuong-49-EBeTwuHwyWd2", "60": "/thai-co-long-tuong-quyet/chuong-60-Txx7yILQbTWS", "81": "/thai-co-long-tuong-quyet/chuong-81-VnHdUwwt0j33", "200": "/thai-co-long-tuong-quyet/chuong-200-Ls6FlxcBHqN9", "204": "/thai-co-long-tuong-quyet/chuong-204-FhJOxSpBnNR1", "224": "/thai-co-long-tuong-quyet/chuong-224-npK7wyr9JzhP", "239": "/thai-co-long-tuong-quyet/chuong-239-yRquAs8cSTeh", "262": "/thai-co-long-tuong-quyet/chuong-262-xgl0mmq5czhk", "279": "/thai-co-long-tuong-quyet/chuong-279-4htN6uDYViBT", "318": "/thai-co-long-tuong-quyet/chuong-318-ZOnRhkUWkfBn", "333": "/thai-co-long-tuong-quyet/chuong-333-MXiM57EeFPjW", "352": "/thai-co-long-tuong-quyet/chuong-352-QxRJVVj7tOjg", "363": "/thai-co-long-tuong-quyet/chuong-363-gjkxXtnbXLd6", "437": "/thai-co-long-tuong-quyet/chuong-437-111A8EdTN36K", "477": "/thai-co-long-tuong-quyet/chuong-477-7H4d4HiPQId6", "536": "/thai-co-long-tuong-quyet/chuong-536-Iyp2RiHo8YA2", "551": "/thai-co-long-tuong-quyet/chuong-551-SZLpfbZHH17K", "568": "/thai-co-long-tuong-quyet/chuong-568-aaSCzkwlAkb3", "577": "/thai-co-long-tuong-quyet/chuong-577-swAHvsuF3Qy1", "602": "/thai-co-long-tuong-quyet/chuong-602-5iVjEvaMv4y9", "635": "/thai-co-long-tuong-quyet/chuong-635-q1RgK5onqtfN", "691": "/thai-co-long-tuong-quyet/chuong-691-abIj39ihuFPf", "833": "/thai-co-long-tuong-quyet/chuong-833-JEUfQagj1XNK", "839": "/thai-co-long-tuong-quyet/chuong-839-ATIOiLziHKxd", "855": "/thai-co-long-tuong-quyet/chuong-855-om6yVMphIQA9", "~881": "/thai-co-long-tuong-quyet/chuong-tiep-PUW8Ndlf4nu6", "894": "/thai-co-long-tuong-quyet/chuong-tiep-RKqetHL7T2Qh", "~915": "/thai-co-long-tuong-quyet/chuong-tiep-AoS5Tny6zcaK", "~921": "/thai-co-long-tuong-quyet/chuong-tiep-23GolXH6FPAe", "975": "/thai-co-long-tuong-quyet/chuong-tiep-pDWHNM50ZUOU", "976": "/thai-co-long-tuong-quyet/chuong-tiep-Iup4vTeVR7ei", "~1001": "/thai-co-long-tuong-quyet/chuong-tiep-QVNfR2XcoIih", "~1097": "/thai-co-long-tuong-quyet/chuong-tiep-06PhFJwYQIOH", "~1142": "/thai-co-long-tuong-quyet/chuong-tiep-1CeJOrETy5yv", "~1203": "/thai-co-long-tuong-quyet/chuong-tiep-9I1HqYtsQa2J", "1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "~1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1268": "/thai-co-long-tuong-quyet/chuong-tiep-iWHcxdDlWzsL", "~1279": "/thai-co-long-tuong-quyet/chuong-tiep-yHaHz1IF9vmk", "~1327": "/thai-co-long-tuong-quyet/chuong-tiep-VGyKkqWJJVgR", "1402": "/thai-co-long-tuong-quyet/chuong-tiep-z26IxFpDbWxl", "~1441": "/thai-co-long-tuong-quyet/chuong-tiep-8tXBn2n9tVx6", "~1447": "/thai-co-long-tuong-quyet/chuong-tiep-08Lu5n689IXP", "~1471": "/thai-co-long-tuong-quyet/chuong-tiep-T5ZmFoM6BRrf", "~1472": "/thai-co-long-tuong-quyet/chuong-tiep-wnsZnwub447t", "~1481": "/thai-co-long-tuong-quyet/chuong-tiep-F9aej5s5xkUr", "1543": "/thai-co-long-tuong-quyet/chuong-tiep-9Aaab100fT5Z", "~1559": "/thai-co-long-tuong-quyet/chuong-tiep-nTOAN2pygZI4", "~1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1574": "/thai-co-long-tuong-quyet/chuong-tiep-x4uybw7Sp2FM", "1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "~1596": "/thai-co-long-tuong-quyet/chuong-tiep-TcXGgiFQ6w2B", "~1641": "/thai-co-long-tuong-quyet/chuong-tiep-8L6b9mBU0iMZ", "~1659": "/thai-co-long-tuong-quyet/chuong-tiep-j3Wk137Sm56W", "~1675": "/thai-co-long-tuong-quyet/chuong-tiep-NMLLn4wRnBJ1", "1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1717": "/thai-co-long-tuong-quyet/chuong-1717-4LnxbNxLcnak", "1728": "/thai-co-long-tuong-quyet/chuong-1728-K76cel2oGkU9", "1729": "/thai-co-long-tuong-quyet/chuong-1729-opPOCtaJ8NkN", "1744": "/thai-co-long-tuong-quyet/chuong-1744-yQvCQnrnHqhf", "1756": "/thai-co-long-tuong-quyet/chuong-1756-huXd0IUmnPrI", "1902": "/thai-co-long-tuong-quyet/chuong-1902-fvlPYTiN8iH6", "1942": "/thai-co-long-tuong-quyet/chuong-1942-lBnsVWnJCxos", "1964": "/thai-co-long-tuong-quyet/chuong-1964-GjQBZIwHTqbh", "1987": "/thai-co-long-tuong-quyet/chuong-1987-FyLGBCdjcMek", "1998": "/thai-co-long-tuong-quyet/chuong-1998-VkevDahDGJY9", "2000": "/thai-co-long-tuong-quyet/chuong-2000-SAFUJpoD1Z4b", "2047": "/thai-co-long-tuong-quyet/chuong-2047-kMJt2HynXC5s", "2106": "/thai-co-long-tuong-quyet/chuong-2106-v35IPiXCESco", "2124": "/thai-co-long-tuong-quyet/chuong-2124-WlUSHzTA0oMl", "2299": "/thai-co-long-tuong-quyet/chuong-2299-UEAnt1A0tZLs", "2334": "/thai-co-long-tuong-quyet/chuong-2334-DyhK6QURYfYY", "2338": "/thai-co-long-tuong-quyet/chuong-2338-7nuTIvgR4BcQ", "2431": "/thai-co-long-tuong-quyet/chuong-2431-HsetscmQHWvd", "2435": "/thai-co-long-tuong-quyet/chuong-2435-Bhr247zPn2yW", "2436": "/thai-co-long-tuong-quyet/chuong-2436-fP9pcFXuffFj", "2576": "/thai-co-long-tuong-quyet/chuong-2576-WKIwPuofL36R", "2584": "/thai-co-long-tuong-quyet/chuong-2584-LzhEnuEfM6DC", "2589": "/thai-co-long-tuong-quyet/chuong-2589-jWDAXXz9jFWI", "2637": "/thai-co-long-tuong-quyet/chuong-2637-eQevraT4nYAo", "2654": "/thai-co-long-tuong-quyet/chuong-2654-mRmIBjrXhHdX", "2713": "/thai-co-long-tuong-quyet/chuong-2713-x8XhYBQwOWAT", "2715": "/thai-co-long-tuong-quyet/chuong-2715-uX8GeQWw9nhv", "2719": "/thai-co-long-tuong-quyet/chuong-2719-oNLQqwjveJkn", "2734": "/thai-co-long-tuong-quyet/chuong-2734-zyrD4p1Pnmh5", "2739": "/thai-co-long-tuong-quyet/chuong-2739-NVM9oSmtBw1B", "2745": "/thai-co-long-tuong-quyet/chuong-2745-EkAr6D5tRjaV", "2785": "/thai-co-long-tuong-quyet/chuong-2785-MLiSbly0otfU", "2883": "/thai-co-long-tuong-quyet/chuong-2883-4w6B8aFKfEU6", "2898": "/thai-co-long-tuong-quyet/chuong-2898-EXcyMTXnohRO", "2938": "/thai-co-long-tuong-quyet/chuong-2938-KnfRJWcjswyA", "2965": "/thai-co-long-tuong-quyet/chuong-2965-Esmg7vWBWz45", "2968": "/thai-co-long-tuong-quyet/chuong-2968-fzg2lIAg9srk", "3183": "/thai-co-long-tuong-quyet/chuong-3183-LxByfmlhtdGH", "3207": "/thai-co-long-tuong-quyet/chuong-3207-HchdNwZ9nPql", "3247": "/thai-co-long-tuong-quyet/chuong-3247-Nsk6Jye5qfNX", "3286": "/thai-co-long-tuong-quyet/chuong-3286-0RUmhtAW1Hd5", "3311": "/thai-co-long-tuong-quyet/chuong-3311-w60RQ3yyv3DZ", "3317": "/thai-co-long-tuong-quyet/chuong-3317-oLo9ioHyBqnt", "3404": "/thai-co-long-tuong-quyet/chuong-3404-qWJNyuqoIOyB", "3475": "/thai-co-long-tuong-quyet/chuong-3475-OhZ4JnxyBbuR", "3564": "/thai-co-long-tuong-quyet/chuong-3564-uZhVw5u6mPFU", "3632": "/thai-co-long-tuong-quyet/chuong-3632-NcAzFeRzMK9P", "3653": "/thai-co-long-tuong-quyet/chuong-3653-PSUVlJ2Slaf0", "3656": "/thai-co-long-tuong-quyet/chuong-3656-qaOrPggxOUSf", "3665": "/thai-co-long-tuong-quyet/chuong-3665-9w6wLoeRHApd", "3691": "/thai-co-long-tuong-quyet/chuong-3691-YJvOb60O3ZgL", "3732": "/thai-co-long-tuong-quyet/chuong-3732-8HHe5GdpzSTK", "3775": "/thai-co-long-tuong-quyet/chuong-3775-gfDSggNFfbnl", "3796": "/thai-co-long-tuong-quyet/chuong-3796-hVXzCLxi4rJM", "3881": "/thai-co-long-tuong-quyet/chuong-3881-IZ7qo3s4YWh0", "4027": "/thai-co-long-tuong-quyet/chuong-4027-X6IpyQ1yy1QD", "4079": "/thai-co-long-tuong-quyet/chuong-4079-NqxjUyjsXq7c", "4082": "/thai-co-long-tuong-quyet/chuong-4082-oxr58MNNAkuH", "4087": "/thai-co-long-tuong-quyet/chuong-4087-CUM1sz8sYuDN", "4140": "/thai-co-long-tuong-quyet/chuong-4140-VwJhwfOHzMB0", "4187": "/thai-co-long-tuong-quyet/chuong-4187-bnnO47yqW2I2", "4198": "/thai-co-long-tuong-quyet/chuong-4198-rZ626V3K9zCS", "4287": "/thai-co-long-tuong-quyet/chuong-4287-MSt3ujAg9Acy", "4356": "/thai-co-long-tuong-quyet/chuong-4356-JCfJlQF4bin6", "4396": "/thai-co-long-tuong-quyet/chuong-4396-QThmhTK0fyJs", "4462": "/thai-co-long-tuong-quyet/chuong-4462-w6ZhunltUdhL", "4463": "/thai-co-long-tuong-quyet/chuong-4463-QorTSvJONGxY", "4464": "/thai-co-long-tuong-quyet/chuong-4464-tWAG03rtFtDm", "4475": "/thai-co-long-tuong-quyet/chuong-4475-9ITv2RwMtq7C", "4504": "/thai-co-long-tuong-quyet/chuong-4504-0mDjw6woI9kY", "4550": "/thai-co-long-tuong-quyet/chuong-4550-yH3uBtKkbBrd", "4586": "/thai-co-long-tuong-quyet/chuong-4586-AitEvRCg9uLX", "4587": "/thai-co-long-tuong-quyet/chuong-4587-dQC0TZkB2Xbk", "4606": "/thai-co-long-tuong-quyet/chuong-4606-iquxtxEegXbv", "4665": "/thai-co-long-tuong-quyet/chuong-4665-9eU9qIghLdZU", "4707": "/thai-co-long-tuong-quyet/chuong-4707-DK8Btard89dh", "4751": "/thai-co-long-tuong-quyet/chuong-4751-EPNn189YhvDL", "4778": "/thai-co-long-tuong-quyet/chuong-4778-7UV2pX30MyKH", "4789": "/thai-co-long-tuong-quyet/chuong-4789-NGogrv7UzuDg", "4793": "/thai-co-long-tuong-quyet/chuong-4793-I51p3RKUVRGY", "4879": "/thai-co-long-tuong-quyet/chuong-4879-MruTEHnLriuQ", "4910": "/thai-co-long-tuong-quyet/chuong-4910-KTTB56DKJC4N", "4959": "/thai-co-long-tuong-quyet/chuong-4959-j6DjxHGkF7y7", "4990": "/thai-co-long-tuong-quyet/chuong-4990-iwZ2kbSqs4cR", "4993": "/thai-co-long-tuong-quyet/chuong-4993-93TPOy7KVyP5", "4994": "/thai-co-long-tuong-quyet/chuong-4994-dlmBw6fpObfJ", "5051": "/thai-co-long-tuong-quyet/chuong-5051-r2w1DI8EKago", "5108": "/thai-co-long-tuong-quyet/chuong-5108-4J5rTTadHZgJ", "5132": "/thai-co-long-tuong-quyet/chuong-5132-XGJjeVqbJi0Z", "5156": "/thai-co-long-tuong-quyet/chuong-5156-0EXboW5YLrKp", "5471": "/thai-co-long-tuong-quyet/chuong-5471-oBIz9E0A5sSP", "5502": "/thai-co-long-tuong-quyet/chuong-5502-8OKab1Y7NoMz", "5642": "/thai-co-long-tuong-quyet/chuong-5642-cMOzpSZ19TUr", "5677": "/thai-co-long-tuong-quyet/chuong-5677-K5vW2rtSoYhX", "5696": "/thai-co-long-tuong-quyet/chuong-5696-PWeTSGNvSYih", "5698": "/thai-co-long-tuong-quyet/chuong-5698-MvF2YWUvDoE8", "5703": "/thai-co-long-tuong-quyet/chuong-5703-kSkyI9FQbyYE", "5753": "/thai-co-long-tuong-quyet/chuong-5753-cnoIiSqKPXiC", "5879": "/thai-co-long-tuong-quyet/chuong-5879-npjPpLO7p4tp", "5880": "/thai-co-long-tuong-quyet/chuong-5880-HW2CNTwchh93", "5953": "/thai-co-long-tuong-quyet/chuong-5953-MfKO6Oo9cJ4k", "5980": "/thai-co-long-tuong-quyet/chuong-5980-FkSdunibGMAf", "6008": "/thai-co-long-tuong-quyet/chuong-6008-cWteGKAYo1Xn", "6014": "/thai-co-long-tuong-quyet/chuong-6014-UlhNY5TX4o77", "6024": "/thai-co-long-tuong-quyet/chuong-6024-GphE2L0Wp8kJ", "6035": "/thai-co-long-tuong-quyet/chuong-6035-Vb1t4j40T4ei", "6060": "/thai-co-long-tuong-quyet/chuong-6060-SGXYntrTNrEC", "6076": "/thai-co-long-tuong-quyet/chuong-6076-5ZM8ZuhROxRi", "6172": "/thai-co-long-tuong-quyet/chuong-6172-Q7YRl8EmOBzz", "6174": "/thai-co-long-tuong-quyet/chuong-6174-NW90rOLm9RVQ", "6178": "/thai-co-long-tuong-quyet/chuong-6178-HMM93tYleyZI", "6217": "/thai-co-long-tuong-quyet/chuong-6217-uu6pSo4Cpapq", "6234": "/thai-co-long-tuong-quyet/chuong-6234-1vDCmxSfiKJa", "6257": "/thai-co-long-tuong-quyet/chuong-6257-0A8IOr98sqMc", "6287": "/thai-co-long-tuong-quyet/chuong-6287-rfs6IVAaI9zz", "6298": "/thai-co-long-tuong-quyet/chuong-6298-7RBlKtE4v5tO", "6333": "/thai-co-long-tuong-quyet/chuong-6333-pAiHXJYVbB64", "6345": "/thai-co-long-tuong-quyet/chuong-6345-YeKj7pAU7lGh", "6377": "/thai-co-long-tuong-quyet/chuong-6377-qGxtfrpR9xgi", "6412": "/thai-co-long-tuong-quyet/chuong-6412-GDDZ6Yg1Po7g", "6420": "/thai-co-long-tuong-quyet/chuong-6420-5rdrUY61QrER", "6504": "/thai-co-long-tuong-quyet/chuong-6504-qxyela57ZqHe", "6546": "/thai-co-long-tuong-quyet/chuong-6546-tdchotG3MLKr", "6570": "/thai-co-long-tuong-quyet/chuong-6570-dheMZoOfMM5l", "6574": "/thai-co-long-tuong-quyet/chuong-6574-XXrVlJbers8e", "6611": "/thai-co-long-tuong-quyet/chuong-6611-Dg0b3y16HEsl", "6634": "/thai-co-long-tuong-quyet/chuong-6634-CvvhfsiYRlvn", "6902": "/thai-co-long-tuong-quyet/chuong-6902-MHi71iMmuOZe", "7106": "/thai-co-long-tuong-quyet/chuong-7106-P8CjXs11EPEe", "7165": "/thai-co-long-tuong-quyet/chuong-7165-eDnp1JKxDw96", "7178": "/thai-co-long-tuong-quyet/chuong-7178-R1sctf9UpjjF", "7723": "/thai-co-long-tuong-quyet/chuong-7723-y0o0AXFFmJlE", "7732": "/thai-co-long-tuong-quyet/chuong-7732-ge6vEPHltdOF", "8040": "/thai-co-long-tuong-quyet/chuong-8040-QYMR8zkPGhSJ", "8150": "/thai-co-long-tuong-quyet/chuong-8150-tpFvn72arGVB", "8164": "/thai-co-long-tuong-quyet/chuong-8164-Nx7UAq5SHSA8", "8202": "/thai-co-long-tuong-quyet/chuong-8202-D6gbK36WyTAo", "8238": "/thai-co-long-tuong-quyet/chuong-8238-1fqHZVEZQkgu", "8381": "/thai-co-long-tuong-quyet/chuong-8381-jcno8TJJ7U2Y", "8626": "/thai-co-long-tuong-quyet/chuong-8626-DgmTVqhX9v2V", "8650": "/thai-co-long-tuong-quyet/chuong-8650-kiYbLoRZ7liF", "8840": "/thai-co-long-tuong-quyet/chuong-8840-0TM97ratcphZ", "8850": "/thai-co-long-tuong-quyet/chuong-8850-EPMIda3urW4N", "8851": "/thai-co-long-tuong-quyet/chuong-8851-lh3V5TVPztnA", "9512": "/thai-co-long-tuong-quyet/chuong-9512-nUrZrELFnfzN", "9706": "/thai-co-long-tuong-quyet/chuong-9706-zhjB9Qj4hPDo", "10084": "/thai-co-long-tuong-quyet/chuong-10084-RuOxt2WC2pK!", "10143": "/thai-co-long-tuong-quyet/chuong-10143-H0!0bjk8ygvC", "10339": "/thai-co-long-tuong-quyet/chuong-10339-9mcOTcvFEXEz", "10379": "/thai-co-long-tuong-quyet/chuong-10379-c2pC_He3_btn", "10416": "/thai-co-long-tuong-quyet/chuong-10416-ZVNSBbthCGf9", "10544": "/thai-co-long-tuong-quyet/chuong-10544-zwFF_eWmyyRd", "10769": "/thai-co-long-tuong-quyet/chuong-10769-XtDNHB_7Xwve", "10800": "/thai-co-long-tuong-quyet/chuong-10800-FmR8TV5b!ZrS", "10846": "/thai-co-long-tuong-quyet/chuong-10846-uXYYKu1r57l_", "11002": "/thai-co-long-tuong-quyet/chuong-11002-3mx1HR5KrcJ4", "11034": "/thai-co-long-tuong-quyet/chuong-11034-u4ERp9HNRByQ", "11192": "/thai-co-long-tuong-quyet/chuong-11192-!aU4mGleaYKD", "11217": "/thai-co-long-tuong-quyet/chuong-11217-Qqbm2huGbNcy"};
+const CH={"1": "/thai-co-long-tuong-quyet/chuong-1-5kmMvinMC62R", "19": "/thai-co-long-tuong-quyet/chuong-19-tzcsU8izgajS", "26": "/thai-co-long-tuong-quyet/chuong-26-FvjNK0aTo0Zz", "29": "/thai-co-long-tuong-quyet/chuong-29-g3djyOEyRuMe", "40": "/thai-co-long-tuong-quyet/chuong-40-vpwO0mJS5qG4", "45": "/thai-co-long-tuong-quyet/chuong-45-JMRKkP4wS0ZA", "49": "/thai-co-long-tuong-quyet/chuong-49-EBeTwuHwyWd2", "52": "/thai-co-long-tuong-quyet/chuong-52-fIYpaIvRbQQh", "54": "/thai-co-long-tuong-quyet/chuong-54-ci9PgX2QLgw8", "60": "/thai-co-long-tuong-quyet/chuong-60-Txx7yILQbTWS", "66": "/thai-co-long-tuong-quyet/chuong-66-LClqG3ePrG6l", "78": "/thai-co-long-tuong-quyet/chuong-78-4fNHqZHONpGO", "81": "/thai-co-long-tuong-quyet/chuong-81-VnHdUwwt0j33", "175": "/thai-co-long-tuong-quyet/chuong-175-PDaZ3nojN4nf", "200": "/thai-co-long-tuong-quyet/chuong-200-Ls6FlxcBHqN9", "204": "/thai-co-long-tuong-quyet/chuong-204-FhJOxSpBnNR1", "224": "/thai-co-long-tuong-quyet/chuong-224-npK7wyr9JzhP", "239": "/thai-co-long-tuong-quyet/chuong-239-yRquAs8cSTeh", "262": "/thai-co-long-tuong-quyet/chuong-262-xgl0mmq5czhk", "279": "/thai-co-long-tuong-quyet/chuong-279-4htN6uDYViBT", "280": "/thai-co-long-tuong-quyet/chuong-280-YPBAe2m3OLRh", "318": "/thai-co-long-tuong-quyet/chuong-318-ZOnRhkUWkfBn", "333": "/thai-co-long-tuong-quyet/chuong-333-MXiM57EeFPjW", "352": "/thai-co-long-tuong-quyet/chuong-352-QxRJVVj7tOjg", "363": "/thai-co-long-tuong-quyet/chuong-363-gjkxXtnbXLd6", "369": "/thai-co-long-tuong-quyet/chuong-369-XyYgpe6an8CP", "437": "/thai-co-long-tuong-quyet/chuong-437-111A8EdTN36K", "462": "/thai-co-long-tuong-quyet/chuong-462-xgYpqNRwHpgo", "477": "/thai-co-long-tuong-quyet/chuong-477-7H4d4HiPQId6", "536": "/thai-co-long-tuong-quyet/chuong-536-Iyp2RiHo8YA2", "551": "/thai-co-long-tuong-quyet/chuong-551-SZLpfbZHH17K", "~560": "/thai-co-long-tuong-quyet/chuong-tiep-NOXyr6lHmXAC", "568": "/thai-co-long-tuong-quyet/chuong-568-aaSCzkwlAkb3", "577": "/thai-co-long-tuong-quyet/chuong-577-swAHvsuF3Qy1", "581": "/thai-co-long-tuong-quyet/chuong-581-nlNQ7O7EZx1u", "602": "/thai-co-long-tuong-quyet/chuong-602-5iVjEvaMv4y9", "619": "/thai-co-long-tuong-quyet/chuong-619-Did6Y4yppnSs", "623": "/thai-co-long-tuong-quyet/chuong-623-7YpFkaBpKKVk", "635": "/thai-co-long-tuong-quyet/chuong-635-q1RgK5onqtfN", "673": "/thai-co-long-tuong-quyet/chuong-673-zssZBtmj8tfi", "691": "/thai-co-long-tuong-quyet/chuong-691-abIj39ihuFPf", "695": "/thai-co-long-tuong-quyet/chuong-695-VQVsFfvhQmSX", "732": "/thai-co-long-tuong-quyet/chuong-732-AZezXKL8q8Ce", "750": "/thai-co-long-tuong-quyet/chuong-750-lH38PbH6cUwb", "763": "/thai-co-long-tuong-quyet/chuong-tiep-yTyMXESa0hMR", "811": "/thai-co-long-tuong-quyet/chuong-811-uOQ7sIxV400y", "818": "/thai-co-long-tuong-quyet/chuong-818-8dyrChPFs4Q2", "833": "/thai-co-long-tuong-quyet/chuong-833-JEUfQagj1XNK", "839": "/thai-co-long-tuong-quyet/chuong-839-ATIOiLziHKxd", "855": "/thai-co-long-tuong-quyet/chuong-855-om6yVMphIQA9", "857": "/thai-co-long-tuong-quyet/chuong-857-lCiXbbvg3gga", "~881": "/thai-co-long-tuong-quyet/chuong-tiep-PUW8Ndlf4nu6", "~884": "/thai-co-long-tuong-quyet/chuong-tiep-qcQU10P9hghl", "894": "/thai-co-long-tuong-quyet/chuong-tiep-RKqetHL7T2Qh", "~896": "/thai-co-long-tuong-quyet/chuong-tiep-Z62vbW28DGqO", "~915": "/thai-co-long-tuong-quyet/chuong-tiep-AoS5Tny6zcaK", "~921": "/thai-co-long-tuong-quyet/chuong-tiep-23GolXH6FPAe", "975": "/thai-co-long-tuong-quyet/chuong-tiep-pDWHNM50ZUOU", "976": "/thai-co-long-tuong-quyet/chuong-tiep-Iup4vTeVR7ei", "~1001": "/thai-co-long-tuong-quyet/chuong-tiep-QVNfR2XcoIih", "~1046": "/thai-co-long-tuong-quyet/chuong-tiep-QbcGZaoXN4IM", "~1097": "/thai-co-long-tuong-quyet/chuong-tiep-06PhFJwYQIOH", "~1142": "/thai-co-long-tuong-quyet/chuong-tiep-1CeJOrETy5yv", "~1166": "/thai-co-long-tuong-quyet/chuong-tiep-T9sBYtTR0EIB", "~1203": "/thai-co-long-tuong-quyet/chuong-tiep-9I1HqYtsQa2J", "~1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1268": "/thai-co-long-tuong-quyet/chuong-tiep-iWHcxdDlWzsL", "~1279": "/thai-co-long-tuong-quyet/chuong-tiep-yHaHz1IF9vmk", "~1321": "/thai-co-long-tuong-quyet/chuong-tiep-d1AbS5DJ3i68", "~1327": "/thai-co-long-tuong-quyet/chuong-tiep-VGyKkqWJJVgR", "1402": "/thai-co-long-tuong-quyet/chuong-tiep-z26IxFpDbWxl", "1412": "/thai-co-long-tuong-quyet/chuong-tiep-yI1OZ9Wfl20o", "~1441": "/thai-co-long-tuong-quyet/chuong-tiep-8tXBn2n9tVx6", "~1447": "/thai-co-long-tuong-quyet/chuong-tiep-08Lu5n689IXP", "~1460": "/thai-co-long-tuong-quyet/chuong-tiep-DJG8DQHcYUxG", "~1471": "/thai-co-long-tuong-quyet/chuong-tiep-T5ZmFoM6BRrf", "~1472": "/thai-co-long-tuong-quyet/chuong-tiep-wnsZnwub447t", "~1481": "/thai-co-long-tuong-quyet/chuong-tiep-F9aej5s5xkUr", "~1482": "/thai-co-long-tuong-quyet/chuong-tiep-irtRHCQapNk5", "~1488": "/thai-co-long-tuong-quyet/chuong-tiep-a6g9ZxjZ5AKP", "~1513": "/thai-co-long-tuong-quyet/chuong-tiep-JfqmhMzYFARC", "~1527": "/thai-co-long-tuong-quyet/chuong-tiep-Vrl0p0A2eNr3", "~1540": "/thai-co-long-tuong-quyet/chuong-tiep-i2gExeLV2aIu", "~1541": "/thai-co-long-tuong-quyet/chuong-tiep-Cky0Vmt0uDY7", "1543": "/thai-co-long-tuong-quyet/chuong-tiep-9Aaab100fT5Z", "~1559": "/thai-co-long-tuong-quyet/chuong-tiep-nTOAN2pygZI4", "1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1574": "/thai-co-long-tuong-quyet/chuong-tiep-x4uybw7Sp2FM", "~1576": "/thai-co-long-tuong-quyet/chuong-tiep-uTWXhBDSaJln", "~1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "~1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "~1621": "/thai-co-long-tuong-quyet/chuong-tiep-aD5rBG9WT66B", "~1641": "/thai-co-long-tuong-quyet/chuong-tiep-8L6b9mBU0iMZ", "~1659": "/thai-co-long-tuong-quyet/chuong-tiep-j3Wk137Sm56W", "~1662": "/thai-co-long-tuong-quyet/chuong-tiep-ABQ7fQmxPytA", "~1668": "/thai-co-long-tuong-quyet/chuong-tiep-2QEpxB5wflTU", "~1672": "/thai-co-long-tuong-quyet/chuong-tiep-wFRy9hIwAIWM", "~1675": "/thai-co-long-tuong-quyet/chuong-tiep-NMLLn4wRnBJ1", "~1682": "/thai-co-long-tuong-quyet/chuong-tiep-iJRqdxovvbAY", "~1683": "/thai-co-long-tuong-quyet/chuong-tiep-C1kdB5MQoEQm", "~1703": "/thai-co-long-tuong-quyet/chuong-tiep-k9lM9bPOKrgA", "~1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1716": "/thai-co-long-tuong-quyet/chuong-1716-bdUA3GPqkAKW", "1717": "/thai-co-long-tuong-quyet/chuong-1717-4LnxbNxLcnak", "1720": "/thai-co-long-tuong-quyet/chuong-1720-VThJFlcpFgNO", "1721": "/thai-co-long-tuong-quyet/chuong-1721-zA06ntAK8Kdc", "1728": "/thai-co-long-tuong-quyet/chuong-1728-K76cel2oGkU9", "1729": "/thai-co-long-tuong-quyet/chuong-1729-opPOCtaJ8NkN", "1744": "/thai-co-long-tuong-quyet/chuong-1744-yQvCQnrnHqhf", "1750": "/thai-co-long-tuong-quyet/chuong-1750-pfjuiXAmXdHy", "1751": "/thai-co-long-tuong-quyet/chuong-1751-JN2hGfjHPGXC", "1755": "/thai-co-long-tuong-quyet/chuong-1755-DCEqSBwHvma4", "1756": "/thai-co-long-tuong-quyet/chuong-1756-huXd0IUmnPrI", "1757": "/thai-co-long-tuong-quyet/chuong-1757-BbqQYQ2Gf37V", "1854": "/thai-co-long-tuong-quyet/chuong-1854-j0JeEQES5Pda", "1902": "/thai-co-long-tuong-quyet/chuong-1902-fvlPYTiN8iH6", "1929": "/thai-co-long-tuong-quyet/chuong-1929-YzseMscpnkN1", "1937": "/thai-co-long-tuong-quyet/chuong-1937-NeIwlt2oooUm", "1940": "/thai-co-long-tuong-quyet/chuong-1940-olCIPGgJRhHR", "1942": "/thai-co-long-tuong-quyet/chuong-1942-lBnsVWnJCxos", "1962": "/thai-co-long-tuong-quyet/chuong-1962-JJobT2pHia4G", "1964": "/thai-co-long-tuong-quyet/chuong-1964-GjQBZIwHTqbh", "1966": "/thai-co-long-tuong-quyet/chuong-1966-E81kfY2GE778", "1972": "/thai-co-long-tuong-quyet/chuong-1972-5NpTxIMGUthS", "1974": "/thai-co-long-tuong-quyet/chuong-1974-3nQ23YSGEAEt", "1987": "/thai-co-long-tuong-quyet/chuong-1987-FyLGBCdjcMek", "1998": "/thai-co-long-tuong-quyet/chuong-1998-VkevDahDGJY9", "2000": "/thai-co-long-tuong-quyet/chuong-2000-SAFUJpoD1Z4b", "2047": "/thai-co-long-tuong-quyet/chuong-2047-kMJt2HynXC5s", "2053": "/thai-co-long-tuong-quyet/chuong-2053-cb7bK2HmnzfC", "2067": "/thai-co-long-tuong-quyet/chuong-2067-IULc0n0l3pMG", "2069": "/thai-co-long-tuong-quyet/chuong-2069-FuwC637lo5sh", "2096": "/thai-co-long-tuong-quyet/chuong-2096-9z4QvS1DT8zc", "2097": "/thai-co-long-tuong-quyet/chuong-2097-cgNDTaZiLlFq", "2100": "/thai-co-long-tuong-quyet/chuong-2100-3oHZ7xEDyf2V", "2101": "/thai-co-long-tuong-quyet/chuong-2101-XWZMf5mhqIJi", "2105": "/thai-co-long-tuong-quyet/chuong-2105-RLmVrazhMoMb", "2106": "/thai-co-long-tuong-quyet/chuong-2106-v35IPiXCESco", "2124": "/thai-co-long-tuong-quyet/chuong-2124-WlUSHzTA0oMl", "2131": "/thai-co-long-tuong-quyet/chuong-2131-ribx7sLe8ECI", "2175": "/thai-co-long-tuong-quyet/chuong-2175-snqZFQcah0nw", "2282": "/thai-co-long-tuong-quyet/chuong-2282-NE3QZsmWzps9", "2299": "/thai-co-long-tuong-quyet/chuong-2299-UEAnt1A0tZLs", "2334": "/thai-co-long-tuong-quyet/chuong-2334-DyhK6QURYfYY", "2335": "/thai-co-long-tuong-quyet/chuong-2335-gg07eY2wRIpm", "2336": "/thai-co-long-tuong-quyet/chuong-2336-ANItCgaRJv5z", "2338": "/thai-co-long-tuong-quyet/chuong-2338-7nuTIvgR4BcQ", "2340": "/thai-co-long-tuong-quyet/chuong-2340-4DV2OBnQoR8s", "2410": "/thai-co-long-tuong-quyet/chuong-2410-F2KNMyBxsGO2", "2431": "/thai-co-long-tuong-quyet/chuong-2431-HsetscmQHWvd", "2435": "/thai-co-long-tuong-quyet/chuong-2435-Bhr247zPn2yW", "2436": "/thai-co-long-tuong-quyet/chuong-2436-fP9pcFXuffFj", "2571": "/thai-co-long-tuong-quyet/chuong-2571-8nn0fG3BytmL", "2576": "/thai-co-long-tuong-quyet/chuong-2576-WKIwPuofL36R", "2584": "/thai-co-long-tuong-quyet/chuong-2584-LzhEnuEfM6DC", "2585": "/thai-co-long-tuong-quyet/chuong-2585-pg01L2m9EjTP", "2586": "/thai-co-long-tuong-quyet/chuong-2586-IOJotAKe6Mjd", "2587": "/thai-co-long-tuong-quyet/chuong-2587-m6baRIs9zzzq", "2588": "/thai-co-long-tuong-quyet/chuong-2588-GouNzPQercG4", "2589": "/thai-co-long-tuong-quyet/chuong-2589-jWDAXXz9jFWI", "2637": "/thai-co-long-tuong-quyet/chuong-2637-eQevraT4nYAo", "2654": "/thai-co-long-tuong-quyet/chuong-2654-mRmIBjrXhHdX", "2713": "/thai-co-long-tuong-quyet/chuong-2713-x8XhYBQwOWAT", "2715": "/thai-co-long-tuong-quyet/chuong-2715-uX8GeQWw9nhv", "2719": "/thai-co-long-tuong-quyet/chuong-2719-oNLQqwjveJkn", "2721": "/thai-co-long-tuong-quyet/chuong-2721-mmwzwBqvPaHE", "2734": "/thai-co-long-tuong-quyet/chuong-2734-zyrD4p1Pnmh5", "2739": "/thai-co-long-tuong-quyet/chuong-2739-NVM9oSmtBw1B", "2745": "/thai-co-long-tuong-quyet/chuong-2745-EkAr6D5tRjaV", "2759": "/thai-co-long-tuong-quyet/chuong-2759-vdNsmyorhZHZ", "2785": "/thai-co-long-tuong-quyet/chuong-2785-MLiSbly0otfU", "2791": "/thai-co-long-tuong-quyet/chuong-2791-DaWBtWHz4gFo", "2801": "/thai-co-long-tuong-quyet/chuong-2801-zeX3Nmoypzs0", "2802": "/thai-co-long-tuong-quyet/chuong-2802-TMppvuMThc8D", "2816": "/thai-co-long-tuong-quyet/chuong-2816-9F3qbg5RySpI", "2822": "/thai-co-long-tuong-quyet/chuong-2822-1UqZuQOREFPb", "2825": "/thai-co-long-tuong-quyet/chuong-2825-SbkvYo3vr9BG", "2829": "/thai-co-long-tuong-quyet/chuong-2829-MQx4kJGvMfF8", "2861": "/thai-co-long-tuong-quyet/chuong-2861-e2aFILvsPrfA", "2872": "/thai-co-long-tuong-quyet/chuong-2872-oAnW6CBq2Hah", "2873": "/thai-co-long-tuong-quyet/chuong-2873-Ir5JeJjLuuru", "2883": "/thai-co-long-tuong-quyet/chuong-2883-4w6B8aFKfEU6", "2898": "/thai-co-long-tuong-quyet/chuong-2898-EXcyMTXnohRO", "2910": "/thai-co-long-tuong-quyet/chuong-2910-x0EPwz9mKGa1", "2938": "/thai-co-long-tuong-quyet/chuong-2938-KnfRJWcjswyA", "2962": "/thai-co-long-tuong-quyet/chuong-2962-nksJTXrgt6HQ", "2965": "/thai-co-long-tuong-quyet/chuong-2965-Esmg7vWBWz45", "2968": "/thai-co-long-tuong-quyet/chuong-2968-fzg2lIAg9srk", "3051": "/thai-co-long-tuong-quyet/chuong-3051-d27QvcGlsIlb", "3183": "/thai-co-long-tuong-quyet/chuong-3183-LxByfmlhtdGH", "3207": "/thai-co-long-tuong-quyet/chuong-3207-HchdNwZ9nPql", "3247": "/thai-co-long-tuong-quyet/chuong-3247-Nsk6Jye5qfNX", "3248": "/thai-co-long-tuong-quyet/chuong-3248-ra3tr6CaiIdl", "3284": "/thai-co-long-tuong-quyet/chuong-3284-31sCbe4WG17e", "3286": "/thai-co-long-tuong-quyet/chuong-3286-0RUmhtAW1Hd5", "3311": "/thai-co-long-tuong-quyet/chuong-3311-w60RQ3yyv3DZ", "3317": "/thai-co-long-tuong-quyet/chuong-3317-oLo9ioHyBqnt", "3404": "/thai-co-long-tuong-quyet/chuong-3404-qWJNyuqoIOyB", "3475": "/thai-co-long-tuong-quyet/chuong-3475-OhZ4JnxyBbuR", "3489": "/thai-co-long-tuong-quyet/chuong-3489-4am4zZgwRRbW", "3564": "/thai-co-long-tuong-quyet/chuong-3564-uZhVw5u6mPFU", "3632": "/thai-co-long-tuong-quyet/chuong-3632-NcAzFeRzMK9P", "3653": "/thai-co-long-tuong-quyet/chuong-3653-PSUVlJ2Slaf0", "3656": "/thai-co-long-tuong-quyet/chuong-3656-qaOrPggxOUSf", "3665": "/thai-co-long-tuong-quyet/chuong-3665-9w6wLoeRHApd", "3667": "/thai-co-long-tuong-quyet/chuong-3667-6MiWR4lQ2QM5", "3691": "/thai-co-long-tuong-quyet/chuong-3691-YJvOb60O3ZgL", "3727": "/thai-co-long-tuong-quyet/chuong-3727-kkliLdsKbI9E", "3732": "/thai-co-long-tuong-quyet/chuong-3732-8HHe5GdpzSTK", "3775": "/thai-co-long-tuong-quyet/chuong-3775-gfDSggNFfbnl", "3796": "/thai-co-long-tuong-quyet/chuong-3796-hVXzCLxi4rJM", "3881": "/thai-co-long-tuong-quyet/chuong-3881-IZ7qo3s4YWh0", "3999": "/thai-co-long-tuong-quyet/chuong-3999-AJsnbtZ1RL35", "4027": "/thai-co-long-tuong-quyet/chuong-4027-X6IpyQ1yy1QD", "4033": "/thai-co-long-tuong-quyet/chuong-4033-PL6XGBKxEo0X", "4037": "/thai-co-long-tuong-quyet/chuong-4037-JAJgSgXxjL3P", "4079": "/thai-co-long-tuong-quyet/chuong-4079-NqxjUyjsXq7c", "4082": "/thai-co-long-tuong-quyet/chuong-4082-oxr58MNNAkuH", "4087": "/thai-co-long-tuong-quyet/chuong-4087-CUM1sz8sYuDN", "4140": "/thai-co-long-tuong-quyet/chuong-4140-VwJhwfOHzMB0", "4165": "/thai-co-long-tuong-quyet/chuong-4165-RbqNfpCjt8lT", "4187": "/thai-co-long-tuong-quyet/chuong-4187-bnnO47yqW2I2", "4198": "/thai-co-long-tuong-quyet/chuong-4198-rZ626V3K9zCS", "4246": "/thai-co-long-tuong-quyet/chuong-4246-mUYnQYXFDHpy", "4287": "/thai-co-long-tuong-quyet/chuong-4287-MSt3ujAg9Acy", "4334": "/thai-co-long-tuong-quyet/chuong-4334-of21he76KpzH", "4356": "/thai-co-long-tuong-quyet/chuong-4356-JCfJlQF4bin6", "4381": "/thai-co-long-tuong-quyet/chuong-4381-GsBzTa3WWVNa", "4462": "/thai-co-long-tuong-quyet/chuong-4462-w6ZhunltUdhL", "4463": "/thai-co-long-tuong-quyet/chuong-4463-QorTSvJONGxY", "4464": "/thai-co-long-tuong-quyet/chuong-4464-tWAG03rtFtDm", "4470": "/thai-co-long-tuong-quyet/chuong-4470-llyzIoAsVgn6", "4475": "/thai-co-long-tuong-quyet/chuong-4475-9ITv2RwMtq7C", "4477": "/thai-co-long-tuong-quyet/chuong-4477-6h5U8h2Md6ed", "4496": "/thai-co-long-tuong-quyet/chuong-4496-B8nRY5WpI6en", "4504": "/thai-co-long-tuong-quyet/chuong-4504-0mDjw6woI9kY", "4512": "/thai-co-long-tuong-quyet/chuong-4512-pQc1K6MnJCrJ", "4541": "/thai-co-long-tuong-quyet/chuong-4541-fvLpElMFiVUf", "4543": "/thai-co-long-tuong-quyet/chuong-4543-cKwPK1TFTl16", "4544": "/thai-co-long-tuong-quyet/chuong-4544-62FCt81kLOHK", "4550": "/thai-co-long-tuong-quyet/chuong-4550-yH3uBtKkbBrd", "4564": "/thai-co-long-tuong-quyet/chuong-4564-eAGvrf3is1Yi", "4579": "/thai-co-long-tuong-quyet/chuong-4579-ommi5YLB1UV0", "4586": "/thai-co-long-tuong-quyet/chuong-4586-AitEvRCg9uLX", "4587": "/thai-co-long-tuong-quyet/chuong-4587-dQC0TZkB2Xbk", "4606": "/thai-co-long-tuong-quyet/chuong-4606-iquxtxEegXbv", "4614": "/thai-co-long-tuong-quyet/chuong-4614-nc82srXIeR9J", "4657": "/thai-co-long-tuong-quyet/chuong-4657-Lz5rSHGiKaSj", "4665": "/thai-co-long-tuong-quyet/chuong-4665-9eU9qIghLdZU", "4707": "/thai-co-long-tuong-quyet/chuong-4707-DK8Btard89dh", "4751": "/thai-co-long-tuong-quyet/chuong-4751-EPNn189YhvDL", "4753": "/thai-co-long-tuong-quyet/chuong-4753-BpyM7OGYSBjn", "4778": "/thai-co-long-tuong-quyet/chuong-4778-7UV2pX30MyKH", "4789": "/thai-co-long-tuong-quyet/chuong-4789-NGogrv7UzuDg", "4793": "/thai-co-long-tuong-quyet/chuong-4793-I51p3RKUVRGY", "4879": "/thai-co-long-tuong-quyet/chuong-4879-MruTEHnLriuQ", "4910": "/thai-co-long-tuong-quyet/chuong-4910-KTTB56DKJC4N", "4959": "/thai-co-long-tuong-quyet/chuong-4959-j6DjxHGkF7y7", "4990": "/thai-co-long-tuong-quyet/chuong-4990-iwZ2kbSqs4cR", "4993": "/thai-co-long-tuong-quyet/chuong-4993-93TPOy7KVyP5", "4994": "/thai-co-long-tuong-quyet/chuong-4994-dlmBw6fpObfJ", "5051": "/thai-co-long-tuong-quyet/chuong-5051-r2w1DI8EKago", "5108": "/thai-co-long-tuong-quyet/chuong-5108-4J5rTTadHZgJ", "5132": "/thai-co-long-tuong-quyet/chuong-5132-XGJjeVqbJi0Z", "5134": "/thai-co-long-tuong-quyet/chuong-5134-UgvJkkwb4yW0", "5156": "/thai-co-long-tuong-quyet/chuong-5156-0EXboW5YLrKp", "5167": "/thai-co-long-tuong-quyet/chuong-5167-F0qGqu92zoDF", "5208": "/thai-co-long-tuong-quyet/chuong-5208-pyCVK5mTug0E", "5325": "/thai-co-long-tuong-quyet/chuong-5325-idPXVqMmRXot", "5363": "/thai-co-long-tuong-quyet/chuong-5363-bIy0UelsZ1V5", "5366": "/thai-co-long-tuong-quyet/chuong-5366-2QsM82QMCuIk", "5471": "/thai-co-long-tuong-quyet/chuong-5471-oBIz9E0A5sSP", "5482": "/thai-co-long-tuong-quyet/chuong-5482-aFJrdVW9qC5b", "5483": "/thai-co-long-tuong-quyet/chuong-5483-4xbdBc4ejpMo", "5502": "/thai-co-long-tuong-quyet/chuong-5502-8OKab1Y7NoMz", "5581": "/thai-co-long-tuong-quyet/chuong-5581-UG21NlucgxQT", "5632": "/thai-co-long-tuong-quyet/chuong-5632-qIN8LC32N9rf", "5642": "/thai-co-long-tuong-quyet/chuong-5642-cMOzpSZ19TUr", "5677": "/thai-co-long-tuong-quyet/chuong-5677-K5vW2rtSoYhX", "5696": "/thai-co-long-tuong-quyet/chuong-5696-PWeTSGNvSYih", "5698": "/thai-co-long-tuong-quyet/chuong-5698-MvF2YWUvDoE8", "5700": "/thai-co-long-tuong-quyet/chuong-5700-JLqcelavy5lZ", "5703": "/thai-co-long-tuong-quyet/chuong-5703-kSkyI9FQbyYE", "5753": "/thai-co-long-tuong-quyet/chuong-5753-cnoIiSqKPXiC", "5770": "/thai-co-long-tuong-quyet/chuong-5770-knvf2bEoJGBv", "5775": "/thai-co-long-tuong-quyet/chuong-5775-8LQbmEzIgQV1", "5813": "/thai-co-long-tuong-quyet/chuong-5813-HBrUd1xEzPVM", "5826": "/thai-co-long-tuong-quyet/chuong-5826-UNmile8iNcvC", "5860": "/thai-co-long-tuong-quyet/chuong-5860-jO0SPwueA5sf", "5879": "/thai-co-long-tuong-quyet/chuong-5879-npjPpLO7p4tp", "5880": "/thai-co-long-tuong-quyet/chuong-5880-HW2CNTwchh93", "5890": "/thai-co-long-tuong-quyet/chuong-5890-r6iRfsL0Y0xF", "5898": "/thai-co-long-tuong-quyet/chuong-5898-gk7j3tlzZ430", "5937": "/thai-co-long-tuong-quyet/chuong-5937-08nf56R10Sdw", "5953": "/thai-co-long-tuong-quyet/chuong-5953-MfKO6Oo9cJ4k", "5975": "/thai-co-long-tuong-quyet/chuong-5975-rDxhAAx7tCrZ", "5979": "/thai-co-long-tuong-quyet/chuong-5979-l2AqMfA6OjuR", "5980": "/thai-co-long-tuong-quyet/chuong-5980-FkSdunibGMAf", "5985": "/thai-co-long-tuong-quyet/chuong-5985-dHxZeQT6eVUl", "5999": "/thai-co-long-tuong-quyet/chuong-5999-KABZKCC4vLAp", "6008": "/thai-co-long-tuong-quyet/chuong-6008-cWteGKAYo1Xn", "6013": "/thai-co-long-tuong-quyet/chuong-6013-03Oa0xv3BBrt", "6014": "/thai-co-long-tuong-quyet/chuong-6014-UlhNY5TX4o77", "6019": "/thai-co-long-tuong-quyet/chuong-6019-sICJIiE2RyRD", "6022": "/thai-co-long-tuong-quyet/chuong-6022-JQ6fw6tX4rEs", "6024": "/thai-co-long-tuong-quyet/chuong-6024-GphE2L0Wp8kJ", "6025": "/thai-co-long-tuong-quyet/chuong-6025-jX01aTY1hl1W", "6035": "/thai-co-long-tuong-quyet/chuong-6035-Vb1t4j40T4ei", "6036": "/thai-co-long-tuong-quyet/chuong-6036-zJJgcrcVLhuw", "6037": "/thai-co-long-tuong-quyet/chuong-6037-T1cSAzA0DKBA", "6040": "/thai-co-long-tuong-quyet/chuong-6040-u8WpoMpVqEyo", "6041": "/thai-co-long-tuong-quyet/chuong-6041-NqpcMUN0jrE2", "6042": "/thai-co-long-tuong-quyet/chuong-6042-rY7OucvVbUUG", "6058": "/thai-co-long-tuong-quyet/chuong-6058-VrwzhdlTcahl", "6059": "/thai-co-long-tuong-quyet/chuong-6059-yZFlFlJyUEyz", "6060": "/thai-co-long-tuong-quyet/chuong-6060-SGXYntrTNrEC", "6061": "/thai-co-long-tuong-quyet/chuong-6061-vyqLL0QyFUUQ", "6072": "/thai-co-long-tuong-quyet/chuong-6072-Bk9zNOURtQOp", "6076": "/thai-co-long-tuong-quyet/chuong-6076-5ZM8ZuhROxRi", "6172": "/thai-co-long-tuong-quyet/chuong-6172-Q7YRl8EmOBzz", "6173": "/thai-co-long-tuong-quyet/chuong-6173-tprDJGnHGoFC", "6174": "/thai-co-long-tuong-quyet/chuong-6174-NW90rOLm9RVQ", "6178": "/thai-co-long-tuong-quyet/chuong-6178-HMM93tYleyZI", "6180": "/thai-co-long-tuong-quyet/chuong-6180-Elxj99elPE5j", "6181": "/thai-co-long-tuong-quyet/chuong-6181-iTGWiHCGHrLx", "6187": "/thai-co-long-tuong-quyet/chuong-6187-ai4E01WFXevH", "6189": "/thai-co-long-tuong-quyet/chuong-6189-X7fo6HcFIvSi", "6196": "/thai-co-long-tuong-quyet/chuong-6196-s4mJwAUjQKIF", "6202": "/thai-co-long-tuong-quyet/chuong-6202-kJa2Evnjg7sY", "6217": "/thai-co-long-tuong-quyet/chuong-6217-uu6pSo4Cpapq", "6224": "/thai-co-long-tuong-quyet/chuong-6224-FrDLIhwgx0fO", "6234": "/thai-co-long-tuong-quyet/chuong-6234-1vDCmxSfiKJa", "6239": "/thai-co-long-tuong-quyet/chuong-6239-PSi8WaDA6Tcg", "6257": "/thai-co-long-tuong-quyet/chuong-6257-0A8IOr98sqMc", "6260": "/thai-co-long-tuong-quyet/chuong-6260-RI2e2EodVj9H", "6263": "/thai-co-long-tuong-quyet/chuong-6263-sPw0gcS78dww", "6266": "/thai-co-long-tuong-quyet/chuong-6266-JXqNKz7clWjb", "6272": "/thai-co-long-tuong-quyet/chuong-6272-Bme5ckQb1JJu", "6275": "/thai-co-long-tuong-quyet/chuong-6275-btYSG756eC6Z", "6285": "/thai-co-long-tuong-quyet/chuong-6285-uFGXCG3aXtTX", "6287": "/thai-co-long-tuong-quyet/chuong-6287-rfs6IVAaI9zz", "6293": "/thai-co-long-tuong-quyet/chuong-6293-jugpaGTZYwZI", "6298": "/thai-co-long-tuong-quyet/chuong-6298-7RBlKtE4v5tO", "6315": "/thai-co-long-tuong-quyet/chuong-6315-ERI8f2cXppM7", "6333": "/thai-co-long-tuong-quyet/chuong-6333-pAiHXJYVbB64", "6345": "/thai-co-long-tuong-quyet/chuong-6345-YeKj7pAU7lGh", "6372": "/thai-co-long-tuong-quyet/chuong-6372-SjSxvE4wmoNc", "6375": "/thai-co-long-tuong-quyet/chuong-6375-tqMKZbjRPhAH", "6377": "/thai-co-long-tuong-quyet/chuong-6377-qGxtfrpR9xgi", "6403": "/thai-co-long-tuong-quyet/chuong-6403-xrVUAPiXW7li", "6412": "/thai-co-long-tuong-quyet/chuong-6412-GDDZ6Yg1Po7g", "6420": "/thai-co-long-tuong-quyet/chuong-6420-5rdrUY61QrER", "6448": "/thai-co-long-tuong-quyet/chuong-6448-5O7c3XBDUUXN", "6488": "/thai-co-long-tuong-quyet/chuong-6488-Cf94zZF9Xj39", "6504": "/thai-co-long-tuong-quyet/chuong-6504-qxyela57ZqHe", "6512": "/thai-co-long-tuong-quyet/chuong-6512-ecNxAbV6ZtNP", "6521": "/thai-co-long-tuong-quyet/chuong-6521-xy526jTaSZkO", "6546": "/thai-co-long-tuong-quyet/chuong-6546-tdchotG3MLKr", "6564": "/thai-co-long-tuong-quyet/chuong-6564-lTqdH35g6ZVS", "6570": "/thai-co-long-tuong-quyet/chuong-6570-dheMZoOfMM5l", "6574": "/thai-co-long-tuong-quyet/chuong-6574-XXrVlJbers8e", "6576": "/thai-co-long-tuong-quyet/chuong-6576-UwS4rZhec9f5", "6598": "/thai-co-long-tuong-quyet/chuong-6598-0U5NvLqct2Su", "6611": "/thai-co-long-tuong-quyet/chuong-6611-Dg0b3y16HEsl", "6634": "/thai-co-long-tuong-quyet/chuong-6634-CvvhfsiYRlvn", "6654": "/thai-co-long-tuong-quyet/chuong-6654-k3wQdPlWxNCB", "6679": "/thai-co-long-tuong-quyet/chuong-6679-gjT5MYYzsAmf", "6789": "/thai-co-long-tuong-quyet/chuong-6789-DRachQGnGbjn", "6834": "/thai-co-long-tuong-quyet/chuong-6834-3rby1RsJCRQd", "6902": "/thai-co-long-tuong-quyet/chuong-6902-MHi71iMmuOZe", "7106": "/thai-co-long-tuong-quyet/chuong-7106-P8CjXs11EPEe", "7107": "/thai-co-long-tuong-quyet/chuong-7107-wQuxzkTXLmyQ", "7108": "/thai-co-long-tuong-quyet/chuong-7108-SibARcv2T9hC", "7109": "/thai-co-long-tuong-quyet/chuong-7109-y0INtVNXbWRz", "7111": "/thai-co-long-tuong-quyet/chuong-7111-1bhonFGXqFuY", "7128": "/thai-co-long-tuong-quyet/chuong-7128-uaaRT6t4wWRp", "7143": "/thai-co-long-tuong-quyet/chuong-7143-9kP865TvUpwv", "7165": "/thai-co-long-tuong-quyet/chuong-7165-eDnp1JKxDw96", "7178": "/thai-co-long-tuong-quyet/chuong-7178-R1sctf9UpjjF", "7179": "/thai-co-long-tuong-quyet/chuong-7179-xJapLXbzw6S1", "7182": "/thai-co-long-tuong-quyet/chuong-7182-WCgShAwUJCgN", "7189": "/thai-co-long-tuong-quyet/chuong-7189-BFZxrH40Bmpq", "7190": "/thai-co-long-tuong-quyet/chuong-7190-hXGAJ9WVJ9Zc", "7670": "/thai-co-long-tuong-quyet/chuong-7670-ISlhFEVfEliq", "7723": "/thai-co-long-tuong-quyet/chuong-7723-y0o0AXFFmJlE", "7729": "/thai-co-long-tuong-quyet/chuong-7729-7l0HsmwGWWBu", "7732": "/thai-co-long-tuong-quyet/chuong-7732-ge6vEPHltdOF", "7803": "/thai-co-long-tuong-quyet/chuong-7803-mTj5IS6Ogohg", "8040": "/thai-co-long-tuong-quyet/chuong-8040-QYMR8zkPGhSJ", "8123": "/thai-co-long-tuong-quyet/chuong-8123-muNAbWw2WJb7", "8150": "/thai-co-long-tuong-quyet/chuong-8150-tpFvn72arGVB", "8151": "/thai-co-long-tuong-quyet/chuong-8151-P8w8F0T5zdEy", "8155": "/thai-co-long-tuong-quyet/chuong-8155-VIkz3UH6U6B5", "8164": "/thai-co-long-tuong-quyet/chuong-8164-Nx7UAq5SHSA8", "8202": "/thai-co-long-tuong-quyet/chuong-8202-D6gbK36WyTAo", "8238": "/thai-co-long-tuong-quyet/chuong-8238-1fqHZVEZQkgu", "8352": "/thai-co-long-tuong-quyet/chuong-8352-a7Wc38JlXngu", "8372": "/thai-co-long-tuong-quyet/chuong-8372-2zVt4cHn0APX", "8376": "/thai-co-long-tuong-quyet/chuong-8376-7AIks64oVdMe", "8381": "/thai-co-long-tuong-quyet/chuong-8381-jcno8TJJ7U2Y", "8383": "/thai-co-long-tuong-quyet/chuong-8383-mDCE2ECKMDW7", "8390": "/thai-co-long-tuong-quyet/chuong-8390-RG5jCLLpEnfa", "8394": "/thai-co-long-tuong-quyet/chuong-8394-WRsa0q8qjHch", "8396": "/thai-co-long-tuong-quyet/chuong-8396-Z1H0ua1qy15G", "8401": "/thai-co-long-tuong-quyet/chuong-8401-BUm4AxGLarmA", "8402": "/thai-co-long-tuong-quyet/chuong-8402-hnTIcpiqiEWx", "8404": "/thai-co-long-tuong-quyet/chuong-8404-kNsiWZcrxxzV", "8405": "/thai-co-long-tuong-quyet/chuong-8405-HfZvyS3M5KjI", "8418": "/thai-co-long-tuong-quyet/chuong-8418-4Uehqotsh8IR", "8420": "/thai-co-long-tuong-quyet/chuong-8420-7438kYmswrm0", "8467": "/thai-co-long-tuong-quyet/chuong-8467-fruAydqSlCPh", "8626": "/thai-co-long-tuong-quyet/chuong-8626-DgmTVqhX9v2V", "8650": "/thai-co-long-tuong-quyet/chuong-8650-kiYbLoRZ7liF", "8660": "/thai-co-long-tuong-quyet/chuong-8660-yeXjqYvaMS53", "8796": "/thai-co-long-tuong-quyet/chuong-8796-1YblFPrpBbHE", "8840": "/thai-co-long-tuong-quyet/chuong-8840-0TM97ratcphZ", "8843": "/thai-co-long-tuong-quyet/chuong-8843-aLSnTTvOzwuv", "8844": "/thai-co-long-tuong-quyet/chuong-8844-6d90vLNu7Jdh", "8848": "/thai-co-long-tuong-quyet/chuong-8848-CoxrjqAucmap", "8850": "/thai-co-long-tuong-quyet/chuong-8850-EPMIda3urW4N", "8851": "/thai-co-long-tuong-quyet/chuong-8851-lh3V5TVPztnA", "8861": "/thai-co-long-tuong-quyet/chuong-8861-zd2dbCzQDZAy", "8863": "/thai-co-long-tuong-quyet/chuong-8863-1DR4VxsRTJdX", "8865": "/thai-co-long-tuong-quyet/chuong-8865-4nqUPhmRi376", "8866": "/thai-co-long-tuong-quyet/chuong-8866-b6XirZEwqQqs", "8881": "/thai-co-long-tuong-quyet/chuong-8881-T5QKXQqTwgN9", "8883": "/thai-co-long-tuong-quyet/chuong-8883-WfolRBkTBQqi", "8884": "/thai-co-long-tuong-quyet/chuong-8884-2xWyt3ByJnaU", "8888": "/thai-co-long-tuong-quyet/chuong-8888-88JphYyyoGXc", "8892": "/thai-co-long-tuong-quyet/chuong-8892-EJ6gV2mzIkTj", "8893": "/thai-co-long-tuong-quyet/chuong-8893-kbotxvDUQ7DW", "8894": "/thai-co-long-tuong-quyet/chuong-8894-GtV7PnfzYUxI", "8897": "/thai-co-long-tuong-quyet/chuong-8897-qmbklP1UvaAd", "8898": "/thai-co-long-tuong-quyet/chuong-8898-M4IxDISz2xtQ", "8899": "/thai-co-long-tuong-quyet/chuong-8899-ZdP6s1r9QpeM", "9275": "/thai-co-long-tuong-quyet/chuong-9275-YlMX0l9RaAug", "9512": "/thai-co-long-tuong-quyet/chuong-9512-nUrZrELFnfzN", "9621": "/thai-co-long-tuong-quyet/chuong-9621-rvFVFRFLeHxg", "9623": "/thai-co-long-tuong-quyet/chuong-9623-uWdv8B8Lt1RF", "9706": "/thai-co-long-tuong-quyet/chuong-9706-zhjB9Qj4hPDo", "9891": "/thai-co-long-tuong-quyet/chuong-9891-5uIFOGepsREB", "9944": "/thai-co-long-tuong-quyet/chuong-9944-cK5LppuIFWEI", "9971": "/thai-co-long-tuong-quyet/chuong-9971-DN_dO4Oh_GUL", "9998": "/thai-co-long-tuong-quyet/chuong-9998-jLicYCjZaXgg", "10084": "/thai-co-long-tuong-quyet/chuong-10084-RuOxt2WC2pK!", "10085": "/thai-co-long-tuong-quyet/chuong-10085-nIiIpu!KGeOB", "10087": "/thai-co-long-tuong-quyet/chuong-10087-fOxlO8YazQJm", "10123": "/thai-co-long-tuong-quyet/chuong-10123-!vylhld019jL", "10143": "/thai-co-long-tuong-quyet/chuong-10143-H0!0bjk8ygvC", "10339": "/thai-co-long-tuong-quyet/chuong-10339-9mcOTcvFEXEz", "10363": "/thai-co-long-tuong-quyet/chuong-10363-Zhq4EYFHMHKN", "10375": "/thai-co-long-tuong-quyet/chuong-10375-HOmh9xHddB0K", "10379": "/thai-co-long-tuong-quyet/chuong-10379-c2pC_He3_btn", "10416": "/thai-co-long-tuong-quyet/chuong-10416-ZVNSBbthCGf9", "10461": "/thai-co-long-tuong-quyet/chuong-10461-D_9xquer5Cxw", "10544": "/thai-co-long-tuong-quyet/chuong-10544-zwFF_eWmyyRd", "10612": "/thai-co-long-tuong-quyet/chuong-10612-GIK_VwGul896", "10683": "/thai-co-long-tuong-quyet/chuong-10683-apjxXsN3tVGY", "10769": "/thai-co-long-tuong-quyet/chuong-10769-XtDNHB_7Xwve", "10800": "/thai-co-long-tuong-quyet/chuong-10800-FmR8TV5b!ZrS", "10813": "/thai-co-long-tuong-quyet/chuong-10813-ZwgjU4ZQgfXw", "10846": "/thai-co-long-tuong-quyet/chuong-10846-uXYYKu1r57l_", "10890": "/thai-co-long-tuong-quyet/chuong-10890-yZFMgd2s9n1e", "10907": "/thai-co-long-tuong-quyet/chuong-10907-UcEorRxfVgyb", "10911": "/thai-co-long-tuong-quyet/chuong-10911-TnpXD_LQfbqd", "10933": "/thai-co-long-tuong-quyet/chuong-10933-lhp!AGEHn_Va", "11002": "/thai-co-long-tuong-quyet/chuong-11002-3mx1HR5KrcJ4", "11034": "/thai-co-long-tuong-quyet/chuong-11034-u4ERp9HNRByQ", "11192": "/thai-co-long-tuong-quyet/chuong-11192-!aU4mGleaYKD", "11217": "/thai-co-long-tuong-quyet/chuong-11217-Qqbm2huGbNcy"};
 </script>
 <script>
 /* ===== Địa danh của từng thế giới =====
@@ -602,7 +654,12 @@ const PLACES={
     ['thanh','Thiên Đô Thành','Một trong thập đại cố đô của Nam Hoang vực.',['~1481'],'Nam Hoang vực'],
     ['tong','Ám Hắc Thần Lâu','Thế lực khủng bố mà mười hai Vực Chủ đều kiêng dè. Lâu chủ Mặc Tử Tà bị Lâm Phong giết.',['~1447','~1481'],'Thiên Châu vực'],
     ['tong','Thiên Đạo Tông','Được xưng là "hỏi đạo chi địa", dù Lâm Phong cho rằng chưa phải nơi cầu tiên thật sự.',['~1559']],
-    ['bau','Thần miếu Lâm Phong','Thần miếu nhận tín ngưỡng của dân chúng, nguồn tín ngưỡng lực để Lâm Phong đột phá Đại Đế và Đế Tôn.',[4187],'Long Môn vực']
+    ['bau','Thần miếu Lâm Phong','Thần miếu nhận tín ngưỡng của dân chúng, nguồn tín ngưỡng lực để Lâm Phong đột phá Đại Đế và Đế Tôn.',[4187],'Long Môn vực'],
+    ['thanh','Tinh Không Cổ Thành','Thành cổ giữa tinh không.',['~1513']],
+    ['hiem','Hoàng Sơn','Nơi có Trấn Hồn Thổ.',['~1527']],
+    ['toc','Tinh Không Cự Thú','Bị Lâm Phong hàng phục, sau giảng cho hắn về lôi kiếp.',['~1541','~1590']],
+    ['toc','Kim Ô tộc','Ba đại cường giả của tộc bị Lâm Phong tiêu diệt.',['~1482','~1488']],
+    ['bau','Hóa Thần Quả','Quả quý các bên tranh đoạt.',['~1460']]
   ],
   cuuchau:[
     ['quoc','Cửu Châu tiên quốc','Tiên quốc mang ma tính, khiến nhiều người kiêng kỵ vì làm người ta mất đi tâm tính ban đầu.',[2431]],
@@ -615,12 +672,20 @@ const PLACES={
     ['gia','Long gia','Thế lực ở Long Huyết Thành, cùng Tà Long Cung và Phù Tang Đảo.',[1942]],
     ['tong','Âm Dương Hợp Hoan Tông','Bị cả chính đạo, ma đạo lẫn tà đạo xem thường.',[1717]],
     ['tong','Vạn Hoa Lâu','Có thánh nữ Diệu Khả Nhi, có phân nhánh ở Thiên Võ đại lục.',[1987]],
-    ['tong','Bắc Minh sơn','Thế lực của Bắc Minh Hiên.',['~1596']],
     ['toc','Kim Ô tộc','Yêu tộc có lãnh địa và đất phong hầu. Tộc trưởng rèn luyện các con để chọn người kế vị.',[1902,5642]],
     ['toc','Hắc Lân tộc','Tộc giao nhân hùng mạnh.',['~1641']],
     ['toc','Cổ Thần Tộc','Có một vị đại đế từ thời viễn cổ tọa trấn Cửu Châu, mạnh hơn Tà Hình Đại Đế rất nhiều.',[2734,2739]],
     ['toc','Huyết Dực Thiên Lang tộc','Chủng tộc có một tôn đại đế giáng lâm Cửu Châu.',[2734],'Nam Tiên Hải Vực'],
-    ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực']
+    ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực'],
+    ['tong','Hồng Trần Tiên Tông','Tiên tông gắn với Hồng Trần Tiên Tôn; nơi Lâm Phong gặp lại cố nhân. Cửu Châu có thập đại tiên tông.',[1929,'~1672']],
+    ['vung','Bắc Man Châu','Có hai đại thế lực, trong đó có Đổng gia.',['~1703']],
+    ['gia','Đổng gia','Một trong hai đại thế lực của Bắc Man Châu.',['~1703'],'Bắc Man Châu'],
+    ['toc','Tuyết tộc & Băng tộc','Hai tộc ở vùng băng, có Tuyết Ưng Thành và Liệt băng cốc.',['~1682','~1683',1720,1721]],
+    ['thanh','Địa Hạ Thành','Thành dưới lòng đất, gắn với Thiên Kiêu Bảng.',[1716,2175]],
+    ['tong','Bách Hiểu Các','Các nắm tin tức.',[1854]],
+    ['quoc','Thiên Xà đế quốc','Đế quốc ở Cửu Châu.',[2282]],
+    ['hiem','Hoa Quả Sơn','Bên trong có sinh linh đáng sợ, khiến người ta nghi là Tề Thiên Đại Thánh.',[2801,2802,2825]],
+    ['hiem','Hỗn Độn chi môn','Sau cánh cửa là một thế giới đáng sợ. Gần đó có tin về Hỗn Độn Cổ Quốc ở Tây Hải.',[2822,2829,2872,2873]]
   ],
   cohoang:[
     ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],
@@ -629,7 +694,12 @@ const PLACES={
     ['dao','Hỏa Hạt Đảo','Thế lực đảo cho người dò xét Long Môn, định diệt môn. Sau phải quỳ trước Vạn Hoa Lâu.',[1964,1987]],
     ['dao','Ác Giao đảo','Bị Long Môn tiêu diệt, chấn động Cổ Hoang hải vực.',[2000,1987]],
     ['tong','Tán Tu Liên Minh','Đại diện các thế lực Cổ Hoang tới quy phục Lâm Phong. Bốn trưởng lão ủng hộ hắn vào hội nghị bàn tròn.',[2106,1987]],
-    ['hiem','Vùng hung thú biển','Nơi hung thú biển tụ tập, rất nguy hiểm nên trở thành đất không ai quản.',[1964]]
+    ['hiem','Vùng hung thú biển','Nơi hung thú biển tụ tập, rất nguy hiểm nên trở thành đất không ai quản.',[1964]],
+    ['hiem','Thâm Hải Ma Huyệt','Hang ma dưới biển sâu.',[1966]],
+    ['hiem','Tà Long Ma ngục','Ngục của Tà Long. Lâm Phong diệt Tà Long đời thứ tám, đối mặt Thủy Tổ Tà Long.',[2100,2101,2105]],
+    ['bau','Nguyền rủa chi thuyền','Con thuyền bị nguyền rủa, từng trở lại dương gian.',[1972,1974]],
+    ['bau','Tinh Không Cổ Thuyền','Cổ thuyền vô địch của Hiên Viên.',[1962]],
+    ['gia','Hậu nhân Cơ Phát','Hậu nhân của văn võ Thánh Nhân Cơ Phát, giúp Lâm Phong xem bói.',[2096,2097]]
   ],
   minhgioi:[
     ['vung','Minh Hải','Có tứ đại thế lực, gọi là "một quốc gia ba đảo".',['~1659']],
@@ -642,7 +712,16 @@ const PLACES={
     ['tong','Thập điện Diêm vương','Thống trị Minh giới. Từ khi Minh Chủ biến mất, nhiều sinh linh mạnh bắt đầu không phục.',[2584]],
     ['tong','Thiên Phủ minh quân','Kéo quân tới Long giới khi thông đạo Minh giới mở rộng. Nói về "thiên nhân ngũ suy".',[5879,5880]],
     ['toc','Minh binh & âm binh','Phần lớn vong linh thành vật tiếp tế cho cường giả Minh giới. Số ít mạnh hoặc có quan hệ được bổ sung vào minh binh, âm binh.',[6234]],
-    ['hiem','Ba mươi ba trọng Minh giới','Minh giới có 33 tầng, giống 33 trọng thiên của Thiên Giới.',[3475]]
+    ['hiem','Ba mươi ba trọng Minh giới','Minh giới có 33 tầng, giống 33 trọng thiên của Thiên Giới.',[3475]],
+    ['tong','Ngũ phương Quỷ Đế','Cùng Thập điện Diêm vương cai quản Minh giới.',[2584]],
+    ['gia','Diêm La Vương','Một trong Thập điện Diêm vương.',[2588]],
+    ['tong','Địa Tạng Vương Bồ Tát','Cùng thần thú Đế Thính; từng ra điều đình khi Lâm Phong đến Địa phủ lần nữa.',[2586,5985],'Phong Đô'],
+    ['thanh','Liệt Ngục Thành','Nơi ngũ đại quân đoàn trưởng tụ họp. Liệt ngục liên minh bị Lâm Phong tiêu diệt.',[5975,5979]],
+    ['toc','Âm Thi Vương','Sinh linh Minh giới Lâm Phong gặp khi mới vào.',[2335]],
+    ['toc','Hắc Ngục Ma Quân','Cường giả Minh giới, xuất hiện cùng Khô Lâu Tà Quân.',[2336]],
+    ['toc','Tử Vong Kỵ Sĩ','Kỵ sĩ của Minh giới, cùng Long kỵ sĩ.',[2587]],
+    ['bau','Minh Vương Chung','Chuông của Minh Vương.',[2585]],
+    ['bau','Ngũ Sát Bi','Bia đá Lâm Phong gặp khi làm sứ giả Minh giới.',[2340]]
   ],
   battu:[
     ['vung','Cửu Linh vực','Do Cửu Linh Tông nắm giữ.',[3632]],
@@ -658,10 +737,12 @@ const PLACES={
     ['gia','Bất Tử gia tộc','Truyền thừa cổ xưa từ bảy vị cường giả. Lâm Phong mang huyết mạch gia tộc này qua cha là Lâm Bại Thiên.',[3183,3286]],
     ['gia','Nam Cung gia tộc','Có tổ địa riêng. Nam Cung Huyên Nhi đưa Lâm Phong tới bằng cổ thuyền.',[3881]],
     ['gia','Mộ Dung gia tộc','Một trong hai thế lực Lâm Phong đặc biệt chú ý, cùng Ninh gia.',[4082]],
-    ['gia','Quách gia','Một thế lực cực kỳ bất phàm.',[4396]],
     ['tong','Thánh Tà Tông','Một trong bảy đại thế lực tà đạo, không ai dám trêu.',[4778]],
     ['toc','Thiên Nhân tộc','Từ khi huyết mạch Tiên Thiên Nhân tộc lắng xuống, thiên nhân huyết mạch mới nổi bật lên.',[4475]],
-    ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]]
+    ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]],
+    ['tong','Huyết Ngục sát thủ','Huyết Ngục sát thủ vương triều, tổ chức sát thủ khủng bố.',[4512,4564]],
+    ['hiem','Thiên Tàn Cốc','Thung lũng đáng sợ của Thiên Tàn tứ quái.',[4541,4543,4544]],
+    ['toc','Diệt Long kỵ sĩ','Diệt Long kỵ sĩ quân đoàn.',[4579]]
   ],
   toivuc:[
     ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
@@ -670,7 +751,9 @@ const PLACES={
     ['toc','Chân Tiên Tội vực','Một nhóm Chân Tiên ở Tội vực.',[5108]],
     ['bau','Tội Huyết Thạch','Gồm Chân Long Tội Huyết Thạch và Bất Tử Tội Huyết Thạch, được rao bán ở Bất Tử giới.',[4462,4463,4464]],
     ['hiem','Ý chí tội huyết','Ý chí của vô số hậu nhân tội huyết đã chết hòa vào pháp tắc, có thể ngưng ra một tôn Thánh Hoàng.',[4504]],
-    ['vung','Bạch Cốt vực','Vực nằm trên đường về Tội vực, giáp Cổ Yêu vực.',[4990]]
+    ['vung','Bạch Cốt vực','Vực nằm trên đường về Tội vực, giáp Cổ Yêu vực.',[4990]],
+    ['toc','Thần thánh quân đoàn','Đàn áp hậu nhân tội huyết, cướp bảo vật và truyền thừa của họ.',[4586]],
+    ['toc','Nhân tộc tội huyết','Nhân tộc cũng có huyết mạch tội huyết.',[4477]]
   ],
   longgioi:[
     ['quoc','Kim Long tộc','Đứng đầu một trong năm phe đang tranh ngôi Long giới chi chủ.',[5698]],
@@ -683,7 +766,12 @@ const PLACES={
     ['toc','Long tộc tạp huyết','Long tộc thuần huyết rất hiếm, đa số là tạp huyết.',[5698]],
     ['toc','Thiên Ma tộc','Kẻ xâm nhập. Lâm Phong một chiêu chém đôi cường giả Thiên Ma tộc.',[5703]],
     ['bau','Bản nguyên Long giới','Chỉ Long giới chi chủ mới câu thông được, vì vậy các phe tranh nhau ngôi chủ.',[5698]],
-    ['hiem','Vùng biển Long giới','Vùng biển nguy hiểm của Long giới.',[5753]]
+    ['hiem','Vùng biển Long giới','Vùng biển nguy hiểm của Long giới.',[5753]],
+    ['bau','Chân Long sách cổ','Sách cổ Lâm Phong có được khi tới Long giới.',[5700]],
+    ['bau','Hồng Quân tiên kinh','Tiên kinh Lâm Phong có được ở Long giới.',[5775]],
+    ['bau','Trảm Long Kiếm','Thanh kiếm Lâm Phong có được.',[5860]],
+    ['toc','Cửu Văn Long','Một loài rồng mạnh ở Long giới.',[5813]],
+    ['toc','Viêm Hỏa thiên tướng','Bị Lâm Phong tru sát.',[5770]]
   ],
   magioi:[
     ['vung','Ma Thiên vực','Vùng Lâm Phong nắm được ngay khi tới Ma giới, sau khi thu phục Đại Ma Thiên.',[6014]],
@@ -694,7 +782,12 @@ const PLACES={
     ['toc','Si ma · Oán ma · Hận ma','Các ma đầu canh giữ bản nguyên Ma giới.',[6014]],
     ['bau','Trấn Ma Bia','Có thủ đoạn phi phàm, phát hiện được cả đội thuyền đang tàng hình.',[6060]],
     ['bau','Ngũ đại chí bảo','Năm chí bảo của Ma giới, tìm được nhờ lệnh bài ma chủ.',[4287]],
-    ['bau','Bản nguyên Ma giới','Khác thường, rất dễ bị dòm ngó.',[6014]]
+    ['bau','Bản nguyên Ma giới','Khác thường, rất dễ bị dòm ngó.',[6014]],
+    ['thanh','Thương Minh phủ','Phủ của Thương Minh Thiên. Hắn đền tội, ba đại cường giả thề thần phục Lâm Phong.',[6036,6037,6040,6041],'Ma Thiên vực'],
+    ['toc','Thiên Ma Bát Bộ','Đại quân Thiên Ma kéo tới, mở màn đại chiến.',[6060,6061]],
+    ['toc','Ôn dịch chi thần','Từng cầu xin tha thứ, sau lại hiển uy trong trận chiến.',[6022,6058]],
+    ['bau','Tám khối Vĩnh Trấn Bia','Phát hiện trọng đại ở Ma giới.',[6019]],
+    ['thanh','Tô Viên','Chỗ ở cũ của một vị đại nho.',[6042]]
   ],
   thiengioi:[
     ['vung','Ba mươi ba trọng thiên','Thiên Giới có 33 tầng trời và 33 vị thiên chủ.',[3475,6174]],
@@ -708,7 +801,15 @@ const PLACES={
     ['tong','Thái Sơn phủ','Thái Sơn phủ quân bị nghi là một trong những kẻ đứng sau màn.',[6298,6420]],
     ['tong','Xích Minh Hòa Dương Thiên chủ','Một vị thiên chủ.',[5953],'Ba mươi ba trọng thiên'],
     ['bau','Truyền thừa Thanh Loan Tôn Giả','Nơi truyền thừa của Thanh Loan Tôn Giả.',[2938]],
-    ['bau','Bia đá Thiên Giới','Tấm bia đá to lớn rơi từ Thiên Giới xuống phàm trần.',[2589],'Bồng Lai vực']
+    ['bau','Bia đá Thiên Giới','Tấm bia đá to lớn rơi từ Thiên Giới xuống phàm trần.',[2589],'Bồng Lai vực'],
+    ['toc','Kim Dực Yêu Thần tộc','Chủng tộc Lâm Phong gặp khi mới tới Thiên giới.',[6181]],
+    ['hiem','Ngũ Chỉ Sơn','Ngọn núi năm ngón ở Thiên giới.',[6187]],
+    ['toc','Tiên Nhân tộc','Có Tân Chỉ Tiên.',[6202]],
+    ['hiem','Bất Chu Sơn','Có Bất Chu Sơn bản nguyên thạch; tu sĩ đế Tiên tộc bị diệt tại đây.',[6260,6266]],
+    ['dao','Huyền Hoàng Đảo','Đảo ở Quỷ Vụ vùng biển, nơi vong linh chi thư thôn phệ âm tà quỷ vật.',[6272]],
+    ['toc','Ám Dạ Tu La tộc','Cùng Hoàng Thiên đạo thống và Thánh Đường tộc.',[6285]],
+    ['toc','Hỗn Độn tộc','Tu sĩ từ Hỗn Độn Huyền Hoàng giới.',[6275]],
+    ['bau','Tam Tiên động phủ','Có sách cổ không chữ, liên quan nhân quả Cửu Châu Đăng.',[6298]]
   ],
   phetho:[
     ['tong','Phế thổ liên minh','Liên minh của Phế thổ thế giới. Nhiều thế lực theo dõi xem nó sẽ phát triển ra sao.',[7165,7178]],
@@ -717,14 +818,23 @@ const PLACES={
     ['tong','Vĩnh Sinh tổ chức','Do vĩnh sinh chi chủ nắm giữ, người được cho là đi ra từ Vĩnh sinh chi môn.',[8040]],
     ['tong','Liên minh ác niệm kẻ khai hoang','Tàn sát bừa bãi, diệt cả một số thế lực đỉnh cấp.',[7106]],
     ['hiem','Mộ địa cường giả','Đại đế Quân Mạc Tiếu chết ở đây. Phế Thổ chứng kiến bao kỷ nguyên ra đời và hủy diệt.',[2883]],
-    ['toc','Hậu nhân tội huyết','Cũng có mặt ở Phế Thổ.',[6902]]
+    ['toc','Hậu nhân tội huyết','Cũng có mặt ở Phế Thổ.',[6902]],
+    ['tong','Long Đằng Các','Thế lực do Lâm Phong làm chi chủ.',[7107,7108]],
+    ['tong','Tiên Vũ Cung','Có Ngọc Tinh tiên tử.',[7109]],
+    ['dao','Quần Tinh Đảo','Nơi Lâm Phong từ biệt Ngọc Tinh tiên tử.',[7128]],
+    ['bau','Chấn Thiên Thạch Bi','Lâm Phong trấn áp rồi luyện hóa khối Chấn Thiên Thạch Bi thứ chín.',[7111,7179,7182]],
+    ['bau','Tứ Phương Thần ấn','Thần ấn Lâm Phong có được.',[7143]]
   ],
   cuuu:[
     ['hiem','Cửu U địa ngục','Bị phong ấn, chỉ linh hồn ra vào được. Thông đạo mỗi năm mở một canh giờ.',[1756]],
     ['bau','Hài cốt Chân Long','Xương thủy tổ long nằm trong địa ngục, Lâm Phong từng thử kéo ra nhưng thất bại.',[1756,8238]],
     ['toc','Cửu U quỷ mẫu','Chủ nhân nơi đây, việc gì trong địa ngục cũng không giấu được bà.',[8238]],
     ['tong','Cửu U sát thủ','Kẻ nào bị Cửu U sát thủ để mắt tới thì không có kết cục tốt.',[333,602]],
-    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa.',[45]]
+    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa.',[45]],
+    ['toc','Mặc lão','Người mở thông đạo đưa linh hồn Lâm Phong vào Cửu U địa ngục để kéo hài cốt Chân Long.',[1755,1756]],
+    ['toc','Đời thứ hai Thủy Tổ Long','Liên quan hài cốt rồng trong Cửu U địa ngục.',[1757,8238]],
+    ['toc','Hoàng Tuyền công tử','Nhân vật Lâm Phong chạm trán ngay trước khi vào Cửu U.',[1750]],
+    ['bau','Luân Hồi Bất Diệt hỏa','Ngọn lửa Lâm Phong gặp trong đoạn này; về sau Quy gia giao hắn luyện hóa.',[1751,6564]]
   ],
   thienchi:[
     ['toc','Thái Tây tộc','Từng thống trị Cửu Châu vũ trụ, phát hiện và tiến vào Thiên Chi Giới, rồi bị Mạc Hậu Hắc Thủ thế giới tiêu diệt.',[7723,8381]],
@@ -732,13 +842,30 @@ const PLACES={
     ['toc','Đồ Thần tộc','Vương tộc của thế giới đứng sau màn.',[6333],'Mạc Hậu Hắc Thủ thế giới'],
     ['hiem','Thông đạo thời không','Nhiều thông đạo nối tới các thời không khác nhau, có lúc truyền ra đạo âm. Vương tộc canh giữ những thông đạo khó trấn phong.',[8381]],
     ['bau','Thiên chi thần thân thể','Vừa sinh ra đã ở cấp Chúa Sáng Thế, có thể thành kẻ khai hoang thứ hai.',[8381]],
-    ['bau','Bảo vật chư thiên','Pháp bảo và thiên tài địa bảo khắp chư thiên bị hút về đây.',[8381]]
+    ['bau','Bảo vật chư thiên','Pháp bảo và thiên tài địa bảo khắp chư thiên bị hút về đây.',[8381]],
+    ['toc','Thiên Hư tộc','Một trong ba đại vương mạch dưới trướng Thái Tây tộc, bị hoàng tộc đứng sau màn tàn sát. Bộ Thường Nguyệt là hậu nhân.',[8372]],
+    ['tong','Thiên Ngục tổ chức','Tổ chức của Bạch Mặc Ly, đạt thỏa thuận hợp tác với Lâm Phong.',[8401,8402]],
+    ['hiem','Sương trắng yêu vực','Vùng sương trắng nơi yêu tà sinh sôi.',[8383]],
+    ['bau','Kiến Mộc chi thụ','Thần thụ bị hủy, ẩn chứa bí mật lớn.',[8376]],
+    ['bau','Côn Lôn Thiên Dương kiếm','Xếp thứ ba trong trăm đại cấm khí.',[8390,8404]],
+    ['bau','Đạo nguyên chi thảo','Dị thảo nghịch thiên, Lâm Phong thu được thành công.',[8418,8420]],
+    ['bau','Vườn thuốc đỉnh cấp','Một trong những vườn thuốc đỉnh cấp nhất.',[8405]],
+    ['toc','Trích tiên nhân','Thân phận bí ẩn, khiến Lâm Phong phải truy xét.',[8394,8396]]
   ],
   hoangchi:[
     ['hiem','Quân đoàn hoang chi âm binh','Cường giả cũng tránh đối đầu trực diện.',[8851]],
     ['bau','Máu bản nguyên kẻ khai hoang','Có thể nằm trong một bí địa ở đây.',[8851]],
     ['tong','Kỳ Liên sơn','Kỳ Liên sơn chủ đi cùng Lâm Phong tới Hoang chi địa.',[8840,8851]],
-    ['toc','Trời xanh con','Hóa thân của hắn rất mạnh, thề truy sát Lâm Phong vì bị phá việc lớn.',[8850,8851]]
+    ['toc','Trời xanh con','Hóa thân của hắn rất mạnh, thề truy sát Lâm Phong vì bị phá việc lớn.',[8850,8851]],
+    ['hiem','Khu vực sương đen','Sương đen lan ra, có nữ tu sống trong vùng này.',[8843,8897]],
+    ['tong','Thiên Khiển các','Thế lực của Bạch Ly.',[8863]],
+    ['tong','Vô Thượng Thần Đình','Thần Đình chi chủ tái xuất ở Hoang chi địa.',[8861]],
+    ['toc','Đế trụ','Cường giả bị Lâm Phong dụ mắc câu, sau dẫn đường tới bí địa.',[8844,8848,8851]],
+    ['quoc','Yêu chi quốc độ','Lâm Phong định hợp tác với quốc độ này.',[8888]],
+    ['toc','Bá chủ biển trong','Thế lực bá chủ dưới biển, có Hải hoàng và Giao hoàng.',[8881,8883,8884]],
+    ['bau','Khởi nguyên thần thạch','Tái hiện thân và bị Lâm Phong nghiền ép.',[8865,8866]],
+    ['bau','Quan tài chôn lửa','Nơi phong ấn một thiên hỏa mới xuất hiện.',[8892,8893,8894]],
+    ['hiem','Đền miếu','Nơi có phát hiện kinh người.',[8898,8899]]
   ],
   dongphuong:[
     ['vung','Côn Lôn vũ trụ','Vũ trụ gốc, lớn nhất trong tứ đại vũ trụ.',[4087,6420]],
@@ -750,10 +877,169 @@ const PLACES={
     ['toc','Cửu Tiêu tộc','Có ba vị lão tổ. Chỉ lão tổ thứ ba đã mạnh khó tưởng.',[11002]],
     ['toc','Thiên Ảnh tộc','Có Thiên Tiểu Ngũ, cực mạnh nhưng khiêm tốn.',[10846]],
     ['quoc','Nam hải thế giới','Chưa từng được thống nhất, cho đến khi Lâm Phong làm được.',[10379]],
-    ['dao','Huyền Vũ đảo','Chọn đầu hàng Lâm Phong.',[10379],'Nam hải thế giới']
+    ['dao','Huyền Vũ đảo','Chọn đầu hàng Lâm Phong.',[10379],'Nam hải thế giới'],
+    ['vung','Vu chi thế giới','Có Tỏa Long phong.',[9998]],
+    ['toc','Thạch Ma tộc','Tộc ở tầng đất đáy.',[9944]],
+    ['tong','Hắc Ám Thiên điện','Lâm Phong cướp khí vận của điện chủ.',[10087,10123]],
+    ['dao','Tinh Lạc đảo','Thế lực đảo ở Nam hải thế giới, chống lại Lâm Phong rồi thất bại.',[10375,10379],'Nam hải thế giới'],
+    ['tong','Vĩnh Sinh hoàng tộc','Tám hoàng gia của Vĩnh sinh chi môn; con trai vĩnh sinh chi chủ là Cơ Tương Thiên.',[10612,10683]]
   ]
 };
 STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn])=>({t,n,d,ch,in:inn||null}))});
+</script>
+<script>
+/* ===== Hồ sơ truyện: nhân vật, hành trình, công pháp & bảo vật =====
+   Mỗi mục đều có số chương. Chương dạng '~1441' là chương không ghi số trong tên. */
+
+/* Nhân vật: [nhóm, tên, mô tả ngắn, [thế giới], [chương]] */
+const PEOPLE_RAW=[
+  ['gd','Lâm Phong','Nhân vật chính. Thiếu niên sa sút ở trấn Thanh Vân, mang thôn phệ võ hồn, có được Thái Cổ Long Tượng Quyết rồi đi từ Võ Giả lên tới Cá Nhảy.',['thienvo','tamthien','phongtruc','cuuchau','battu','longgioi','magioi','thiengioi','dongphuong'],[1,26,11217]],
+  ['gd','Lâm Bại Thiên','Cha của Lâm Phong, thuộc Bất Tử gia tộc, mang huyết mạch tội huyết. Tự sáng ra Đại Thiên Đại Tự Tại Thần Công, được gọi là kỳ tài có một không hai. Vừa đạt Chân Tiên thì bị bảy đại cổ thánh truy sát cướp khí vận.',['battu','toivuc'],[4381,4504,5208,5325,6488]],
+  ['gd','Mẹ của Lâm Phong','Thuộc một tộc có các "tổ tiên" bí ẩn. Truyện có chương về việc mẹ con bị bỏ lại và về tung tích của bà.',[],[673,'~1166',6196,7803]],
+  ['hn','Tô Nguyệt Tịch','Thanh mai trúc mã từ trấn Thanh Vân. Lâm Phong hút độc hỏa cho nàng đến mức tụt tu vi. Về sau xuất hiện lại với thân phận Cửu Thiên Huyền Nữ chuyển thế, từng quyết đấu với Lâm Phong.',['thienvo'],[1,4033,4037,6263,6598]],
+  ['hn','Hồng Trần Tiên Tôn','Đệ nhất cường giả Cửu Châu đại thế giới, một vị Đại Đế từng độ đại đế kiếp. Người Lâm Phong trong lòng coi là "đại lão bà".',['cuuchau'],['~1662',1940,2816,9275]],
+  ['hn','Mộ Dung Tuyết','Đại tiểu thư từ Thiên Thánh thành, đệ tử thượng cổ thế lực trong nội thành.',['tamthien'],[19,811,818]],
+  ['hn','Nữ Đế','Người nắm Đại phóng trục thuật, ném kẻ địch vào dòng thời không chảy ngược. Về sau thức tỉnh, cùng lúc tu vi Lâm Phong tăng vọt.',['phongtruc','cuuchau'],[732,'~1710',1937,6403]],
+  ['dh','Độc Tổ','Bạn đồng hành giỏi dùng độc, có mặt từ Trục xuất đại thế giới tới gần cuối truyện. Đột phá Thiên Tiên, từng lo sách lược cho cả đoàn, sau còn tính chuyện thành thân.',['phongtruc','battu','phetho'],['~1481',2131,4614,4665,7670,10933]],
+  ['dh','Yêu Quân','Gặp ở động phủ Hỏa Diễm Yêu Quân rồi kết hiệp nghị. Thường bế quan và thức tỉnh trong những lúc quyết định.',['thienvo','magioi'],[581,750,857,4496,5999]],
+  ['dh','Vô Lượng Đạo Sĩ','Đạo sĩ xuất hiện từ ch.280, biết nhiều về Ma Chủ và dị vực sinh linh. Từng độ chí tôn kiếp.',['thienvo','cuuchau','dongphuong'],[280,2053,2571,4753,10461]],
+  ['dh','Bối Bối','Tiểu sinh linh đi theo Lâm Phong. Tính trẻ con, chỉ cần ăn no chơi vui, nhưng thuộc chủng tộc rất hiếm (giống chúa tể đế tộc) và nhiều lần phát thần uy.',['tamthien','battu'],['~1046','~1321',3284,8123]],
+  ['dh','Hỏa Kỳ Lân','Thần thú lửa bị săn lúc Lâm Phong còn là Võ Giả, sau thành bạn đồng hành. Là người giảng cho Lâm Phong về thiên hỏa, địa hỏa, yêu hỏa.',['thienvo'],[78,81,175,352]],
+  ['dh','Tà Tôn Thánh Giả','Bị Lâm Phong đánh tan rồi độ hóa, thân thể biến từ thi mị. Về sau trọng thương Hận ma ở Ma giới.',['cuuchau','magioi'],[2067,2069,5937,6059]],
+  ['dh','Hạ Đông Hoàng','Đồ đệ của Lâm Phong ở Thiên giới, thường ra tay thay thầy.',['thiengioi'],[6224,6293,6375,6448]],
+  ['dh','Đại Bằng Vương','Đồng minh có thần thông "không gian bất động", cùng Thạch Nhân Vương đi theo Lâm Phong.',['tamthien','cuuchau'],['~884',2861,3051]],
+  ['dh','A Long Tác','Thành viên tối cường thiên đoàn. Đột phá Siêu Việt, sau đó lên Chúa Sáng Thế.',['dongphuong'],[6512,6546,7732]],
+  ['dh','Đại Ngục Ma Thánh','Được "vạn đạo chi chủ" độ hóa, vào tối cường thiên đoàn, có tầm nhìn về thế cục tương lai.',['dongphuong'],[6576,6654,6679]],
+  ['dh','Diệp Hiên','Bạn của Lâm Phong, có thù với Côn Lôn sơn, từng đối đầu thời không Ma tổ.',['dongphuong'],[5632,6420,8660,8796]],
+  ['dh','Kỳ Liên sơn chủ','Cùng Lâm Phong vào Hoang chi địa tìm cơ duyên.',['hoangchi'],[8840,8851]],
+  ['dh','Lão Tửu Quỷ','Người Thái Tây tộc, quen Lâm Phong từ sớm, về sau lộ ra là cường giả vượt kỷ nguyên.',['thienchi'],[623,6072,8372]],
+  ['dh','Bất Diệt kiếm chủ','Được Lâm Phong chủ động mời chào, sau xung kích bậc vũ trụ đại lão.',['dongphuong'],[8151,8155,9891]],
+  ['dh','Thiên Tử Ức','Chúa tể Phế Thổ, chưa vào chuẩn Chúa Sáng Thế nhưng chiến lực ngang bậc đó, tu Tiêu Diêu Thiên Công.',['phetho'],[6834]],
+  ['dh','Bộ Thường Nguyệt','Hậu nhân Thiên Hư tộc, kể cho Lâm Phong bí mật Thiên chi giới.',['thienchi'],[8372,8381]],
+  ['dt','Hoàng Phủ Thanh Thiên','Đỉnh cấp thiên kiêu của Vũ Hóa Tiên Triều, từng có trận sinh tử với Lâm Phong.',['tamthien'],['~915','~1097','~1621']],
+  ['dt','Độc Cô Hiên','Người của Độc Cô gia tộc, truy sát Lâm Phong ở Thiên Thánh thành.',['tamthien'],[833,855]],
+  ['dt','Quân Thiên Đế','Vực Chủ Thiên Châu vực, bị Lâm Phong giết cùng lâu chủ Ám Hắc Thần Lâu.',['phongtruc'],['~1441','~1481']],
+  ['dt','Con Thiên Yêu Hoàng','Nắm Hắc Diễm Phệ Thần Hỏa, tàn sát sinh linh Cửu Châu, bị Lâm Phong giết.',['cuuchau'],[2299,2968]],
+  ['dt','Trời xanh con','Hóa thân cực mạnh, thề truy sát Lâm Phong khắp trời đất.',['hoangchi'],[8850,8851]],
+  ['cg','Thôn Thiên Ma Đế','Đột phá Siêu Việt, bị 33 thiên chủ chặn giết. Kim Tàm chúa tể là cố nhân của hắn.',['thiengioi'],[4246,6172,6173,6174]],
+  ['cg','Long Tượng Chí Tôn','Người sáng tạo Thái Cổ Long Tượng Quyết. Truyền thừa Lâm Phong thấy có chín trọng.',[],[5826]],
+  ['cg','Đế Vô Đạo','Cường giả ở Bất Tử giới, mẹ xuất thân từ một nhánh Thiên chủ.',['battu'],[2721,4657,5581]],
+  ['cg','Thiên Tiểu Ngũ','Thiên kiêu ẩn mình mạnh nhất của Thiên Ảnh tộc, cực mạnh nhưng khiêm tốn.',['dongphuong'],[10813,10846,10890]]
+];
+const PEOPLE_GROUPS={gd:'Gia đình',hn:'Hồng nhan',dh:'Đồng hành & đồng minh',dt:'Đối thủ',cg:'Cường giả khác'};
+const PEOPLE=PEOPLE_RAW.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));
+
+/* Hành trình: [chương, thế giới, sự kiện, cảnh giới đạt được (nếu có)] */
+const JOURNEY_RAW=[
+  [1,'thienvo','Lâm Phong hút độc hỏa cho Tô Nguyệt Tịch, tu vi tụt từ Võ Giả lục trọng xuống tam trọng.'],
+  [26,'thienvo','Có được Thái Cổ cấm kỵ chi thuật: Thái Cổ Long Tượng Quyết.'],
+  [29,'thienvo','Thôn phệ võ hồn tiến hóa, hiện ra ba tòa lỗ đen thôn phệ.'],
+  [49,'thienvo','Đột phá Võ Giả mười trọng thiên.','vogia'],
+  [52,'thienvo','"Thái Cổ Long Tượng, Thánh Hoàng cúi đầu".'],
+  [60,'thienvo','Thành Võ Sư nhờ Huyền Minh Hắc Diễm Quả.','vosu'],
+  [239,'thienvo','Cùng Thanh Long học phủ đại thắng Thú Nhân Đế Quốc ở Trụy Nguyệt thành.'],
+  [262,'thienvo','Lập Long Môn đầu tiên tại Thanh Long học phủ.'],
+  [352,'thienvo','Đột phá Võ Tướng.','votuong'],
+  [568,'thienvo','Đột phá Võ Vương trong Lôi Đao bí cảnh.','vovuong'],
+  [577,'thienvo','Linh hồn đột phá Tạo Hóa cảnh.'],
+  [791,'tamthien','Trở lại đông quận Thần Châu.'],
+  [855,'tamthien','Dẫn liên quân bốn thành diệt Độc Cô gia tộc ở Ngạo Thiên cổ đô.'],
+  ['~976','tamthien','Độ Tạo Hóa kiếp với 49 đạo lôi kiếp.','taohoa'],
+  ['~1001','tamthien','Đến Trung Châu, chạm trán Đại Tần đế quốc.'],
+  ['~1268','tamthien','Đột phá Sinh Tử cảnh, hơn 50 đạo lôi kiếp.','sinhtu'],
+  ['~1402','tamthien','Đột phá Luân Hồi cảnh.','luanhoi'],
+  ['~1441','phongtruc','Vào Trục xuất đại thế giới, gây dựng thế lực riêng.'],
+  ['~1481','phongtruc','Lập Long Môn vực, giết Vực Chủ Thiên Châu vực và lâu chủ Ám Hắc Thần Lâu.'],
+  ['~1571','tamthien','Trở về Đông Hải, Dục Vọng quốc độ.'],
+  ['~1590','tamthien','Độ 81 đạo lôi kiếp để vào Thần cảnh.','huthan'],
+  ['~1662','cuuchau','Đến Cửu Châu đại thế giới, gặp Hồng Trần Tiên Tôn.'],
+  ['~1729','cuuchau','Đột phá Thần Hỏa cảnh.','thanhoa'],
+  [1756,'cuuu','Linh hồn vào Cửu U địa ngục kéo hài cốt Chân Long suốt một năm.'],
+  [1964,'cohoang','Lập Long Môn trên đảo hoang ở Cổ Hoang hải vực.'],
+  [2000,'cohoang','Thành Chân Thần, diệt Ác Giao đảo.','chanthan'],
+  [2106,'cohoang','Nhất thống Cổ Hoang hải vực.'],
+  [2334,'minhgioi','Hộ tống vong hồn vào Minh giới, sau thành sứ giả Minh giới.'],
+  [2436,'cuuchau','Độ Đại Luân Hồi kiếp, thành Thiên Thần.','thienthan'],
+  [2719,'cuuchau','Độ Tiểu Nhân Quả Kiếp, thành Cự Thần.','cuthan'],
+  [2745,'thienvo','Trở về Thiên Võ đại lục, diệt 12 Chuẩn Đế trong chớp mắt.'],
+  [2883,'phetho','Biết lai lịch Phế Thổ, mộ địa của cường giả.'],
+  [2968,'cuuchau','Độ Đại Nhân Quả Kiếp thành Chuẩn Đế, giết con Thiên Yêu Hoàng.','chuande'],
+  [3656,'phongtruc','Độ đế kiếp với 99 đạo kiếp quang, thành Đại Đế.','thande'],
+  [3881,'battu','Đến Bất Tử giới, tới tổ địa Nam Cung gia tộc.'],
+  [4187,'phongtruc','Dùng tín ngưỡng lực từ thần miếu để đột phá Đế Tôn.','deton'],
+  [4504,'toivuc','Tội huyết thức tỉnh, Tội vực dị biến, Bất Tử giới dậy sóng.'],
+  [4707,'battu','Lên Đế Chủ thập trọng thiên; linh hồn đạt Thiên Tiên bát trọng.','dechu'],
+  [4751,'battu','Đột phá Tán Tiên, bước vào Tiên cảnh.','tantien'],
+  [4959,'battu','Trọng thương Bất Tử giới chủ.'],
+  [5156,'battu','Hóa giải kiếp "Các thần ngày diệt vong", thành Địa Tiên.','diatien'],
+  [5585,'toivuc','Được thiên hạ biết đến là Tội vực chi chủ.'],
+  [5698,'longgioi','Đến Long giới đang loạn năm phe.'],
+  [5826,'longgioi','Thấy truyền thừa chín trọng Thái Cổ Long Tượng Quyết của Long Tượng Chí Tôn.'],
+  [5980,'minhgioi','Trở lại Địa phủ, diệt Liệt ngục liên minh; nghe tin về tổ tiên Lâm Kỳ.'],
+  [5898,'longgioi','Các phe Long giới quỳ xuống nhận chủ; Lâm Phong dung hợp Long giới.'],
+  [6014,'magioi','Vào Ma giới, thu phục Đại Ma Thiên, nắm Ma Thiên vực.'],
+  [6025,'magioi','Đột phá Đại Thánh cảnh.','thanh'],
+  [6041,'magioi','Diệt Thương Minh Thiên, ba đại cường giả thề thần phục.'],
+  [6178,'thiengioi','Đến Thiên giới, đối mặt liên minh Long cung.'],
+  [6315,'thiengioi','Tu thành đệ lục trọng Thái Cổ Long Tượng Quyết, nhảy từ Tiên Thánh tứ trọng lên lục trọng.'],
+  [6372,'thiengioi','Lên Tiên Thánh thập trọng thiên; linh hồn đạt Vạn Thánh cửu trọng.'],
+  [6634,'thiengioi','Đột phá Siêu Việt giữa vòng vây, dùng lôi kiếp giết địch.','sieuviet'],
+  [6834,'phetho','Trở lại Long Đằng Các bế quan, từ Hợp Đạo thập trọng đột phá Hỗn Nguyên.','honnguyen'],
+  [7189,'phetho','Đột phá chuẩn Chúa Sáng Thế.'],
+  [7729,'dongphuong','Đột phá Chúa Sáng Thế ở hải ngoại thế giới.','chuasangthe'],
+  [8381,'thienchi','Biết bí mật Thiên chi giới và vì sao Thái Tây tộc bị diệt.'],
+  [8851,'hoangchi','Vào Hoang chi địa tìm máu bản nguyên kẻ khai hoang.'],
+  [8467,'dongphuong','Linh hồn đột phá khai hoang áo nghĩa cảnh giới.'],
+  [9512,'dongphuong','Quyết diệt Nam hải Yêu Long tộc.'],
+  [9792,'dongphuong','Ác ma chi chủ xúi Chư Lão điện tru sát Lâm Phong, truy sát hắn trong ác ma vực sâu.'],
+  [9706,'dongphuong','Đột phá chuẩn Kẻ Khai Hoang nhờ Đại Thiên Đại Tự Tại Thần Công.','khaihoang'],
+  [10363,'dongphuong','Linh hồn đạt tầng vũ trụ đại lão (100 tòa tiên điện).','vutrudailao'],
+  [10379,'dongphuong','Thống nhất Nam hải thế giới.'],
+  [10458,'dongphuong','Nhiều thế lực liên thủ tru sát Lâm Phong.'],
+  [10800,'dongphuong','Luyện hóa bản nguyên ba cường giả Cá Nhảy, đột phá chuẩn Cá Nhảy.','canhay'],
+  [11192,'dongphuong','Thôi diễn nơi ẩn thân của bản nguyên phương Đông vũ trụ.'],
+  [11220,'dongphuong','Chương cuối: Lục Tinh Thiên Mang Trận.']
+];
+const JOURNEY=JOURNEY_RAW.map(([ch,w,d,r])=>({ch,w,d,r:r||null}));
+
+/* Công pháp, thần thông, thiên hỏa, bảo vật: [nhóm, tên, mô tả, [chương], hạng (thiên hỏa)] */
+const ARTS_RAW=[
+  ['cp','Thái Cổ Long Tượng Quyết','Cấm kỵ thần thuật đệ nhất thời Thái Cổ, do Long Tượng Chí Tôn sáng tạo. Truyền thừa có chín trọng; Lâm Phong tu thành đệ lục trọng ở ch.6315 và dung nhập Long Tượng thánh cốt.',[26,52,2791,5826,6315]],
+  ['cp','Thôn phệ võ hồn','Võ hồn cực hiếm, hấp thu thiên địa năng lượng nhanh hơn người khác rất nhiều. Tiến hóa thành ba tòa lỗ đen thôn phệ.',[1,29]],
+  ['cp','Đại Thiên Đại Tự Tại Thần Công','Do Lâm Bại Thiên tự sáng. Có cách trùng tu vô hạn, mỗi lần trùng tu chiến lực bạo tăng; rớt cảnh giới mà không rớt chiến lực. Giúp Lâm Phong đột phá chuẩn Kẻ Khai Hoang.',[5208,6488,9706]],
+  ['cp','Cửu hoàng phân thân','Phân thân Lâm Phong luyện chế từ sớm. Về sau còn phục hồi các tôn Thái Cổ Thánh Hoàng phân thân.',[54,66,369]],
+  ['hm','Bất tử huyết mạch','Từ Bất Tử gia tộc qua cha Lâm Bại Thiên. Bất tử thần thể sơ hiện từ sớm; thức tỉnh lần thứ tư, rồi lần thứ năm tiến hóa cho năng lực khủng bố.',['~560',4470,5363]],
+  ['hm','Chúa Tể đế huyết','Phục hồi từ thời Thần cảnh, có năng lực thứ hai, về sau thức tỉnh tầng sâu. Vì nó mà Lâm Phong được gọi là "tội huyết chi vương".',['~1540','~1668',3727,4504]],
+  ['hm','Vận Mệnh huyết mạch','Từng bị phong ấn và phản kháng; gắn với Đại Mệnh Vận Thuật. Thức tỉnh lần thứ ba có năng lực khủng bố, lần thứ năm lột xác.',[3489,3667,4334,5366,6180]],
+  ['hm','Huyết mạch thứ tư','Lực lượng thứ tư trong cơ thể Lâm Phong; về sau hắn tìm được cách phục hồi nó.',[3489,6189]],
+  ['hm','Thánh Tổ huyết mạch','Huyết mạch Thánh Tổ cổ xưa thức tỉnh khi Lâm Phong còn ở Thiên Võ đại lục.',[462]],
+  ['tt','Đại Tai Nạn Thuật','Hóa giải được lực lôi kiếp, vì lôi kiếp cũng là một loại tai nạn chi lực.',['~1590']],
+  ['tt','Đại phóng trục thuật','Thần thông của Nữ Đế: ném kẻ địch và vật thể vào dòng thời không chảy ngược hoặc không gian song song.',['~1710',2654]],
+  ['tt','Phần Thiên chi nộ','Thần thông Lâm Phong tự nghĩ ra.',[1412]],
+  ['tt','Chí Tôn Luân Hồi Quyền','Quyền pháp uy lực lớn của Lâm Phong.',['~896',2759]],
+  ['tt','Thủy Tổ Long quyền','Quyền pháp mang sức mạnh thủy tổ long.',[2910]],
+  ['th','Vận Mệnh chi hỏa','Thiên hỏa xếp thứ hai, nắm sức mạnh của mệnh vận chi đạo, từng muốn tranh hạng nhất.',[6789],2],
+  ['th','Hổ Mãng Thôn Thiên Hỏa','Thiên hỏa xếp thứ năm. Thiên hỏa chi linh của nó kết hiệp nghị với Lâm Phong, đang tránh né Vận Mệnh chi hỏa.',[6789],5],
+  ['th','Đại Nhật Kim Tinh Hỏa','Thiên hỏa xếp thứ bảy.',[2410],7],
+  ['th','Hắc Diễm Phệ Thần Hỏa','Thiên hỏa xếp thứ tám, do con Thiên Yêu Hoàng nắm giữ, bị Lâm Phong trấn áp.',[763,2299,2962],8],
+  ['th','Thanh Long Chân Hỏa','Thiên hỏa xếp thứ mười.',[4165],10],
+  ['th','Cửu Tuyệt Phách Thiên Hỏa','Thiên hỏa xếp thứ bốn mươi bốn.',[8352],44],
+  ['th','Tịch Diệt Thiên Hỏa','Bị Lâm Phong trấn áp.',[5482,5483]],
+  ['th','Chu Thiên Hoàn Vũ Hỏa','Thiên hỏa liên quan Cửu Cực Thiên Hỏa Đồ Tiên Trận.',[6239]],
+  ['th','Thực Cốt Thiên Hỏa','Từng đánh úp Lâm Phong.',[9621,9623]],
+  ['th','Thái Hư Thiên Hỏa','Cuối cùng tự nổ.',[10907,10911]],
+  ['th','Niết Bàn Sen Lửa','Thiên hỏa đặc thù.',[9971]],
+  ['th','Chân Long yêu hỏa','Yêu hỏa, bị Thần cảnh phân thân của Lâm Phong thôn phệ để đột phá Thần Hỏa cảnh.',['~1576','~1577']],
+  ['bv','Hắc Long kiếm','Bảo kiếm của Lâm Phong, đạt cấp chuẩn Chúa Sáng Thế rồi lột xác lên cấp Chúa Sáng Thế.',[6521,6611]],
+  ['bv','Hỗn Độn Thạch & Hỗn Nguyên Tán','Pháp bảo bản mệnh, được cải tạo để đột phá lên cấp Tạo Vật Chủ.',[8164]],
+  ['bv','Bất tử thần huyết','Lâm Phong lần lượt có giọt đầu tiên rồi chín giọt, bất tử thần thể dần hiện.',[619,695]],
+  ['bv','Ma Châu','Hạt châu quỷ dị ẩn trong đan điền Lâm Phong, có thể thôn phệ, không chịu điều khiển.',[224,4356]],
+  ['bv','Cửu Thiên Lôi Mẫu châu','Vũ khí khủng bố do luyện kim thuật sĩ Bùi Anh Tuấn chế tạo.',[5134,5167]],
+  ['bv','Luân hồi thánh dịch & Chư Thiên Thạch','Giúp đột phá chuẩn Chúa Sáng Thế.',[6504]]
+];
+const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
+const ARTS=ARTS_RAW.map(([g,n,d,ch,rank])=>({g,n,d,ch,rank:rank||null}));
+STORIES[0].people=PEOPLE;STORIES[0].journey=JOURNEY;STORIES[0].arts=ARTS;
 </script>
 <script>
 /* ===== Tiện ích ===== */
@@ -987,7 +1273,7 @@ function terrain(g,mode,base,box,seed){
 const ANCHORS={1:[[0,0]],2:[[-.45,0],[.45,0]],3:[[-.48,-.3],[.48,-.3],[0,.42]],4:[[-.45,-.38],[.45,-.38],[-.45,.4],[.45,.4]],
   5:[[0,0],[-.58,-.4],[.58,-.4],[-.58,.42],[.58,.42]],6:[[-.56,-.4],[0,-.45],[.56,-.4],[-.56,.42],[0,.45],[.56,.42]],
   7:[[0,0],[-.6,-.42],[0,-.55],[.6,-.42],[-.6,.42],[0,.55],[.6,.42]]};
-const markRect=(x,y,name)=>{const w=Math.max(44,name.length*7.2+8);return[x-w/2,y-21,x+w/2,y+36]};
+const markRect=(x,y,name)=>{const w=Math.max(44,name.length*7.7+10);return[x-w/2,y-21,x+w/2,y+36]};
 const labelRect=(x,y,name)=>{const w=name.length*11.5+24;return[x-w/2,y-16,x+w/2,y+8]};
 const hit=(a,b,m=6)=>a[0]<b[2]+m&&b[0]<a[2]+m&&a[1]<b[3]+m&&b[1]<a[3]+m;
 function layoutPlaces(places,box,avoid){
@@ -1039,7 +1325,7 @@ function renderRegion(w){
   const st=stars(svg,200,1000,640,w.x*3+w.y);sparkle(st,40,300,5);sparkle(st,960,600,5);
   [[170,560,.35],[860,120,.0],[60,200,.22]].forEach(([x,y,s])=>{if(s)island(el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.45},svg),120,shade(base,-.2))});
 
-  const box={cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
+  const dense=w.places.length>18,box=dense?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   if(mode==='land'||mode==='cloud'){
     if(mode==='land'){
@@ -1143,6 +1429,46 @@ function renderRealmBadge(w){
 }
 </script>
 <script>
+/* ===== Trang hồ sơ: Nhân vật · Hành trình · Công pháp & bảo vật ===== */
+const INFO_TABS=[['nhan-vat','Nhân vật'],['hanh-trinh','Hành trình'],['cong-phap','Công pháp & bảo vật']];
+const worldChip=id=>byId[id]?`<a class="chip" href="#${S.id}--${id}">${esc(short(byId[id].name))}</a>`:'';
+const refs=chs=>`<div class="refs">${chs.map(chLink).join('')}</div>`;
+
+function renderInfo(tab){
+  setBar([['Thư viện','#thu-vien'],[S.title,'#'+S.id],[INFO_TABS.find(t=>t[0]===tab)[1]]],[['Bản đồ thế giới','#'+S.id]]);
+  document.getElementById('infoTabs').innerHTML=INFO_TABS.map(([k,n])=>`<a class="tab" href="#${S.id}--${k}" aria-selected="${k===tab}">${n}</a>`).join('');
+  const b=document.getElementById('infoBody');
+  if(tab==='nhan-vat'){
+    document.getElementById('infoTitle').textContent='Nhân vật';
+    document.getElementById('infoSub').textContent=`${S.people.length} nhân vật quan trọng, chia theo quan hệ với Lâm Phong. Bấm thế giới để tới bản đồ, bấm số chương để đọc.`;
+    b.innerHTML=Object.entries(PEOPLE_GROUPS).map(([g,gn])=>{const ps=S.people.filter(p=>p.g===g);if(!ps.length)return'';
+      return `<section class="sec"><h2 class="h-sec">${gn} <span class="meta">${ps.length}</span></h2><div class="cards">${ps.map(p=>`<article class="card person">
+        <h3>${esc(p.n)}</h3><p>${esc(p.d)}</p>${p.w.length?`<div class="chips">${p.w.map(worldChip).join('')}</div>`:''}${refs(p.ch)}</article>`).join('')}</div></section>`}).join('');
+  }else if(tab==='hanh-trinh'){
+    document.getElementById('infoTitle').textContent='Hành trình của Lâm Phong';
+    document.getElementById('infoSub').textContent=`${S.journey.length} mốc lớn từ chương 1 đến chương cuối: thế giới đặt chân tới, sự kiện, và cảnh giới đạt được.`;
+    let prevW=null;
+    b.innerHTML=`<ol class="tl">${S.journey.map(j=>{const w=byId[j.w],r=j.r?REALMS[RIDX[j.r]]:null,newW=j.w!==prevW;prevW=j.w;
+      return `<li class="${newW?'neww':''}">${newW&&w?`<div class="tl-w">${worldChip(j.w)}<span class="meta">Tầng ${w.tier} · ${esc(S.tiers[w.tier].name)}</span></div>`:''}
+        <div class="tl-row"><span class="tl-ch">${chLink(j.ch)}</span><p>${esc(j.d)}</p>${r?`<span class="tl-r" style="--c:${GBY[r.g].c}">${esc(r.name)}</span>`:''}</div></li>`}).join('')}</ol>`;
+  }else{
+    document.getElementById('infoTitle').textContent='Công pháp & bảo vật';
+    document.getElementById('infoSub').textContent='Công pháp, huyết mạch, thần thông, thiên hỏa có xếp hạng và bảo vật chính của Lâm Phong.';
+    b.innerHTML=Object.entries(ARTS_GROUPS).map(([g,gn])=>{let as=S.arts.filter(a=>a.g===g);if(!as.length)return'';
+      if(g==='th')as=[...as].sort((x,y)=>(x.rank||999)-(y.rank||999));
+      return `<section class="sec"><h2 class="h-sec">${gn} <span class="meta">${as.length}</span></h2>${g==='th'?'<p class="meta">Thiên hỏa có thứ hạng. Truyện phân biệt thiên hỏa, địa hỏa và yêu hỏa (ch.175).</p>':''}<div class="cards">${as.map(a=>`<article class="card art">
+        ${a.rank?`<span class="rank">#${a.rank}</span>`:''}<h3>${esc(a.n)}</h3><p>${esc(a.d)}</p>${refs(a.ch)}</article>`).join('')}</div></section>`}).join('');
+  }
+}
+
+/* Trong màn thế giới: nhân vật và sự kiện tại đây */
+function renderWorldExtras(wid){
+  const ps=(S.people||[]).filter(p=>p.w.includes(wid)),js=(S.journey||[]).filter(j=>j.w===wid);
+  document.getElementById('wPeople').innerHTML=ps.length?ps.map(p=>`<a class="chip" href="#${S.id}--nhan-vat" title="${esc(p.d)}">${esc(p.n)}</a>`).join(''):'<span class="meta">Chưa ghi.</span>';
+  document.getElementById('wEvents').innerHTML=js.length?js.map(j=>`<li>${chLink(j.ch)} ${esc(j.d)}</li>`).join(''):'<li class="meta">Chưa ghi.</li>';
+}
+</script>
+<script>
 /* ===== Trạng thái ===== */
 let S,byId,adj,showAll=false,curWorld=null,curRealm=null;
 function useStory(id){
@@ -1179,8 +1505,8 @@ function renderHome(){
       <h1>${esc(s.title)}</h1>
       <span class="meta">${esc(s.author)} · ${esc(s.genre)} · <a class="chref" href="${s.source}" target="_blank" rel="noopener">đọc truyện</a></span>
       <p class="sub">${esc(s.sub)}</p>
-      <div class="stats"><div class="stat"><b>${s.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${s.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${REALMS.length}</b><span>cảnh giới</span></div></div>
-      <div class="actions"><a class="btn primary" href="#${s.id}">Mở bản đồ thế giới →</a><a class="btn" href="#${s.id}--${s.start}">Vào ${esc(short(byId[s.start].name))}</a></div>
+      <div class="stats"><div class="stat"><b>${s.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${s.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${REALMS.length}</b><span>cảnh giới</span></div><div class="stat"><b>${(s.people||[]).length}</b><span>nhân vật</span></div></div>
+      <div class="actions"><a class="btn primary" href="#${s.id}">Mở bản đồ thế giới →</a><a class="btn" href="#${s.id}--hanh-trinh">Hành trình</a><a class="btn" href="#${s.id}--nhan-vat">Nhân vật</a><a class="btn" href="#${s.id}--cong-phap">Công pháp</a></div>
     </div><a class="feature-art" href="#${s.id}" aria-label="Mở bản đồ ${esc(s.title)}"></a>`;
   const sv=el('svg',{viewBox:'0 0 560 420',preserveAspectRatio:'xMidYMid slice','aria-hidden':'true'});f.querySelector('.feature-art').appendChild(sv);
   coverArt(sv,560,420,5);
@@ -1217,7 +1543,7 @@ function showPreview(wid){
 }
 const svgMap=()=>document.getElementById('map');
 function renderMap(){
-  setBar([['Thư viện','#thu-vien'],[S.title]],[['Vào '+short(byId[S.start].name),`#${S.id}--${S.start}`]]);
+  setBar([['Thư viện','#thu-vien'],[S.title]],[['Nhân vật',`#${S.id}--nhan-vat`],['Hành trình',`#${S.id}--hanh-trinh`],['Công pháp',`#${S.id}--cong-phap`]]);
   document.getElementById('storyTitle').textContent=S.title;
   const ups=S.links.filter(l=>l[2]==='up').length;
   document.getElementById('stats').innerHTML=`<div class="stat"><b>${S.worlds.length}</b><span>thế giới</span></div><div class="stat"><b>${S.links.length}</b><span>đường hầm</span></div><div class="stat"><b>${ups}</b><span>lối lên cấp cao</span></div>`;
@@ -1326,7 +1652,7 @@ function renderWorld(wid){
   const ups=path.slice(1).filter((p,i)=>linkType(path[i],p)==='up').length;
   document.getElementById('wRouteMeta').textContent=steps?`${steps} lần qua đường hầm${ups?`, trong đó ${ups} lần lên cấp cao hơn`:''}.`:'Đây là nơi hành trình bắt đầu.';
   document.getElementById('wNear').innerHTML=adj[wid].map(n=>`<a class="chip${linkType(wid,n)==='up'?' gold':''}" href="#${S.id}--${n}">${esc(short(byId[n].name))}</a>`).join('');
-  renderLadder(w);renderRealm();renderRealmBadge(w);
+  renderLadder(w);renderRealm();renderRealmBadge(w);renderWorldExtras(wid);
 }
 
 document.getElementById('realmBadge').addEventListener('click',e=>{const b=e.target.closest('[data-realm]');if(!b)return;curRealm=b.dataset.realm;store.set(`realm:${S.id}:${curWorld}`,curRealm);renderRealm();if(window.matchMedia('(max-width:720px)').matches)document.getElementById('realmPanel').scrollIntoView({behavior:'smooth',block:'start'})});
@@ -1335,11 +1661,12 @@ document.getElementById('realmPanel').addEventListener('click',e=>{const b=e.tar
 document.getElementById('toggleAll').addEventListener('click',()=>{showAll=!showAll;renderLadder(byId[curWorld]);renderRealm()});
 
 /* ===== Điều hướng theo #hash ===== */
-function show(v){['vHome','vMap','vWorld'].forEach(id=>document.getElementById(id).hidden=id!==v)}
+function show(v){['vHome','vMap','vWorld','vInfo'].forEach(id=>document.getElementById(id).hidden=id!==v)}
 function router(){
   const [sid,wid]=decodeURIComponent(location.hash.slice(1)).split('--');
   if(sid&&useStory(sid)){
-    if(wid&&byId[wid]){showAll=false;show('vWorld');renderWorld(wid)}
+    if(INFO_TABS.some(x=>x[0]===wid)){show('vInfo');renderInfo(wid)}
+    else if(wid&&byId[wid]){showAll=false;show('vWorld');renderWorld(wid)}
     else{show('vMap');renderMap()}
   }else{show('vHome');renderHome()}
   window.scrollTo(0,0);
