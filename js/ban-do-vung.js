@@ -150,17 +150,30 @@ function renderRegion(w,opt){
   [[170,560,.35],[860,120,.0],[60,200,.22]].forEach(([x,y,s])=>{if(s)island(el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.45},svg),120,shade(base,-.2))});
 
   const dense=w.places.length>18,box=dense?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
+  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
+  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
+  const pos=layoutPlaces(w.places,box,avoid);
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
+  // Địa hình chân thật (ảnh sinh theo độ cao) cho lục địa và biển đảo; chỗ có thành/tông môn được san bằng
+  const real=(mode==='land'||mode==='sea')&&typeof reliefMap==='function'&&!!document.createElement('canvas').getContext;
+  const rel=real?reliefMap(w,shape,box,w.places.map(p=>[p,pos.get(p)]).filter(([p,P])=>P&&(!P.terr||(mode==='sea'&&!isWaterName(p.n)))).map(([p,P])=>P.terr?{x:P.bx,y:P.by,rx:P.rx*.92,ry:P.ry*.92}:{x:P.x,y:P.y,r:mode==='sea'?34:42}),mode==='sea'):null;
   if(mode==='land'||mode==='cloud'){
     if(mode==='land'){
       el('path',{d:`M${box.cx-box.rx*.96},${box.cy+12} Q${box.cx-box.rx*.6},${box.cy+box.ry+70} ${box.cx-box.rx*.12},${box.cy+box.ry+125} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'url(#rock)'},land);
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
-    if(mode==='land')el('path',{d:shape,fill:'none',stroke:'#e6d29a','stroke-width':9,opacity:.75},land);
-    el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':`url(#landTop${sfx})`,stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land);
+    if(rel){el('path',{d:shape,fill:'#3b2e24',transform:'translate(0,12)'},land);el('path',{d:shape,fill:'#2a2019',opacity:.6,transform:'translate(0,6)'},land);
+      el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);
+      // Thác nước nơi sông chảy ra mép đảo phía trước
+      rel.falls.filter(([x,y])=>y>box.cy).forEach(([x,y],k)=>{const h=70+k*25,id='fall'+sfx+k;
+        el('defs',{},land).innerHTML=`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8efff" stop-opacity=".95"/><stop offset="1" stop-color="#d8efff" stop-opacity="0"/></linearGradient>`;
+        el('path',{d:`M${x-4},${y} L${x+4},${y} L${x+9},${y+h} L${x-9},${y+h}Z`,fill:`url(#${id})`},land);
+        el('ellipse',{cx:x,cy:y+2,rx:8,ry:3,fill:'#fff',opacity:.7,filter:'url(#soft)'},land)})}
+    else{if(mode==='land')el('path',{d:shape,fill:'none',stroke:'#e6d29a','stroke-width':9,opacity:.75},land);
+    el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':`url(#landTop${sfx})`,stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land)}
   }else if(mode==='sea'){
     el('path',{d:blob(box.cx,box.cy+10,box.rx*1.04,box.ry*1.06,seed+1,.05),fill:'#071f44',opacity:.6,filter:'url(#soft)'},land);
-    el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
+    if(rel)el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);else el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
   }else if(mode==='void'){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.04,ry:box.ry*1.06,fill:'#ff6a1f',opacity:.35,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#2a120c',stroke:'#ff8a3a','stroke-width':3},land);
@@ -174,11 +187,8 @@ function renderRegion(w,opt){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.05,ry:box.ry*1.1,fill:'#5b6cff',opacity:.25,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#14123f',opacity:.55,stroke:'#9b8cff','stroke-width':1.5,'stroke-dasharray':'6 6'},land);
   }
-  terrain(land,mode,base,box,seed+3);
+  if(!rel)terrain(land,mode,base,box,seed+3);
 
-  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
-  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
-  const pos=layoutPlaces(w.places,box,avoid);
   if(!opt.svg)placeIndex=w.places;
   const roadG=el('g',{},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
   if(mode==='land'||mode==='cloud'){const hubs=w.places.map(p=>pos.get(p)).filter((P,i)=>P&&['thanh','tong','quoc'].includes(w.places[i].t)&&!P.terr);
@@ -190,9 +200,10 @@ function renderRegion(w,opt){
     const d=blob(P.bx,P.by,P.rx,P.ry,seed+i*17+5,.1,22);
     if(/băng/i.test(p.n))el('path',{d,fill:'#e8f4ff',stroke:'#ffffff','stroke-width':3,opacity:.92},g);
     else if(water)el('path',{d,fill:'#2a6fb8',opacity:.55},g);
-    else if(mode==='sea')el('path',{d,fill:'#4f9a46',stroke:'#e9d6a0','stroke-width':4,opacity:.95},g);
+    else if(mode==='sea'&&!rel)el('path',{d,fill:'#4f9a46',stroke:'#e9d6a0','stroke-width':4,opacity:.95},g);
+    else if(rel)el('path',{d,fill:c,opacity:.08},g);
     else if(mode==='space'){[1,.7,.42].forEach((k,j)=>el('ellipse',{cx:P.bx,cy:P.by,rx:P.rx*k,ry:P.ry*.8*k,fill:'none',stroke:c,opacity:.3+j*.15,'stroke-width':1.4,transform:`rotate(-10 ${P.bx} ${P.by})`},g));el('path',{d,fill:c,opacity:.08},g)}
-    else el('path',{d,fill:c,opacity:.16},g);
+    else el('path',{d,fill:c,opacity:rel?.1:.16},g);
     el('path',{d,fill:'none',stroke:'#0a0b22','stroke-width':4.5,opacity:.35},g);
     el('path',{class:'edge',d,fill:'none',stroke:c,'stroke-width':1.6+p.s*.3,'stroke-dasharray':'8 4 2 4',opacity:.9},g);
     el('text',{class:'tlabel',x:P.x,y:P.y,fill:c,style:`font-size:${(12+p.s*1.6).toFixed(1)}px`},g).textContent=p.n.toUpperCase();

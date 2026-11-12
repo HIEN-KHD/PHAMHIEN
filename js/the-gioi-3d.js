@@ -270,7 +270,7 @@ function build3D(){
   [1,2,3,4].forEach(t=>{const ws=S.worlds.filter(w=>w.tier===t),n=ws.length,f=ws.map(foot),mx=Math.max(...f,1);RM[t]=mx;
     TIER_R[t]=n<2?0:Math.max(TIER_R[t],(2*mx+10)/(2*Math.sin(Math.PI/n)))});
   TIER_R[3]=Math.max(TIER_R[3],1);
-  const W=host.clientWidth||900,H=Math.round(Math.max(420,Math.min(700,window.innerHeight*.72)));
+  const W=host.clientWidth||900,H=Math.round(Math.max(420,Math.min(980,window.innerHeight-120)));
   const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.setSize(W,H);renderer.setClearColor(0x05060f);
   host.appendChild(renderer.domElement);
   const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05060f,.0017);
