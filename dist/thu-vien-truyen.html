@@ -128,8 +128,14 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 /* Thế giới */
 .w-head{display:flex;flex-direction:column;gap:6px}
 .w-map{position:relative;margin:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#070818}
-.w-scroll{overflow-x:auto;overscroll-behavior-x:contain}
-.w-scroll svg{display:block;width:100%;min-width:760px;height:auto}
+.w-stage{position:relative;aspect-ratio:1000/640;max-height:calc(100vh - 120px);width:100%;overflow:hidden;touch-action:none;cursor:grab}
+.w-stage.drag{cursor:grabbing}
+.w-stage svg{display:block;width:100%;height:100%}
+.map-zoom{position:absolute;left:12px;bottom:54px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.map-zoom .btn{width:38px;height:38px;padding:0;justify-content:center;font-size:18px;background:rgba(8,9,30,.85)}
+.mz-lv{font:600 11px var(--body);color:var(--muted);background:rgba(8,9,30,.8);border-radius:999px;padding:2px 7px}
+svg .edge,svg .roads path{vector-effect:non-scaling-stroke}
+@media (max-width:720px){.w-stage{aspect-ratio:auto;height:68vh}}
 .portal{cursor:pointer}
 .portal:hover ellipse:first-child{stroke-width:4}
 .portal text{font:600 15px var(--body);fill:#eef;paint-order:stroke;stroke:#070818;stroke-width:4px}
@@ -264,6 +270,7 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .tile b{font:700 26px var(--body);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .tile span{font-size:12px;color:var(--muted)}
 /* Vũ trụ 3D */
+.v3d-wrap:fullscreen{border-radius:0;border:0}
 .v3d-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#05060f}
 .v3d-canvas canvas{display:block;width:100%!important;touch-action:none}
 .v3d-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:15px}
@@ -303,6 +310,10 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .v2d-hint{position:absolute;right:16px;bottom:10px;margin:0;padding:4px 10px;border-radius:999px;background:rgba(8,9,30,.7);font-size:12px;pointer-events:none}
 .v2d #scene2d .place.sel .bg{stroke:#fff;stroke-width:3}
 @media (max-width:720px){.v2d-hint{display:none}.v2d .realm-badge{width:min(190px,48%);font-size:12px}}
+
+/* Địa danh nhỏ chỉ hiện khi phóng to */
+svg .place.minor{display:none}
+svg.lod-near .place.minor{display:inline}
 </style>
 </head>
 <body>
@@ -361,6 +372,7 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
         <button type="button" class="btn" data-v3d="top">Nhìn từ trên</button>
         <button type="button" class="btn" data-v3d="side">Nhìn ngang</button>
         <button type="button" class="btn" data-v3d="reset">Góc ban đầu</button>
+        <button type="button" class="btn" data-v3d="full">Toàn màn hình</button>
       </div>
       <div class="v3d-pivots" role="group" aria-label="Tâm xoay">
         <span>Tâm xoay</span>
@@ -372,31 +384,19 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
       </div>
       <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
     </div>
-    <div class="v2d" id="v2d" hidden role="dialog" aria-modal="true" aria-labelledby="v2dName">
-      <div class="v2d-bar">
-        <button type="button" class="btn" data-v2d="close">← Về 3D</button>
-        <h2 id="v2dName"></h2>
-        <div class="v2d-zoom" role="group" aria-label="Phóng to thu nhỏ">
-          <button type="button" class="btn" data-v2d="out" aria-label="Thu nhỏ">−</button>
-          <button type="button" class="btn" data-v2d="fit">Vừa khung</button>
-          <button type="button" class="btn" data-v2d="in" aria-label="Phóng to">+</button>
-        </div>
-        <a class="btn primary" id="v2dFull" href="#">Trang thế giới →</a>
-      </div>
-      <div class="v2d-stage" id="v2dStage">
-        <svg id="scene2d" viewBox="0 0 1000 640" role="img"></svg>
-        <div class="realm-badge" id="v2dBadge"></div>
-        <aside class="panel v2d-card" id="v2dCard" hidden aria-live="polite"></aside>
-        <p class="v2d-hint meta">Lăn chuột hoặc chụm 2 ngón để phóng to · kéo để di chuyển · bấm thế lực để xem</p>
-      </div>
-    </div>
   </section>
 
   <!-- Màn 3: Thế giới -->
   <section class="view" id="vWorld" hidden>
     <header class="w-head"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></header>
     <figure class="w-map">
-      <div class="w-scroll"><svg id="scene" viewBox="0 0 1000 640" role="img"></svg></div>
+      <div class="w-stage" id="wStage"><svg id="scene" viewBox="0 0 1000 640" role="img"></svg></div>
+      <div class="map-zoom" role="group" aria-label="Phóng to thu nhỏ bản đồ">
+        <button type="button" class="btn" data-mz="in" aria-label="Phóng to">+</button>
+        <button type="button" class="btn" data-mz="out" aria-label="Thu nhỏ">−</button>
+        <button type="button" class="btn" data-mz="fit" title="Vừa khung">⤢</button>
+        <span class="mz-lv" id="mzLv">1×</span>
+      </div>
       <div class="realm-badge" id="realmBadge"></div>
       <figcaption class="place-legend" id="placeLegend"></figcaption>
     </figure>
@@ -429,6 +429,25 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 </main>
 
 <!-- Thứ tự nạp quan trọng: dữ liệu → tiện ích → hình vẽ → ứng dụng -->
+<!-- Màn 2D phóng to (mở từ vũ trụ 3D) -->
+  <div class="v2d" id="v2d" hidden role="dialog" aria-modal="true" aria-labelledby="v2dName">
+    <div class="v2d-bar">
+      <button type="button" class="btn" data-v2d="close">← Về 3D</button>
+      <h2 id="v2dName"></h2>
+      <div class="v2d-zoom" role="group" aria-label="Phóng to thu nhỏ">
+        <button type="button" class="btn" data-v2d="out" aria-label="Thu nhỏ">−</button>
+        <button type="button" class="btn" data-v2d="fit">Vừa khung</button>
+        <button type="button" class="btn" data-v2d="in" aria-label="Phóng to">+</button>
+      </div>
+      <a class="btn primary" id="v2dFull" href="#">Trang thế giới →</a>
+    </div>
+    <div class="v2d-stage" id="v2dStage">
+      <svg id="scene2d" viewBox="0 0 1000 640" role="img"></svg>
+      <div class="realm-badge" id="v2dBadge"></div>
+      <aside class="panel v2d-card" id="v2dCard" hidden aria-live="polite"></aside>
+      <p class="v2d-hint meta">Lăn chuột hoặc chụm 2 ngón để phóng to · kéo để di chuyển · bấm thế lực để xem</p>
+    </div>
+  </div>
 <script>
 /* ===== Hệ thống cảnh giới =====
    Nguồn của từng mục: t = theo lời truyện (có số chương), w = bách khoa trên web, d = diễn giải từ tên gọi.
@@ -705,7 +724,7 @@ const SKY={galaxy:['#0b0d3a','#1b2a6b','#5b6cff'],sun:['#2a1a3d','#7a4a2a','#f2b
 </script>
 <script>
 /* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */
-const CH={"1": "/thai-co-long-tuong-quyet/chuong-1-5kmMvinMC62R", "19": "/thai-co-long-tuong-quyet/chuong-19-tzcsU8izgajS", "26": "/thai-co-long-tuong-quyet/chuong-26-FvjNK0aTo0Zz", "29": "/thai-co-long-tuong-quyet/chuong-29-g3djyOEyRuMe", "40": "/thai-co-long-tuong-quyet/chuong-40-vpwO0mJS5qG4", "45": "/thai-co-long-tuong-quyet/chuong-45-JMRKkP4wS0ZA", "49": "/thai-co-long-tuong-quyet/chuong-49-EBeTwuHwyWd2", "52": "/thai-co-long-tuong-quyet/chuong-52-fIYpaIvRbQQh", "54": "/thai-co-long-tuong-quyet/chuong-54-ci9PgX2QLgw8", "60": "/thai-co-long-tuong-quyet/chuong-60-Txx7yILQbTWS", "66": "/thai-co-long-tuong-quyet/chuong-66-LClqG3ePrG6l", "78": "/thai-co-long-tuong-quyet/chuong-78-4fNHqZHONpGO", "81": "/thai-co-long-tuong-quyet/chuong-81-VnHdUwwt0j33", "175": "/thai-co-long-tuong-quyet/chuong-175-PDaZ3nojN4nf", "200": "/thai-co-long-tuong-quyet/chuong-200-Ls6FlxcBHqN9", "204": "/thai-co-long-tuong-quyet/chuong-204-FhJOxSpBnNR1", "224": "/thai-co-long-tuong-quyet/chuong-224-npK7wyr9JzhP", "239": "/thai-co-long-tuong-quyet/chuong-239-yRquAs8cSTeh", "262": "/thai-co-long-tuong-quyet/chuong-262-xgl0mmq5czhk", "279": "/thai-co-long-tuong-quyet/chuong-279-4htN6uDYViBT", "280": "/thai-co-long-tuong-quyet/chuong-280-YPBAe2m3OLRh", "318": "/thai-co-long-tuong-quyet/chuong-318-ZOnRhkUWkfBn", "333": "/thai-co-long-tuong-quyet/chuong-333-MXiM57EeFPjW", "352": "/thai-co-long-tuong-quyet/chuong-352-QxRJVVj7tOjg", "363": "/thai-co-long-tuong-quyet/chuong-363-gjkxXtnbXLd6", "369": "/thai-co-long-tuong-quyet/chuong-369-XyYgpe6an8CP", "437": "/thai-co-long-tuong-quyet/chuong-437-111A8EdTN36K", "462": "/thai-co-long-tuong-quyet/chuong-462-xgYpqNRwHpgo", "477": "/thai-co-long-tuong-quyet/chuong-477-7H4d4HiPQId6", "536": "/thai-co-long-tuong-quyet/chuong-536-Iyp2RiHo8YA2", "551": "/thai-co-long-tuong-quyet/chuong-551-SZLpfbZHH17K", "~560": "/thai-co-long-tuong-quyet/chuong-tiep-NOXyr6lHmXAC", "568": "/thai-co-long-tuong-quyet/chuong-568-aaSCzkwlAkb3", "577": "/thai-co-long-tuong-quyet/chuong-577-swAHvsuF3Qy1", "581": "/thai-co-long-tuong-quyet/chuong-581-nlNQ7O7EZx1u", "602": "/thai-co-long-tuong-quyet/chuong-602-5iVjEvaMv4y9", "619": "/thai-co-long-tuong-quyet/chuong-619-Did6Y4yppnSs", "623": "/thai-co-long-tuong-quyet/chuong-623-7YpFkaBpKKVk", "635": "/thai-co-long-tuong-quyet/chuong-635-q1RgK5onqtfN", "673": "/thai-co-long-tuong-quyet/chuong-673-zssZBtmj8tfi", "691": "/thai-co-long-tuong-quyet/chuong-691-abIj39ihuFPf", "695": "/thai-co-long-tuong-quyet/chuong-695-VQVsFfvhQmSX", "732": "/thai-co-long-tuong-quyet/chuong-732-AZezXKL8q8Ce", "750": "/thai-co-long-tuong-quyet/chuong-750-lH38PbH6cUwb", "763": "/thai-co-long-tuong-quyet/chuong-tiep-yTyMXESa0hMR", "811": "/thai-co-long-tuong-quyet/chuong-811-uOQ7sIxV400y", "818": "/thai-co-long-tuong-quyet/chuong-818-8dyrChPFs4Q2", "833": "/thai-co-long-tuong-quyet/chuong-833-JEUfQagj1XNK", "839": "/thai-co-long-tuong-quyet/chuong-839-ATIOiLziHKxd", "855": "/thai-co-long-tuong-quyet/chuong-855-om6yVMphIQA9", "857": "/thai-co-long-tuong-quyet/chuong-857-lCiXbbvg3gga", "~881": "/thai-co-long-tuong-quyet/chuong-tiep-PUW8Ndlf4nu6", "~884": "/thai-co-long-tuong-quyet/chuong-tiep-qcQU10P9hghl", "894": "/thai-co-long-tuong-quyet/chuong-tiep-RKqetHL7T2Qh", "~896": "/thai-co-long-tuong-quyet/chuong-tiep-Z62vbW28DGqO", "~915": "/thai-co-long-tuong-quyet/chuong-tiep-AoS5Tny6zcaK", "~921": "/thai-co-long-tuong-quyet/chuong-tiep-23GolXH6FPAe", "975": "/thai-co-long-tuong-quyet/chuong-tiep-pDWHNM50ZUOU", "976": "/thai-co-long-tuong-quyet/chuong-tiep-Iup4vTeVR7ei", "~1001": "/thai-co-long-tuong-quyet/chuong-tiep-QVNfR2XcoIih", "~1046": "/thai-co-long-tuong-quyet/chuong-tiep-QbcGZaoXN4IM", "~1097": "/thai-co-long-tuong-quyet/chuong-tiep-06PhFJwYQIOH", "~1142": "/thai-co-long-tuong-quyet/chuong-tiep-1CeJOrETy5yv", "~1166": "/thai-co-long-tuong-quyet/chuong-tiep-T9sBYtTR0EIB", "~1203": "/thai-co-long-tuong-quyet/chuong-tiep-9I1HqYtsQa2J", "~1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1268": "/thai-co-long-tuong-quyet/chuong-tiep-iWHcxdDlWzsL", "~1279": "/thai-co-long-tuong-quyet/chuong-tiep-yHaHz1IF9vmk", "~1321": "/thai-co-long-tuong-quyet/chuong-tiep-d1AbS5DJ3i68", "~1327": "/thai-co-long-tuong-quyet/chuong-tiep-VGyKkqWJJVgR", "1402": "/thai-co-long-tuong-quyet/chuong-tiep-z26IxFpDbWxl", "1412": "/thai-co-long-tuong-quyet/chuong-tiep-yI1OZ9Wfl20o", "~1441": "/thai-co-long-tuong-quyet/chuong-tiep-8tXBn2n9tVx6", "~1447": "/thai-co-long-tuong-quyet/chuong-tiep-08Lu5n689IXP", "~1460": "/thai-co-long-tuong-quyet/chuong-tiep-DJG8DQHcYUxG", "~1471": "/thai-co-long-tuong-quyet/chuong-tiep-T5ZmFoM6BRrf", "~1472": "/thai-co-long-tuong-quyet/chuong-tiep-wnsZnwub447t", "~1481": "/thai-co-long-tuong-quyet/chuong-tiep-F9aej5s5xkUr", "~1482": "/thai-co-long-tuong-quyet/chuong-tiep-irtRHCQapNk5", "~1488": "/thai-co-long-tuong-quyet/chuong-tiep-a6g9ZxjZ5AKP", "~1513": "/thai-co-long-tuong-quyet/chuong-tiep-JfqmhMzYFARC", "~1527": "/thai-co-long-tuong-quyet/chuong-tiep-Vrl0p0A2eNr3", "~1540": "/thai-co-long-tuong-quyet/chuong-tiep-i2gExeLV2aIu", "~1541": "/thai-co-long-tuong-quyet/chuong-tiep-Cky0Vmt0uDY7", "1543": "/thai-co-long-tuong-quyet/chuong-tiep-9Aaab100fT5Z", "~1559": "/thai-co-long-tuong-quyet/chuong-tiep-nTOAN2pygZI4", "1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1574": "/thai-co-long-tuong-quyet/chuong-tiep-x4uybw7Sp2FM", "~1576": "/thai-co-long-tuong-quyet/chuong-tiep-uTWXhBDSaJln", "~1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "~1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "~1621": "/thai-co-long-tuong-quyet/chuong-tiep-aD5rBG9WT66B", "~1641": "/thai-co-long-tuong-quyet/chuong-tiep-8L6b9mBU0iMZ", "~1659": "/thai-co-long-tuong-quyet/chuong-tiep-j3Wk137Sm56W", "~1662": "/thai-co-long-tuong-quyet/chuong-tiep-ABQ7fQmxPytA", "~1668": "/thai-co-long-tuong-quyet/chuong-tiep-2QEpxB5wflTU", "~1672": "/thai-co-long-tuong-quyet/chuong-tiep-wFRy9hIwAIWM", "~1675": "/thai-co-long-tuong-quyet/chuong-tiep-NMLLn4wRnBJ1", "~1682": "/thai-co-long-tuong-quyet/chuong-tiep-iJRqdxovvbAY", "~1683": "/thai-co-long-tuong-quyet/chuong-tiep-C1kdB5MQoEQm", "~1703": "/thai-co-long-tuong-quyet/chuong-tiep-k9lM9bPOKrgA", "~1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1716": "/thai-co-long-tuong-quyet/chuong-1716-bdUA3GPqkAKW", "1717": "/thai-co-long-tuong-quyet/chuong-1717-4LnxbNxLcnak", "1720": "/thai-co-long-tuong-quyet/chuong-1720-VThJFlcpFgNO", "1721": "/thai-co-long-tuong-quyet/chuong-1721-zA06ntAK8Kdc", "1728": "/thai-co-long-tuong-quyet/chuong-1728-K76cel2oGkU9", "1729": "/thai-co-long-tuong-quyet/chuong-1729-opPOCtaJ8NkN", "1744": "/thai-co-long-tuong-quyet/chuong-1744-yQvCQnrnHqhf", "1750": "/thai-co-long-tuong-quyet/chuong-1750-pfjuiXAmXdHy", "1751": "/thai-co-long-tuong-quyet/chuong-1751-JN2hGfjHPGXC", "1755": "/thai-co-long-tuong-quyet/chuong-1755-DCEqSBwHvma4", "1756": "/thai-co-long-tuong-quyet/chuong-1756-huXd0IUmnPrI", "1757": "/thai-co-long-tuong-quyet/chuong-1757-BbqQYQ2Gf37V", "1854": "/thai-co-long-tuong-quyet/chuong-1854-j0JeEQES5Pda", "1902": "/thai-co-long-tuong-quyet/chuong-1902-fvlPYTiN8iH6", "1929": "/thai-co-long-tuong-quyet/chuong-1929-YzseMscpnkN1", "1937": "/thai-co-long-tuong-quyet/chuong-1937-NeIwlt2oooUm", "1940": "/thai-co-long-tuong-quyet/chuong-1940-olCIPGgJRhHR", "1942": "/thai-co-long-tuong-quyet/chuong-1942-lBnsVWnJCxos", "1962": "/thai-co-long-tuong-quyet/chuong-1962-JJobT2pHia4G", "1964": "/thai-co-long-tuong-quyet/chuong-1964-GjQBZIwHTqbh", "1966": "/thai-co-long-tuong-quyet/chuong-1966-E81kfY2GE778", "1972": "/thai-co-long-tuong-quyet/chuong-1972-5NpTxIMGUthS", "1974": "/thai-co-long-tuong-quyet/chuong-1974-3nQ23YSGEAEt", "1987": "/thai-co-long-tuong-quyet/chuong-1987-FyLGBCdjcMek", "1998": "/thai-co-long-tuong-quyet/chuong-1998-VkevDahDGJY9", "2000": "/thai-co-long-tuong-quyet/chuong-2000-SAFUJpoD1Z4b", "2047": "/thai-co-long-tuong-quyet/chuong-2047-kMJt2HynXC5s", "2053": "/thai-co-long-tuong-quyet/chuong-2053-cb7bK2HmnzfC", "2067": "/thai-co-long-tuong-quyet/chuong-2067-IULc0n0l3pMG", "2069": "/thai-co-long-tuong-quyet/chuong-2069-FuwC637lo5sh", "2096": "/thai-co-long-tuong-quyet/chuong-2096-9z4QvS1DT8zc", "2097": "/thai-co-long-tuong-quyet/chuong-2097-cgNDTaZiLlFq", "2100": "/thai-co-long-tuong-quyet/chuong-2100-3oHZ7xEDyf2V", "2101": "/thai-co-long-tuong-quyet/chuong-2101-XWZMf5mhqIJi", "2105": "/thai-co-long-tuong-quyet/chuong-2105-RLmVrazhMoMb", "2106": "/thai-co-long-tuong-quyet/chuong-2106-v35IPiXCESco", "2124": "/thai-co-long-tuong-quyet/chuong-2124-WlUSHzTA0oMl", "2131": "/thai-co-long-tuong-quyet/chuong-2131-ribx7sLe8ECI", "2175": "/thai-co-long-tuong-quyet/chuong-2175-snqZFQcah0nw", "2282": "/thai-co-long-tuong-quyet/chuong-2282-NE3QZsmWzps9", "2299": "/thai-co-long-tuong-quyet/chuong-2299-UEAnt1A0tZLs", "2334": "/thai-co-long-tuong-quyet/chuong-2334-DyhK6QURYfYY", "2335": "/thai-co-long-tuong-quyet/chuong-2335-gg07eY2wRIpm", "2336": "/thai-co-long-tuong-quyet/chuong-2336-ANItCgaRJv5z", "2338": "/thai-co-long-tuong-quyet/chuong-2338-7nuTIvgR4BcQ", "2340": "/thai-co-long-tuong-quyet/chuong-2340-4DV2OBnQoR8s", "2410": "/thai-co-long-tuong-quyet/chuong-2410-F2KNMyBxsGO2", "2431": "/thai-co-long-tuong-quyet/chuong-2431-HsetscmQHWvd", "2435": "/thai-co-long-tuong-quyet/chuong-2435-Bhr247zPn2yW", "2436": "/thai-co-long-tuong-quyet/chuong-2436-fP9pcFXuffFj", "2571": "/thai-co-long-tuong-quyet/chuong-2571-8nn0fG3BytmL", "2576": "/thai-co-long-tuong-quyet/chuong-2576-WKIwPuofL36R", "2584": "/thai-co-long-tuong-quyet/chuong-2584-LzhEnuEfM6DC", "2585": "/thai-co-long-tuong-quyet/chuong-2585-pg01L2m9EjTP", "2586": "/thai-co-long-tuong-quyet/chuong-2586-IOJotAKe6Mjd", "2587": "/thai-co-long-tuong-quyet/chuong-2587-m6baRIs9zzzq", "2588": "/thai-co-long-tuong-quyet/chuong-2588-GouNzPQercG4", "2589": "/thai-co-long-tuong-quyet/chuong-2589-jWDAXXz9jFWI", "2637": "/thai-co-long-tuong-quyet/chuong-2637-eQevraT4nYAo", "2654": "/thai-co-long-tuong-quyet/chuong-2654-mRmIBjrXhHdX", "2713": "/thai-co-long-tuong-quyet/chuong-2713-x8XhYBQwOWAT", "2715": "/thai-co-long-tuong-quyet/chuong-2715-uX8GeQWw9nhv", "2719": "/thai-co-long-tuong-quyet/chuong-2719-oNLQqwjveJkn", "2721": "/thai-co-long-tuong-quyet/chuong-2721-mmwzwBqvPaHE", "2734": "/thai-co-long-tuong-quyet/chuong-2734-zyrD4p1Pnmh5", "2739": "/thai-co-long-tuong-quyet/chuong-2739-NVM9oSmtBw1B", "2745": "/thai-co-long-tuong-quyet/chuong-2745-EkAr6D5tRjaV", "2759": "/thai-co-long-tuong-quyet/chuong-2759-vdNsmyorhZHZ", "2785": "/thai-co-long-tuong-quyet/chuong-2785-MLiSbly0otfU", "2791": "/thai-co-long-tuong-quyet/chuong-2791-DaWBtWHz4gFo", "2801": "/thai-co-long-tuong-quyet/chuong-2801-zeX3Nmoypzs0", "2802": "/thai-co-long-tuong-quyet/chuong-2802-TMppvuMThc8D", "2816": "/thai-co-long-tuong-quyet/chuong-2816-9F3qbg5RySpI", "2822": "/thai-co-long-tuong-quyet/chuong-2822-1UqZuQOREFPb", "2825": "/thai-co-long-tuong-quyet/chuong-2825-SbkvYo3vr9BG", "2829": "/thai-co-long-tuong-quyet/chuong-2829-MQx4kJGvMfF8", "2861": "/thai-co-long-tuong-quyet/chuong-2861-e2aFILvsPrfA", "2872": "/thai-co-long-tuong-quyet/chuong-2872-oAnW6CBq2Hah", "2873": "/thai-co-long-tuong-quyet/chuong-2873-Ir5JeJjLuuru", "2883": "/thai-co-long-tuong-quyet/chuong-2883-4w6B8aFKfEU6", "2898": "/thai-co-long-tuong-quyet/chuong-2898-EXcyMTXnohRO", "2910": "/thai-co-long-tuong-quyet/chuong-2910-x0EPwz9mKGa1", "2938": "/thai-co-long-tuong-quyet/chuong-2938-KnfRJWcjswyA", "2962": "/thai-co-long-tuong-quyet/chuong-2962-nksJTXrgt6HQ", "2965": "/thai-co-long-tuong-quyet/chuong-2965-Esmg7vWBWz45", "2968": "/thai-co-long-tuong-quyet/chuong-2968-fzg2lIAg9srk", "3051": "/thai-co-long-tuong-quyet/chuong-3051-d27QvcGlsIlb", "3183": "/thai-co-long-tuong-quyet/chuong-3183-LxByfmlhtdGH", "3207": "/thai-co-long-tuong-quyet/chuong-3207-HchdNwZ9nPql", "3247": "/thai-co-long-tuong-quyet/chuong-3247-Nsk6Jye5qfNX", "3248": "/thai-co-long-tuong-quyet/chuong-3248-ra3tr6CaiIdl", "3284": "/thai-co-long-tuong-quyet/chuong-3284-31sCbe4WG17e", "3286": "/thai-co-long-tuong-quyet/chuong-3286-0RUmhtAW1Hd5", "3311": "/thai-co-long-tuong-quyet/chuong-3311-w60RQ3yyv3DZ", "3317": "/thai-co-long-tuong-quyet/chuong-3317-oLo9ioHyBqnt", "3404": "/thai-co-long-tuong-quyet/chuong-3404-qWJNyuqoIOyB", "3475": "/thai-co-long-tuong-quyet/chuong-3475-OhZ4JnxyBbuR", "3489": "/thai-co-long-tuong-quyet/chuong-3489-4am4zZgwRRbW", "3564": "/thai-co-long-tuong-quyet/chuong-3564-uZhVw5u6mPFU", "3632": "/thai-co-long-tuong-quyet/chuong-3632-NcAzFeRzMK9P", "3653": "/thai-co-long-tuong-quyet/chuong-3653-PSUVlJ2Slaf0", "3656": "/thai-co-long-tuong-quyet/chuong-3656-qaOrPggxOUSf", "3665": "/thai-co-long-tuong-quyet/chuong-3665-9w6wLoeRHApd", "3667": "/thai-co-long-tuong-quyet/chuong-3667-6MiWR4lQ2QM5", "3691": "/thai-co-long-tuong-quyet/chuong-3691-YJvOb60O3ZgL", "3727": "/thai-co-long-tuong-quyet/chuong-3727-kkliLdsKbI9E", "3732": "/thai-co-long-tuong-quyet/chuong-3732-8HHe5GdpzSTK", "3775": "/thai-co-long-tuong-quyet/chuong-3775-gfDSggNFfbnl", "3796": "/thai-co-long-tuong-quyet/chuong-3796-hVXzCLxi4rJM", "3881": "/thai-co-long-tuong-quyet/chuong-3881-IZ7qo3s4YWh0", "3999": "/thai-co-long-tuong-quyet/chuong-3999-AJsnbtZ1RL35", "4027": "/thai-co-long-tuong-quyet/chuong-4027-X6IpyQ1yy1QD", "4033": "/thai-co-long-tuong-quyet/chuong-4033-PL6XGBKxEo0X", "4037": "/thai-co-long-tuong-quyet/chuong-4037-JAJgSgXxjL3P", "4079": "/thai-co-long-tuong-quyet/chuong-4079-NqxjUyjsXq7c", "4082": "/thai-co-long-tuong-quyet/chuong-4082-oxr58MNNAkuH", "4087": "/thai-co-long-tuong-quyet/chuong-4087-CUM1sz8sYuDN", "4140": "/thai-co-long-tuong-quyet/chuong-4140-VwJhwfOHzMB0", "4165": "/thai-co-long-tuong-quyet/chuong-4165-RbqNfpCjt8lT", "4187": "/thai-co-long-tuong-quyet/chuong-4187-bnnO47yqW2I2", "4198": "/thai-co-long-tuong-quyet/chuong-4198-rZ626V3K9zCS", "4246": "/thai-co-long-tuong-quyet/chuong-4246-mUYnQYXFDHpy", "4287": "/thai-co-long-tuong-quyet/chuong-4287-MSt3ujAg9Acy", "4334": "/thai-co-long-tuong-quyet/chuong-4334-of21he76KpzH", "4356": "/thai-co-long-tuong-quyet/chuong-4356-JCfJlQF4bin6", "4381": "/thai-co-long-tuong-quyet/chuong-4381-GsBzTa3WWVNa", "4462": "/thai-co-long-tuong-quyet/chuong-4462-w6ZhunltUdhL", "4463": "/thai-co-long-tuong-quyet/chuong-4463-QorTSvJONGxY", "4464": "/thai-co-long-tuong-quyet/chuong-4464-tWAG03rtFtDm", "4470": "/thai-co-long-tuong-quyet/chuong-4470-llyzIoAsVgn6", "4475": "/thai-co-long-tuong-quyet/chuong-4475-9ITv2RwMtq7C", "4477": "/thai-co-long-tuong-quyet/chuong-4477-6h5U8h2Md6ed", "4496": "/thai-co-long-tuong-quyet/chuong-4496-B8nRY5WpI6en", "4504": "/thai-co-long-tuong-quyet/chuong-4504-0mDjw6woI9kY", "4512": "/thai-co-long-tuong-quyet/chuong-4512-pQc1K6MnJCrJ", "4541": "/thai-co-long-tuong-quyet/chuong-4541-fvLpElMFiVUf", "4543": "/thai-co-long-tuong-quyet/chuong-4543-cKwPK1TFTl16", "4544": "/thai-co-long-tuong-quyet/chuong-4544-62FCt81kLOHK", "4550": "/thai-co-long-tuong-quyet/chuong-4550-yH3uBtKkbBrd", "4564": "/thai-co-long-tuong-quyet/chuong-4564-eAGvrf3is1Yi", "4579": "/thai-co-long-tuong-quyet/chuong-4579-ommi5YLB1UV0", "4586": "/thai-co-long-tuong-quyet/chuong-4586-AitEvRCg9uLX", "4587": "/thai-co-long-tuong-quyet/chuong-4587-dQC0TZkB2Xbk", "4606": "/thai-co-long-tuong-quyet/chuong-4606-iquxtxEegXbv", "4614": "/thai-co-long-tuong-quyet/chuong-4614-nc82srXIeR9J", "4657": "/thai-co-long-tuong-quyet/chuong-4657-Lz5rSHGiKaSj", "4665": "/thai-co-long-tuong-quyet/chuong-4665-9eU9qIghLdZU", "4707": "/thai-co-long-tuong-quyet/chuong-4707-DK8Btard89dh", "4751": "/thai-co-long-tuong-quyet/chuong-4751-EPNn189YhvDL", "4753": "/thai-co-long-tuong-quyet/chuong-4753-BpyM7OGYSBjn", "4778": "/thai-co-long-tuong-quyet/chuong-4778-7UV2pX30MyKH", "4789": "/thai-co-long-tuong-quyet/chuong-4789-NGogrv7UzuDg", "4793": "/thai-co-long-tuong-quyet/chuong-4793-I51p3RKUVRGY", "4879": "/thai-co-long-tuong-quyet/chuong-4879-MruTEHnLriuQ", "4910": "/thai-co-long-tuong-quyet/chuong-4910-KTTB56DKJC4N", "4959": "/thai-co-long-tuong-quyet/chuong-4959-j6DjxHGkF7y7", "4990": "/thai-co-long-tuong-quyet/chuong-4990-iwZ2kbSqs4cR", "4993": "/thai-co-long-tuong-quyet/chuong-4993-93TPOy7KVyP5", "4994": "/thai-co-long-tuong-quyet/chuong-4994-dlmBw6fpObfJ", "5051": "/thai-co-long-tuong-quyet/chuong-5051-r2w1DI8EKago", "5108": "/thai-co-long-tuong-quyet/chuong-5108-4J5rTTadHZgJ", "5132": "/thai-co-long-tuong-quyet/chuong-5132-XGJjeVqbJi0Z", "5134": "/thai-co-long-tuong-quyet/chuong-5134-UgvJkkwb4yW0", "5156": "/thai-co-long-tuong-quyet/chuong-5156-0EXboW5YLrKp", "5167": "/thai-co-long-tuong-quyet/chuong-5167-F0qGqu92zoDF", "5208": "/thai-co-long-tuong-quyet/chuong-5208-pyCVK5mTug0E", "5325": "/thai-co-long-tuong-quyet/chuong-5325-idPXVqMmRXot", "5363": "/thai-co-long-tuong-quyet/chuong-5363-bIy0UelsZ1V5", "5366": "/thai-co-long-tuong-quyet/chuong-5366-2QsM82QMCuIk", "5471": "/thai-co-long-tuong-quyet/chuong-5471-oBIz9E0A5sSP", "5482": "/thai-co-long-tuong-quyet/chuong-5482-aFJrdVW9qC5b", "5483": "/thai-co-long-tuong-quyet/chuong-5483-4xbdBc4ejpMo", "5502": "/thai-co-long-tuong-quyet/chuong-5502-8OKab1Y7NoMz", "5581": "/thai-co-long-tuong-quyet/chuong-5581-UG21NlucgxQT", "5632": "/thai-co-long-tuong-quyet/chuong-5632-qIN8LC32N9rf", "5642": "/thai-co-long-tuong-quyet/chuong-5642-cMOzpSZ19TUr", "5677": "/thai-co-long-tuong-quyet/chuong-5677-K5vW2rtSoYhX", "5696": "/thai-co-long-tuong-quyet/chuong-5696-PWeTSGNvSYih", "5698": "/thai-co-long-tuong-quyet/chuong-5698-MvF2YWUvDoE8", "5700": "/thai-co-long-tuong-quyet/chuong-5700-JLqcelavy5lZ", "5703": "/thai-co-long-tuong-quyet/chuong-5703-kSkyI9FQbyYE", "5753": "/thai-co-long-tuong-quyet/chuong-5753-cnoIiSqKPXiC", "5770": "/thai-co-long-tuong-quyet/chuong-5770-knvf2bEoJGBv", "5775": "/thai-co-long-tuong-quyet/chuong-5775-8LQbmEzIgQV1", "5813": "/thai-co-long-tuong-quyet/chuong-5813-HBrUd1xEzPVM", "5826": "/thai-co-long-tuong-quyet/chuong-5826-UNmile8iNcvC", "5860": "/thai-co-long-tuong-quyet/chuong-5860-jO0SPwueA5sf", "5879": "/thai-co-long-tuong-quyet/chuong-5879-npjPpLO7p4tp", "5880": "/thai-co-long-tuong-quyet/chuong-5880-HW2CNTwchh93", "5890": "/thai-co-long-tuong-quyet/chuong-5890-r6iRfsL0Y0xF", "5898": "/thai-co-long-tuong-quyet/chuong-5898-gk7j3tlzZ430", "5937": "/thai-co-long-tuong-quyet/chuong-5937-08nf56R10Sdw", "5953": "/thai-co-long-tuong-quyet/chuong-5953-MfKO6Oo9cJ4k", "5975": "/thai-co-long-tuong-quyet/chuong-5975-rDxhAAx7tCrZ", "5979": "/thai-co-long-tuong-quyet/chuong-5979-l2AqMfA6OjuR", "5980": "/thai-co-long-tuong-quyet/chuong-5980-FkSdunibGMAf", "5985": "/thai-co-long-tuong-quyet/chuong-5985-dHxZeQT6eVUl", "5999": "/thai-co-long-tuong-quyet/chuong-5999-KABZKCC4vLAp", "6008": "/thai-co-long-tuong-quyet/chuong-6008-cWteGKAYo1Xn", "6013": "/thai-co-long-tuong-quyet/chuong-6013-03Oa0xv3BBrt", "6014": "/thai-co-long-tuong-quyet/chuong-6014-UlhNY5TX4o77", "6019": "/thai-co-long-tuong-quyet/chuong-6019-sICJIiE2RyRD", "6022": "/thai-co-long-tuong-quyet/chuong-6022-JQ6fw6tX4rEs", "6024": "/thai-co-long-tuong-quyet/chuong-6024-GphE2L0Wp8kJ", "6025": "/thai-co-long-tuong-quyet/chuong-6025-jX01aTY1hl1W", "6035": "/thai-co-long-tuong-quyet/chuong-6035-Vb1t4j40T4ei", "6036": "/thai-co-long-tuong-quyet/chuong-6036-zJJgcrcVLhuw", "6037": "/thai-co-long-tuong-quyet/chuong-6037-T1cSAzA0DKBA", "6040": "/thai-co-long-tuong-quyet/chuong-6040-u8WpoMpVqEyo", "6041": "/thai-co-long-tuong-quyet/chuong-6041-NqpcMUN0jrE2", "6042": "/thai-co-long-tuong-quyet/chuong-6042-rY7OucvVbUUG", "6058": "/thai-co-long-tuong-quyet/chuong-6058-VrwzhdlTcahl", "6059": "/thai-co-long-tuong-quyet/chuong-6059-yZFlFlJyUEyz", "6060": "/thai-co-long-tuong-quyet/chuong-6060-SGXYntrTNrEC", "6061": "/thai-co-long-tuong-quyet/chuong-6061-vyqLL0QyFUUQ", "6072": "/thai-co-long-tuong-quyet/chuong-6072-Bk9zNOURtQOp", "6076": "/thai-co-long-tuong-quyet/chuong-6076-5ZM8ZuhROxRi", "6172": "/thai-co-long-tuong-quyet/chuong-6172-Q7YRl8EmOBzz", "6173": "/thai-co-long-tuong-quyet/chuong-6173-tprDJGnHGoFC", "6174": "/thai-co-long-tuong-quyet/chuong-6174-NW90rOLm9RVQ", "6178": "/thai-co-long-tuong-quyet/chuong-6178-HMM93tYleyZI", "6180": "/thai-co-long-tuong-quyet/chuong-6180-Elxj99elPE5j", "6181": "/thai-co-long-tuong-quyet/chuong-6181-iTGWiHCGHrLx", "6187": "/thai-co-long-tuong-quyet/chuong-6187-ai4E01WFXevH", "6189": "/thai-co-long-tuong-quyet/chuong-6189-X7fo6HcFIvSi", "6196": "/thai-co-long-tuong-quyet/chuong-6196-s4mJwAUjQKIF", "6202": "/thai-co-long-tuong-quyet/chuong-6202-kJa2Evnjg7sY", "6217": "/thai-co-long-tuong-quyet/chuong-6217-uu6pSo4Cpapq", "6224": "/thai-co-long-tuong-quyet/chuong-6224-FrDLIhwgx0fO", "6234": "/thai-co-long-tuong-quyet/chuong-6234-1vDCmxSfiKJa", "6239": "/thai-co-long-tuong-quyet/chuong-6239-PSi8WaDA6Tcg", "6257": "/thai-co-long-tuong-quyet/chuong-6257-0A8IOr98sqMc", "6260": "/thai-co-long-tuong-quyet/chuong-6260-RI2e2EodVj9H", "6263": "/thai-co-long-tuong-quyet/chuong-6263-sPw0gcS78dww", "6266": "/thai-co-long-tuong-quyet/chuong-6266-JXqNKz7clWjb", "6272": "/thai-co-long-tuong-quyet/chuong-6272-Bme5ckQb1JJu", "6275": "/thai-co-long-tuong-quyet/chuong-6275-btYSG756eC6Z", "6285": "/thai-co-long-tuong-quyet/chuong-6285-uFGXCG3aXtTX", "6287": "/thai-co-long-tuong-quyet/chuong-6287-rfs6IVAaI9zz", "6293": "/thai-co-long-tuong-quyet/chuong-6293-jugpaGTZYwZI", "6298": "/thai-co-long-tuong-quyet/chuong-6298-7RBlKtE4v5tO", "6315": "/thai-co-long-tuong-quyet/chuong-6315-ERI8f2cXppM7", "6333": "/thai-co-long-tuong-quyet/chuong-6333-pAiHXJYVbB64", "6345": "/thai-co-long-tuong-quyet/chuong-6345-YeKj7pAU7lGh", "6372": "/thai-co-long-tuong-quyet/chuong-6372-SjSxvE4wmoNc", "6375": "/thai-co-long-tuong-quyet/chuong-6375-tqMKZbjRPhAH", "6377": "/thai-co-long-tuong-quyet/chuong-6377-qGxtfrpR9xgi", "6403": "/thai-co-long-tuong-quyet/chuong-6403-xrVUAPiXW7li", "6412": "/thai-co-long-tuong-quyet/chuong-6412-GDDZ6Yg1Po7g", "6420": "/thai-co-long-tuong-quyet/chuong-6420-5rdrUY61QrER", "6448": "/thai-co-long-tuong-quyet/chuong-6448-5O7c3XBDUUXN", "6488": "/thai-co-long-tuong-quyet/chuong-6488-Cf94zZF9Xj39", "6504": "/thai-co-long-tuong-quyet/chuong-6504-qxyela57ZqHe", "6512": "/thai-co-long-tuong-quyet/chuong-6512-ecNxAbV6ZtNP", "6521": "/thai-co-long-tuong-quyet/chuong-6521-xy526jTaSZkO", "6546": "/thai-co-long-tuong-quyet/chuong-6546-tdchotG3MLKr", "6564": "/thai-co-long-tuong-quyet/chuong-6564-lTqdH35g6ZVS", "6570": "/thai-co-long-tuong-quyet/chuong-6570-dheMZoOfMM5l", "6574": "/thai-co-long-tuong-quyet/chuong-6574-XXrVlJbers8e", "6576": "/thai-co-long-tuong-quyet/chuong-6576-UwS4rZhec9f5", "6598": "/thai-co-long-tuong-quyet/chuong-6598-0U5NvLqct2Su", "6611": "/thai-co-long-tuong-quyet/chuong-6611-Dg0b3y16HEsl", "6634": "/thai-co-long-tuong-quyet/chuong-6634-CvvhfsiYRlvn", "6654": "/thai-co-long-tuong-quyet/chuong-6654-k3wQdPlWxNCB", "6679": "/thai-co-long-tuong-quyet/chuong-6679-gjT5MYYzsAmf", "6789": "/thai-co-long-tuong-quyet/chuong-6789-DRachQGnGbjn", "6834": "/thai-co-long-tuong-quyet/chuong-6834-3rby1RsJCRQd", "6902": "/thai-co-long-tuong-quyet/chuong-6902-MHi71iMmuOZe", "7106": "/thai-co-long-tuong-quyet/chuong-7106-P8CjXs11EPEe", "7107": "/thai-co-long-tuong-quyet/chuong-7107-wQuxzkTXLmyQ", "7108": "/thai-co-long-tuong-quyet/chuong-7108-SibARcv2T9hC", "7109": "/thai-co-long-tuong-quyet/chuong-7109-y0INtVNXbWRz", "7111": "/thai-co-long-tuong-quyet/chuong-7111-1bhonFGXqFuY", "7128": "/thai-co-long-tuong-quyet/chuong-7128-uaaRT6t4wWRp", "7143": "/thai-co-long-tuong-quyet/chuong-7143-9kP865TvUpwv", "7165": "/thai-co-long-tuong-quyet/chuong-7165-eDnp1JKxDw96", "7178": "/thai-co-long-tuong-quyet/chuong-7178-R1sctf9UpjjF", "7179": "/thai-co-long-tuong-quyet/chuong-7179-xJapLXbzw6S1", "7182": "/thai-co-long-tuong-quyet/chuong-7182-WCgShAwUJCgN", "7189": "/thai-co-long-tuong-quyet/chuong-7189-BFZxrH40Bmpq", "7190": "/thai-co-long-tuong-quyet/chuong-7190-hXGAJ9WVJ9Zc", "7670": "/thai-co-long-tuong-quyet/chuong-7670-ISlhFEVfEliq", "7723": "/thai-co-long-tuong-quyet/chuong-7723-y0o0AXFFmJlE", "7729": "/thai-co-long-tuong-quyet/chuong-7729-7l0HsmwGWWBu", "7732": "/thai-co-long-tuong-quyet/chuong-7732-ge6vEPHltdOF", "7803": "/thai-co-long-tuong-quyet/chuong-7803-mTj5IS6Ogohg", "8040": "/thai-co-long-tuong-quyet/chuong-8040-QYMR8zkPGhSJ", "8123": "/thai-co-long-tuong-quyet/chuong-8123-muNAbWw2WJb7", "8150": "/thai-co-long-tuong-quyet/chuong-8150-tpFvn72arGVB", "8151": "/thai-co-long-tuong-quyet/chuong-8151-P8w8F0T5zdEy", "8155": "/thai-co-long-tuong-quyet/chuong-8155-VIkz3UH6U6B5", "8164": "/thai-co-long-tuong-quyet/chuong-8164-Nx7UAq5SHSA8", "8202": "/thai-co-long-tuong-quyet/chuong-8202-D6gbK36WyTAo", "8238": "/thai-co-long-tuong-quyet/chuong-8238-1fqHZVEZQkgu", "8352": "/thai-co-long-tuong-quyet/chuong-8352-a7Wc38JlXngu", "8372": "/thai-co-long-tuong-quyet/chuong-8372-2zVt4cHn0APX", "8376": "/thai-co-long-tuong-quyet/chuong-8376-7AIks64oVdMe", "8381": "/thai-co-long-tuong-quyet/chuong-8381-jcno8TJJ7U2Y", "8383": "/thai-co-long-tuong-quyet/chuong-8383-mDCE2ECKMDW7", "8390": "/thai-co-long-tuong-quyet/chuong-8390-RG5jCLLpEnfa", "8394": "/thai-co-long-tuong-quyet/chuong-8394-WRsa0q8qjHch", "8396": "/thai-co-long-tuong-quyet/chuong-8396-Z1H0ua1qy15G", "8401": "/thai-co-long-tuong-quyet/chuong-8401-BUm4AxGLarmA", "8402": "/thai-co-long-tuong-quyet/chuong-8402-hnTIcpiqiEWx", "8404": "/thai-co-long-tuong-quyet/chuong-8404-kNsiWZcrxxzV", "8405": "/thai-co-long-tuong-quyet/chuong-8405-HfZvyS3M5KjI", "8418": "/thai-co-long-tuong-quyet/chuong-8418-4Uehqotsh8IR", "8420": "/thai-co-long-tuong-quyet/chuong-8420-7438kYmswrm0", "8467": "/thai-co-long-tuong-quyet/chuong-8467-fruAydqSlCPh", "8626": "/thai-co-long-tuong-quyet/chuong-8626-DgmTVqhX9v2V", "8650": "/thai-co-long-tuong-quyet/chuong-8650-kiYbLoRZ7liF", "8660": "/thai-co-long-tuong-quyet/chuong-8660-yeXjqYvaMS53", "8796": "/thai-co-long-tuong-quyet/chuong-8796-1YblFPrpBbHE", "8840": "/thai-co-long-tuong-quyet/chuong-8840-0TM97ratcphZ", "8843": "/thai-co-long-tuong-quyet/chuong-8843-aLSnTTvOzwuv", "8844": "/thai-co-long-tuong-quyet/chuong-8844-6d90vLNu7Jdh", "8848": "/thai-co-long-tuong-quyet/chuong-8848-CoxrjqAucmap", "8850": "/thai-co-long-tuong-quyet/chuong-8850-EPMIda3urW4N", "8851": "/thai-co-long-tuong-quyet/chuong-8851-lh3V5TVPztnA", "8861": "/thai-co-long-tuong-quyet/chuong-8861-zd2dbCzQDZAy", "8863": "/thai-co-long-tuong-quyet/chuong-8863-1DR4VxsRTJdX", "8865": "/thai-co-long-tuong-quyet/chuong-8865-4nqUPhmRi376", "8866": "/thai-co-long-tuong-quyet/chuong-8866-b6XirZEwqQqs", "8881": "/thai-co-long-tuong-quyet/chuong-8881-T5QKXQqTwgN9", "8883": "/thai-co-long-tuong-quyet/chuong-8883-WfolRBkTBQqi", "8884": "/thai-co-long-tuong-quyet/chuong-8884-2xWyt3ByJnaU", "8888": "/thai-co-long-tuong-quyet/chuong-8888-88JphYyyoGXc", "8892": "/thai-co-long-tuong-quyet/chuong-8892-EJ6gV2mzIkTj", "8893": "/thai-co-long-tuong-quyet/chuong-8893-kbotxvDUQ7DW", "8894": "/thai-co-long-tuong-quyet/chuong-8894-GtV7PnfzYUxI", "8897": "/thai-co-long-tuong-quyet/chuong-8897-qmbklP1UvaAd", "8898": "/thai-co-long-tuong-quyet/chuong-8898-M4IxDISz2xtQ", "8899": "/thai-co-long-tuong-quyet/chuong-8899-ZdP6s1r9QpeM", "9275": "/thai-co-long-tuong-quyet/chuong-9275-YlMX0l9RaAug", "9512": "/thai-co-long-tuong-quyet/chuong-9512-nUrZrELFnfzN", "9621": "/thai-co-long-tuong-quyet/chuong-9621-rvFVFRFLeHxg", "9623": "/thai-co-long-tuong-quyet/chuong-9623-uWdv8B8Lt1RF", "9706": "/thai-co-long-tuong-quyet/chuong-9706-zhjB9Qj4hPDo", "9891": "/thai-co-long-tuong-quyet/chuong-9891-5uIFOGepsREB", "9944": "/thai-co-long-tuong-quyet/chuong-9944-cK5LppuIFWEI", "9971": "/thai-co-long-tuong-quyet/chuong-9971-DN_dO4Oh_GUL", "9998": "/thai-co-long-tuong-quyet/chuong-9998-jLicYCjZaXgg", "10084": "/thai-co-long-tuong-quyet/chuong-10084-RuOxt2WC2pK!", "10085": "/thai-co-long-tuong-quyet/chuong-10085-nIiIpu!KGeOB", "10087": "/thai-co-long-tuong-quyet/chuong-10087-fOxlO8YazQJm", "10123": "/thai-co-long-tuong-quyet/chuong-10123-!vylhld019jL", "10143": "/thai-co-long-tuong-quyet/chuong-10143-H0!0bjk8ygvC", "10339": "/thai-co-long-tuong-quyet/chuong-10339-9mcOTcvFEXEz", "10363": "/thai-co-long-tuong-quyet/chuong-10363-Zhq4EYFHMHKN", "10375": "/thai-co-long-tuong-quyet/chuong-10375-HOmh9xHddB0K", "10379": "/thai-co-long-tuong-quyet/chuong-10379-c2pC_He3_btn", "10416": "/thai-co-long-tuong-quyet/chuong-10416-ZVNSBbthCGf9", "10461": "/thai-co-long-tuong-quyet/chuong-10461-D_9xquer5Cxw", "10544": "/thai-co-long-tuong-quyet/chuong-10544-zwFF_eWmyyRd", "10612": "/thai-co-long-tuong-quyet/chuong-10612-GIK_VwGul896", "10683": "/thai-co-long-tuong-quyet/chuong-10683-apjxXsN3tVGY", "10769": "/thai-co-long-tuong-quyet/chuong-10769-XtDNHB_7Xwve", "10800": "/thai-co-long-tuong-quyet/chuong-10800-FmR8TV5b!ZrS", "10813": "/thai-co-long-tuong-quyet/chuong-10813-ZwgjU4ZQgfXw", "10846": "/thai-co-long-tuong-quyet/chuong-10846-uXYYKu1r57l_", "10890": "/thai-co-long-tuong-quyet/chuong-10890-yZFMgd2s9n1e", "10907": "/thai-co-long-tuong-quyet/chuong-10907-UcEorRxfVgyb", "10911": "/thai-co-long-tuong-quyet/chuong-10911-TnpXD_LQfbqd", "10933": "/thai-co-long-tuong-quyet/chuong-10933-lhp!AGEHn_Va", "11002": "/thai-co-long-tuong-quyet/chuong-11002-3mx1HR5KrcJ4", "11034": "/thai-co-long-tuong-quyet/chuong-11034-u4ERp9HNRByQ", "11192": "/thai-co-long-tuong-quyet/chuong-11192-!aU4mGleaYKD", "11217": "/thai-co-long-tuong-quyet/chuong-11217-Qqbm2huGbNcy"};
+const CH={"1": "/thai-co-long-tuong-quyet/chuong-1-5kmMvinMC62R", "19": "/thai-co-long-tuong-quyet/chuong-19-tzcsU8izgajS", "26": "/thai-co-long-tuong-quyet/chuong-26-FvjNK0aTo0Zz", "29": "/thai-co-long-tuong-quyet/chuong-29-g3djyOEyRuMe", "40": "/thai-co-long-tuong-quyet/chuong-40-vpwO0mJS5qG4", "45": "/thai-co-long-tuong-quyet/chuong-45-JMRKkP4wS0ZA", "49": "/thai-co-long-tuong-quyet/chuong-49-EBeTwuHwyWd2", "52": "/thai-co-long-tuong-quyet/chuong-52-fIYpaIvRbQQh", "54": "/thai-co-long-tuong-quyet/chuong-54-ci9PgX2QLgw8", "60": "/thai-co-long-tuong-quyet/chuong-60-Txx7yILQbTWS", "66": "/thai-co-long-tuong-quyet/chuong-66-LClqG3ePrG6l", "78": "/thai-co-long-tuong-quyet/chuong-78-4fNHqZHONpGO", "81": "/thai-co-long-tuong-quyet/chuong-81-VnHdUwwt0j33", "101": "/thai-co-long-tuong-quyet/chuong-101-3vJNTTyqXMJR", "175": "/thai-co-long-tuong-quyet/chuong-175-PDaZ3nojN4nf", "176": "/thai-co-long-tuong-quyet/chuong-176-svsMbvNEFh4t", "200": "/thai-co-long-tuong-quyet/chuong-200-Ls6FlxcBHqN9", "204": "/thai-co-long-tuong-quyet/chuong-204-FhJOxSpBnNR1", "224": "/thai-co-long-tuong-quyet/chuong-224-npK7wyr9JzhP", "239": "/thai-co-long-tuong-quyet/chuong-239-yRquAs8cSTeh", "251": "/thai-co-long-tuong-quyet/chuong-251-huSMkOlby2oK", "262": "/thai-co-long-tuong-quyet/chuong-262-xgl0mmq5czhk", "279": "/thai-co-long-tuong-quyet/chuong-279-4htN6uDYViBT", "280": "/thai-co-long-tuong-quyet/chuong-280-YPBAe2m3OLRh", "318": "/thai-co-long-tuong-quyet/chuong-318-ZOnRhkUWkfBn", "326": "/thai-co-long-tuong-quyet/chuong-326-O3Cj5ktVkiIY", "333": "/thai-co-long-tuong-quyet/chuong-333-MXiM57EeFPjW", "352": "/thai-co-long-tuong-quyet/chuong-352-QxRJVVj7tOjg", "363": "/thai-co-long-tuong-quyet/chuong-363-gjkxXtnbXLd6", "369": "/thai-co-long-tuong-quyet/chuong-369-XyYgpe6an8CP", "426": "/thai-co-long-tuong-quyet/chuong-426-lFiW6qZzk6Du", "437": "/thai-co-long-tuong-quyet/chuong-437-111A8EdTN36K", "462": "/thai-co-long-tuong-quyet/chuong-462-xgYpqNRwHpgo", "477": "/thai-co-long-tuong-quyet/chuong-477-7H4d4HiPQId6", "501": "/thai-co-long-tuong-quyet/chuong-501-aEIVEIyNSSxM", "536": "/thai-co-long-tuong-quyet/chuong-536-Iyp2RiHo8YA2", "551": "/thai-co-long-tuong-quyet/chuong-551-SZLpfbZHH17K", "~560": "/thai-co-long-tuong-quyet/chuong-tiep-NOXyr6lHmXAC", "568": "/thai-co-long-tuong-quyet/chuong-568-aaSCzkwlAkb3", "577": "/thai-co-long-tuong-quyet/chuong-577-swAHvsuF3Qy1", "581": "/thai-co-long-tuong-quyet/chuong-581-nlNQ7O7EZx1u", "602": "/thai-co-long-tuong-quyet/chuong-602-5iVjEvaMv4y9", "619": "/thai-co-long-tuong-quyet/chuong-619-Did6Y4yppnSs", "623": "/thai-co-long-tuong-quyet/chuong-623-7YpFkaBpKKVk", "626": "/thai-co-long-tuong-quyet/chuong-626-YfjbOxqJxDIP", "635": "/thai-co-long-tuong-quyet/chuong-635-q1RgK5onqtfN", "673": "/thai-co-long-tuong-quyet/chuong-673-zssZBtmj8tfi", "676": "/thai-co-long-tuong-quyet/chuong-676-QzmwpGRElmSN", "691": "/thai-co-long-tuong-quyet/chuong-691-abIj39ihuFPf", "695": "/thai-co-long-tuong-quyet/chuong-695-VQVsFfvhQmSX", "732": "/thai-co-long-tuong-quyet/chuong-732-AZezXKL8q8Ce", "750": "/thai-co-long-tuong-quyet/chuong-750-lH38PbH6cUwb", "751": "/thai-co-long-tuong-quyet/chuong-751-FzMvxipbU7Co", "763": "/thai-co-long-tuong-quyet/chuong-tiep-yTyMXESa0hMR", "800": "/thai-co-long-tuong-quyet/chuong-800-ec7Tqus1Q36Z", "811": "/thai-co-long-tuong-quyet/chuong-811-uOQ7sIxV400y", "818": "/thai-co-long-tuong-quyet/chuong-818-8dyrChPFs4Q2", "833": "/thai-co-long-tuong-quyet/chuong-833-JEUfQagj1XNK", "839": "/thai-co-long-tuong-quyet/chuong-839-ATIOiLziHKxd", "840": "/thai-co-long-tuong-quyet/chuong-840-eBbAGTYD9xDr", "855": "/thai-co-long-tuong-quyet/chuong-855-om6yVMphIQA9", "857": "/thai-co-long-tuong-quyet/chuong-857-lCiXbbvg3gga", "~881": "/thai-co-long-tuong-quyet/chuong-tiep-PUW8Ndlf4nu6", "~884": "/thai-co-long-tuong-quyet/chuong-tiep-qcQU10P9hghl", "894": "/thai-co-long-tuong-quyet/chuong-tiep-RKqetHL7T2Qh", "~896": "/thai-co-long-tuong-quyet/chuong-tiep-Z62vbW28DGqO", "~915": "/thai-co-long-tuong-quyet/chuong-tiep-AoS5Tny6zcaK", "~921": "/thai-co-long-tuong-quyet/chuong-tiep-23GolXH6FPAe", "975": "/thai-co-long-tuong-quyet/chuong-tiep-pDWHNM50ZUOU", "976": "/thai-co-long-tuong-quyet/chuong-tiep-Iup4vTeVR7ei", "1000": "/thai-co-long-tuong-quyet/chuong-1000-EAmxp2wbpLpS", "~1001": "/thai-co-long-tuong-quyet/chuong-tiep-QVNfR2XcoIih", "~1046": "/thai-co-long-tuong-quyet/chuong-tiep-QbcGZaoXN4IM", "~1097": "/thai-co-long-tuong-quyet/chuong-tiep-06PhFJwYQIOH", "1120": "/thai-co-long-tuong-quyet/chuong-1120-lQLeLT9zL84W", "~1142": "/thai-co-long-tuong-quyet/chuong-tiep-1CeJOrETy5yv", "~1166": "/thai-co-long-tuong-quyet/chuong-tiep-T9sBYtTR0EIB", "~1203": "/thai-co-long-tuong-quyet/chuong-tiep-9I1HqYtsQa2J", "1220": "/thai-co-long-tuong-quyet/chuong-tiep-W4RJC5LpyGPR", "1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "~1226": "/thai-co-long-tuong-quyet/chuong-tiep-eqdauK2piTp8", "1268": "/thai-co-long-tuong-quyet/chuong-tiep-iWHcxdDlWzsL", "~1279": "/thai-co-long-tuong-quyet/chuong-tiep-yHaHz1IF9vmk", "~1321": "/thai-co-long-tuong-quyet/chuong-tiep-d1AbS5DJ3i68", "~1327": "/thai-co-long-tuong-quyet/chuong-tiep-VGyKkqWJJVgR", "1402": "/thai-co-long-tuong-quyet/chuong-tiep-z26IxFpDbWxl", "1412": "/thai-co-long-tuong-quyet/chuong-tiep-yI1OZ9Wfl20o", "~1441": "/thai-co-long-tuong-quyet/chuong-tiep-8tXBn2n9tVx6", "~1447": "/thai-co-long-tuong-quyet/chuong-tiep-08Lu5n689IXP", "~1460": "/thai-co-long-tuong-quyet/chuong-tiep-DJG8DQHcYUxG", "~1471": "/thai-co-long-tuong-quyet/chuong-tiep-T5ZmFoM6BRrf", "~1472": "/thai-co-long-tuong-quyet/chuong-tiep-wnsZnwub447t", "~1481": "/thai-co-long-tuong-quyet/chuong-tiep-F9aej5s5xkUr", "~1482": "/thai-co-long-tuong-quyet/chuong-tiep-irtRHCQapNk5", "~1488": "/thai-co-long-tuong-quyet/chuong-tiep-a6g9ZxjZ5AKP", "~1513": "/thai-co-long-tuong-quyet/chuong-tiep-JfqmhMzYFARC", "~1527": "/thai-co-long-tuong-quyet/chuong-tiep-Vrl0p0A2eNr3", "~1540": "/thai-co-long-tuong-quyet/chuong-tiep-i2gExeLV2aIu", "~1541": "/thai-co-long-tuong-quyet/chuong-tiep-Cky0Vmt0uDY7", "1543": "/thai-co-long-tuong-quyet/chuong-tiep-9Aaab100fT5Z", "~1559": "/thai-co-long-tuong-quyet/chuong-tiep-nTOAN2pygZI4", "1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1571": "/thai-co-long-tuong-quyet/chuong-tiep-Ww0bxYSxC9Sh", "~1574": "/thai-co-long-tuong-quyet/chuong-tiep-x4uybw7Sp2FM", "~1576": "/thai-co-long-tuong-quyet/chuong-tiep-uTWXhBDSaJln", "1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "~1577": "/thai-co-long-tuong-quyet/chuong-tiep-OBoKFJlxSw21", "1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "~1590": "/thai-co-long-tuong-quyet/chuong-tiep-bNjYNxwQq9Ss", "~1621": "/thai-co-long-tuong-quyet/chuong-tiep-aD5rBG9WT66B", "~1641": "/thai-co-long-tuong-quyet/chuong-tiep-8L6b9mBU0iMZ", "~1659": "/thai-co-long-tuong-quyet/chuong-tiep-j3Wk137Sm56W", "~1662": "/thai-co-long-tuong-quyet/chuong-tiep-ABQ7fQmxPytA", "~1668": "/thai-co-long-tuong-quyet/chuong-tiep-2QEpxB5wflTU", "~1672": "/thai-co-long-tuong-quyet/chuong-tiep-wFRy9hIwAIWM", "~1675": "/thai-co-long-tuong-quyet/chuong-tiep-NMLLn4wRnBJ1", "~1682": "/thai-co-long-tuong-quyet/chuong-tiep-iJRqdxovvbAY", "~1683": "/thai-co-long-tuong-quyet/chuong-tiep-C1kdB5MQoEQm", "~1703": "/thai-co-long-tuong-quyet/chuong-tiep-k9lM9bPOKrgA", "~1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1710": "/thai-co-long-tuong-quyet/chuong-tiep-56sszUGsTHXh", "1716": "/thai-co-long-tuong-quyet/chuong-1716-bdUA3GPqkAKW", "1717": "/thai-co-long-tuong-quyet/chuong-1717-4LnxbNxLcnak", "1720": "/thai-co-long-tuong-quyet/chuong-1720-VThJFlcpFgNO", "1721": "/thai-co-long-tuong-quyet/chuong-1721-zA06ntAK8Kdc", "1728": "/thai-co-long-tuong-quyet/chuong-1728-K76cel2oGkU9", "1729": "/thai-co-long-tuong-quyet/chuong-1729-opPOCtaJ8NkN", "1740": "/thai-co-long-tuong-quyet/chuong-1740-3bi3EHenmJdm", "1744": "/thai-co-long-tuong-quyet/chuong-1744-yQvCQnrnHqhf", "1748": "/thai-co-long-tuong-quyet/chuong-1748-sF8LcI4mmMkX", "1750": "/thai-co-long-tuong-quyet/chuong-1750-pfjuiXAmXdHy", "1751": "/thai-co-long-tuong-quyet/chuong-1751-JN2hGfjHPGXC", "1752": "/thai-co-long-tuong-quyet/chuong-1752-n4KUonHmItnP", "1755": "/thai-co-long-tuong-quyet/chuong-1755-DCEqSBwHvma4", "1756": "/thai-co-long-tuong-quyet/chuong-1756-huXd0IUmnPrI", "1757": "/thai-co-long-tuong-quyet/chuong-1757-BbqQYQ2Gf37V", "1760": "/thai-co-long-tuong-quyet/chuong-1760-bjkmCohlIwuA", "1772": "/thai-co-long-tuong-quyet/chuong-1772-LDLDmJJkoW4n", "1854": "/thai-co-long-tuong-quyet/chuong-1854-j0JeEQES5Pda", "1870": "/thai-co-long-tuong-quyet/chuong-1870-NJ7F0R3Q6Vq5", "1902": "/thai-co-long-tuong-quyet/chuong-1902-fvlPYTiN8iH6", "1929": "/thai-co-long-tuong-quyet/chuong-1929-YzseMscpnkN1", "1937": "/thai-co-long-tuong-quyet/chuong-1937-NeIwlt2oooUm", "1940": "/thai-co-long-tuong-quyet/chuong-1940-olCIPGgJRhHR", "1942": "/thai-co-long-tuong-quyet/chuong-1942-lBnsVWnJCxos", "1957": "/thai-co-long-tuong-quyet/chuong-1957-vmJfjP4mLQlA", "1962": "/thai-co-long-tuong-quyet/chuong-1962-JJobT2pHia4G", "1964": "/thai-co-long-tuong-quyet/chuong-1964-GjQBZIwHTqbh", "1966": "/thai-co-long-tuong-quyet/chuong-1966-E81kfY2GE778", "1971": "/thai-co-long-tuong-quyet/chuong-1971-cfWgPBnlbGRE", "1972": "/thai-co-long-tuong-quyet/chuong-1972-5NpTxIMGUthS", "1974": "/thai-co-long-tuong-quyet/chuong-1974-3nQ23YSGEAEt", "1987": "/thai-co-long-tuong-quyet/chuong-1987-FyLGBCdjcMek", "1998": "/thai-co-long-tuong-quyet/chuong-1998-VkevDahDGJY9", "2000": "/thai-co-long-tuong-quyet/chuong-2000-SAFUJpoD1Z4b", "2006": "/thai-co-long-tuong-quyet/chuong-2006-KP3Dba7CHMeu", "2013": "/thai-co-long-tuong-quyet/chuong-2013-fLAiRTzhPmVR", "2047": "/thai-co-long-tuong-quyet/chuong-2047-kMJt2HynXC5s", "2053": "/thai-co-long-tuong-quyet/chuong-2053-cb7bK2HmnzfC", "2067": "/thai-co-long-tuong-quyet/chuong-2067-IULc0n0l3pMG", "2069": "/thai-co-long-tuong-quyet/chuong-2069-FuwC637lo5sh", "2096": "/thai-co-long-tuong-quyet/chuong-2096-9z4QvS1DT8zc", "2097": "/thai-co-long-tuong-quyet/chuong-2097-cgNDTaZiLlFq", "2100": "/thai-co-long-tuong-quyet/chuong-2100-3oHZ7xEDyf2V", "2101": "/thai-co-long-tuong-quyet/chuong-2101-XWZMf5mhqIJi", "2105": "/thai-co-long-tuong-quyet/chuong-2105-RLmVrazhMoMb", "2106": "/thai-co-long-tuong-quyet/chuong-2106-v35IPiXCESco", "2124": "/thai-co-long-tuong-quyet/chuong-2124-WlUSHzTA0oMl", "2131": "/thai-co-long-tuong-quyet/chuong-2131-ribx7sLe8ECI", "2140": "/thai-co-long-tuong-quyet/chuong-2140-A4J230J81uZH", "2175": "/thai-co-long-tuong-quyet/chuong-2175-snqZFQcah0nw", "2275": "/thai-co-long-tuong-quyet/chuong-2275-2Hwvjzu2rP1c", "2282": "/thai-co-long-tuong-quyet/chuong-2282-NE3QZsmWzps9", "2299": "/thai-co-long-tuong-quyet/chuong-2299-UEAnt1A0tZLs", "2334": "/thai-co-long-tuong-quyet/chuong-2334-DyhK6QURYfYY", "2335": "/thai-co-long-tuong-quyet/chuong-2335-gg07eY2wRIpm", "2336": "/thai-co-long-tuong-quyet/chuong-2336-ANItCgaRJv5z", "2338": "/thai-co-long-tuong-quyet/chuong-2338-7nuTIvgR4BcQ", "2340": "/thai-co-long-tuong-quyet/chuong-2340-4DV2OBnQoR8s", "2350": "/thai-co-long-tuong-quyet/chuong-2350-qHWusRJPalm4", "2410": "/thai-co-long-tuong-quyet/chuong-2410-F2KNMyBxsGO2", "2431": "/thai-co-long-tuong-quyet/chuong-2431-HsetscmQHWvd", "2435": "/thai-co-long-tuong-quyet/chuong-2435-Bhr247zPn2yW", "2436": "/thai-co-long-tuong-quyet/chuong-2436-fP9pcFXuffFj", "2500": "/thai-co-long-tuong-quyet/chuong-2500-EdQAiJrnk45m", "2571": "/thai-co-long-tuong-quyet/chuong-2571-8nn0fG3BytmL", "2576": "/thai-co-long-tuong-quyet/chuong-2576-WKIwPuofL36R", "2584": "/thai-co-long-tuong-quyet/chuong-2584-LzhEnuEfM6DC", "2585": "/thai-co-long-tuong-quyet/chuong-2585-pg01L2m9EjTP", "2586": "/thai-co-long-tuong-quyet/chuong-2586-IOJotAKe6Mjd", "2587": "/thai-co-long-tuong-quyet/chuong-2587-m6baRIs9zzzq", "2588": "/thai-co-long-tuong-quyet/chuong-2588-GouNzPQercG4", "2589": "/thai-co-long-tuong-quyet/chuong-2589-jWDAXXz9jFWI", "2635": "/thai-co-long-tuong-quyet/chuong-2635-h13LlLN43IdN", "2637": "/thai-co-long-tuong-quyet/chuong-2637-eQevraT4nYAo", "2654": "/thai-co-long-tuong-quyet/chuong-2654-mRmIBjrXhHdX", "2713": "/thai-co-long-tuong-quyet/chuong-2713-x8XhYBQwOWAT", "2715": "/thai-co-long-tuong-quyet/chuong-2715-uX8GeQWw9nhv", "2719": "/thai-co-long-tuong-quyet/chuong-2719-oNLQqwjveJkn", "2721": "/thai-co-long-tuong-quyet/chuong-2721-mmwzwBqvPaHE", "2734": "/thai-co-long-tuong-quyet/chuong-2734-zyrD4p1Pnmh5", "2739": "/thai-co-long-tuong-quyet/chuong-2739-NVM9oSmtBw1B", "2745": "/thai-co-long-tuong-quyet/chuong-2745-EkAr6D5tRjaV", "2759": "/thai-co-long-tuong-quyet/chuong-2759-vdNsmyorhZHZ", "2785": "/thai-co-long-tuong-quyet/chuong-2785-MLiSbly0otfU", "2791": "/thai-co-long-tuong-quyet/chuong-2791-DaWBtWHz4gFo", "2801": "/thai-co-long-tuong-quyet/chuong-2801-zeX3Nmoypzs0", "2802": "/thai-co-long-tuong-quyet/chuong-2802-TMppvuMThc8D", "2815": "/thai-co-long-tuong-quyet/chuong-2815-gXk33YXw6pY4", "2816": "/thai-co-long-tuong-quyet/chuong-2816-9F3qbg5RySpI", "2822": "/thai-co-long-tuong-quyet/chuong-2822-1UqZuQOREFPb", "2825": "/thai-co-long-tuong-quyet/chuong-2825-SbkvYo3vr9BG", "2829": "/thai-co-long-tuong-quyet/chuong-2829-MQx4kJGvMfF8", "2861": "/thai-co-long-tuong-quyet/chuong-2861-e2aFILvsPrfA", "2872": "/thai-co-long-tuong-quyet/chuong-2872-oAnW6CBq2Hah", "2873": "/thai-co-long-tuong-quyet/chuong-2873-Ir5JeJjLuuru", "2875": "/thai-co-long-tuong-quyet/chuong-2875-FHhtkZqLfBNL", "2880": "/thai-co-long-tuong-quyet/chuong-2880-doCoUCbp2KhR", "2883": "/thai-co-long-tuong-quyet/chuong-2883-4w6B8aFKfEU6", "2898": "/thai-co-long-tuong-quyet/chuong-2898-EXcyMTXnohRO", "2910": "/thai-co-long-tuong-quyet/chuong-2910-x0EPwz9mKGa1", "2920": "/thai-co-long-tuong-quyet/chuong-2920-j4FHRFgl6aED", "2930": "/thai-co-long-tuong-quyet/chuong-2930-V9F9vVCkrtrP", "2938": "/thai-co-long-tuong-quyet/chuong-2938-KnfRJWcjswyA", "2940": "/thai-co-long-tuong-quyet/chuong-2940-HDG0PlijcDUb", "2945": "/thai-co-long-tuong-quyet/chuong-2945-gklw9OTD0Moh", "2962": "/thai-co-long-tuong-quyet/chuong-2962-nksJTXrgt6HQ", "2965": "/thai-co-long-tuong-quyet/chuong-2965-Esmg7vWBWz45", "2968": "/thai-co-long-tuong-quyet/chuong-2968-fzg2lIAg9srk", "2995": "/thai-co-long-tuong-quyet/chuong-2995-Y4oHZh48ovyf", "3051": "/thai-co-long-tuong-quyet/chuong-3051-d27QvcGlsIlb", "3183": "/thai-co-long-tuong-quyet/chuong-3183-LxByfmlhtdGH", "3207": "/thai-co-long-tuong-quyet/chuong-3207-HchdNwZ9nPql", "3247": "/thai-co-long-tuong-quyet/chuong-3247-Nsk6Jye5qfNX", "3248": "/thai-co-long-tuong-quyet/chuong-3248-ra3tr6CaiIdl", "3284": "/thai-co-long-tuong-quyet/chuong-3284-31sCbe4WG17e", "3286": "/thai-co-long-tuong-quyet/chuong-3286-0RUmhtAW1Hd5", "3311": "/thai-co-long-tuong-quyet/chuong-3311-w60RQ3yyv3DZ", "3317": "/thai-co-long-tuong-quyet/chuong-3317-oLo9ioHyBqnt", "3404": "/thai-co-long-tuong-quyet/chuong-3404-qWJNyuqoIOyB", "3475": "/thai-co-long-tuong-quyet/chuong-3475-OhZ4JnxyBbuR", "3489": "/thai-co-long-tuong-quyet/chuong-3489-4am4zZgwRRbW", "3564": "/thai-co-long-tuong-quyet/chuong-3564-uZhVw5u6mPFU", "3632": "/thai-co-long-tuong-quyet/chuong-3632-NcAzFeRzMK9P", "3653": "/thai-co-long-tuong-quyet/chuong-3653-PSUVlJ2Slaf0", "3656": "/thai-co-long-tuong-quyet/chuong-3656-qaOrPggxOUSf", "3665": "/thai-co-long-tuong-quyet/chuong-3665-9w6wLoeRHApd", "3667": "/thai-co-long-tuong-quyet/chuong-3667-6MiWR4lQ2QM5", "3691": "/thai-co-long-tuong-quyet/chuong-3691-YJvOb60O3ZgL", "3727": "/thai-co-long-tuong-quyet/chuong-3727-kkliLdsKbI9E", "3732": "/thai-co-long-tuong-quyet/chuong-3732-8HHe5GdpzSTK", "3775": "/thai-co-long-tuong-quyet/chuong-3775-gfDSggNFfbnl", "3796": "/thai-co-long-tuong-quyet/chuong-3796-hVXzCLxi4rJM", "3881": "/thai-co-long-tuong-quyet/chuong-3881-IZ7qo3s4YWh0", "3999": "/thai-co-long-tuong-quyet/chuong-3999-AJsnbtZ1RL35", "4027": "/thai-co-long-tuong-quyet/chuong-4027-X6IpyQ1yy1QD", "4033": "/thai-co-long-tuong-quyet/chuong-4033-PL6XGBKxEo0X", "4037": "/thai-co-long-tuong-quyet/chuong-4037-JAJgSgXxjL3P", "4079": "/thai-co-long-tuong-quyet/chuong-4079-NqxjUyjsXq7c", "4082": "/thai-co-long-tuong-quyet/chuong-4082-oxr58MNNAkuH", "4087": "/thai-co-long-tuong-quyet/chuong-4087-CUM1sz8sYuDN", "4120": "/thai-co-long-tuong-quyet/chuong-4120-xoIyy9MJTjuc", "4140": "/thai-co-long-tuong-quyet/chuong-4140-VwJhwfOHzMB0", "4165": "/thai-co-long-tuong-quyet/chuong-4165-RbqNfpCjt8lT", "4187": "/thai-co-long-tuong-quyet/chuong-4187-bnnO47yqW2I2", "4198": "/thai-co-long-tuong-quyet/chuong-4198-rZ626V3K9zCS", "4246": "/thai-co-long-tuong-quyet/chuong-4246-mUYnQYXFDHpy", "4287": "/thai-co-long-tuong-quyet/chuong-4287-MSt3ujAg9Acy", "4300": "/thai-co-long-tuong-quyet/chuong-4300-ZdnG3NLAXN2o", "4334": "/thai-co-long-tuong-quyet/chuong-4334-of21he76KpzH", "4356": "/thai-co-long-tuong-quyet/chuong-4356-JCfJlQF4bin6", "4381": "/thai-co-long-tuong-quyet/chuong-4381-GsBzTa3WWVNa", "4420": "/thai-co-long-tuong-quyet/chuong-4420-sQvesVZxg7d8", "4462": "/thai-co-long-tuong-quyet/chuong-4462-w6ZhunltUdhL", "4463": "/thai-co-long-tuong-quyet/chuong-4463-QorTSvJONGxY", "4464": "/thai-co-long-tuong-quyet/chuong-4464-tWAG03rtFtDm", "4470": "/thai-co-long-tuong-quyet/chuong-4470-llyzIoAsVgn6", "4475": "/thai-co-long-tuong-quyet/chuong-4475-9ITv2RwMtq7C", "4477": "/thai-co-long-tuong-quyet/chuong-4477-6h5U8h2Md6ed", "4496": "/thai-co-long-tuong-quyet/chuong-4496-B8nRY5WpI6en", "4500": "/thai-co-long-tuong-quyet/chuong-4500-5x0akajpnchf", "4504": "/thai-co-long-tuong-quyet/chuong-4504-0mDjw6woI9kY", "4506": "/thai-co-long-tuong-quyet/chuong-4506-xCoI2L2o3PHz", "4512": "/thai-co-long-tuong-quyet/chuong-4512-pQc1K6MnJCrJ", "4524": "/thai-co-long-tuong-quyet/chuong-4524-YuESucympl1w", "4530": "/thai-co-long-tuong-quyet/chuong-4530-P92BCNIm5YbF", "4536": "/thai-co-long-tuong-quyet/chuong-4536-HOqtU8blLLBZ", "4540": "/thai-co-long-tuong-quyet/chuong-4540-CD32gdolqsER", "4541": "/thai-co-long-tuong-quyet/chuong-4541-fvLpElMFiVUf", "4543": "/thai-co-long-tuong-quyet/chuong-4543-cKwPK1TFTl16", "4544": "/thai-co-long-tuong-quyet/chuong-4544-62FCt81kLOHK", "4548": "/thai-co-long-tuong-quyet/chuong-4548-0sSL5eEkrvLC", "4550": "/thai-co-long-tuong-quyet/chuong-4550-yH3uBtKkbBrd", "4564": "/thai-co-long-tuong-quyet/chuong-4564-eAGvrf3is1Yi", "4579": "/thai-co-long-tuong-quyet/chuong-4579-ommi5YLB1UV0", "4586": "/thai-co-long-tuong-quyet/chuong-4586-AitEvRCg9uLX", "4587": "/thai-co-long-tuong-quyet/chuong-4587-dQC0TZkB2Xbk", "4606": "/thai-co-long-tuong-quyet/chuong-4606-iquxtxEegXbv", "4608": "/thai-co-long-tuong-quyet/chuong-4608-fGWXzDLdQn8M", "4614": "/thai-co-long-tuong-quyet/chuong-4614-nc82srXIeR9J", "4657": "/thai-co-long-tuong-quyet/chuong-4657-Lz5rSHGiKaSj", "4665": "/thai-co-long-tuong-quyet/chuong-4665-9eU9qIghLdZU", "4707": "/thai-co-long-tuong-quyet/chuong-4707-DK8Btard89dh", "4720": "/thai-co-long-tuong-quyet/chuong-4720-QV3P1E27XM3Y", "4751": "/thai-co-long-tuong-quyet/chuong-4751-EPNn189YhvDL", "4753": "/thai-co-long-tuong-quyet/chuong-4753-BpyM7OGYSBjn", "4778": "/thai-co-long-tuong-quyet/chuong-4778-7UV2pX30MyKH", "4789": "/thai-co-long-tuong-quyet/chuong-4789-NGogrv7UzuDg", "4793": "/thai-co-long-tuong-quyet/chuong-4793-I51p3RKUVRGY", "4840": "/thai-co-long-tuong-quyet/chuong-4840-jIAnqMHug6er", "4879": "/thai-co-long-tuong-quyet/chuong-4879-MruTEHnLriuQ", "4910": "/thai-co-long-tuong-quyet/chuong-4910-KTTB56DKJC4N", "4959": "/thai-co-long-tuong-quyet/chuong-4959-j6DjxHGkF7y7", "4960": "/thai-co-long-tuong-quyet/chuong-4960-DnWWVPoF8kEL", "4990": "/thai-co-long-tuong-quyet/chuong-4990-iwZ2kbSqs4cR", "4993": "/thai-co-long-tuong-quyet/chuong-4993-93TPOy7KVyP5", "4994": "/thai-co-long-tuong-quyet/chuong-4994-dlmBw6fpObfJ", "5051": "/thai-co-long-tuong-quyet/chuong-5051-r2w1DI8EKago", "5108": "/thai-co-long-tuong-quyet/chuong-5108-4J5rTTadHZgJ", "5132": "/thai-co-long-tuong-quyet/chuong-5132-XGJjeVqbJi0Z", "5134": "/thai-co-long-tuong-quyet/chuong-5134-UgvJkkwb4yW0", "5140": "/thai-co-long-tuong-quyet/chuong-5140-Mvi12VFaKl6K", "5156": "/thai-co-long-tuong-quyet/chuong-5156-0EXboW5YLrKp", "5167": "/thai-co-long-tuong-quyet/chuong-5167-F0qGqu92zoDF", "5200": "/thai-co-long-tuong-quyet/chuong-5200-0JmDw5NUtduU", "5208": "/thai-co-long-tuong-quyet/chuong-5208-pyCVK5mTug0E", "5260": "/thai-co-long-tuong-quyet/chuong-5260-fiqPreUOTVhd", "5325": "/thai-co-long-tuong-quyet/chuong-5325-idPXVqMmRXot", "5363": "/thai-co-long-tuong-quyet/chuong-5363-bIy0UelsZ1V5", "5366": "/thai-co-long-tuong-quyet/chuong-5366-2QsM82QMCuIk", "5471": "/thai-co-long-tuong-quyet/chuong-5471-oBIz9E0A5sSP", "5482": "/thai-co-long-tuong-quyet/chuong-5482-aFJrdVW9qC5b", "5483": "/thai-co-long-tuong-quyet/chuong-5483-4xbdBc4ejpMo", "5502": "/thai-co-long-tuong-quyet/chuong-5502-8OKab1Y7NoMz", "5581": "/thai-co-long-tuong-quyet/chuong-5581-UG21NlucgxQT", "5632": "/thai-co-long-tuong-quyet/chuong-5632-qIN8LC32N9rf", "5642": "/thai-co-long-tuong-quyet/chuong-5642-cMOzpSZ19TUr", "5677": "/thai-co-long-tuong-quyet/chuong-5677-K5vW2rtSoYhX", "5696": "/thai-co-long-tuong-quyet/chuong-5696-PWeTSGNvSYih", "5698": "/thai-co-long-tuong-quyet/chuong-5698-MvF2YWUvDoE8", "5700": "/thai-co-long-tuong-quyet/chuong-5700-JLqcelavy5lZ", "5703": "/thai-co-long-tuong-quyet/chuong-5703-kSkyI9FQbyYE", "5706": "/thai-co-long-tuong-quyet/chuong-5706-BaeKwWuuErLt", "5714": "/thai-co-long-tuong-quyet/chuong-5714-0E4cKXJuEvRe", "5730": "/thai-co-long-tuong-quyet/chuong-5730-dXsD6Y9sG1f9", "5753": "/thai-co-long-tuong-quyet/chuong-5753-cnoIiSqKPXiC", "5762": "/thai-co-long-tuong-quyet/chuong-5762-v9WNeaopID5A", "5770": "/thai-co-long-tuong-quyet/chuong-5770-knvf2bEoJGBv", "5775": "/thai-co-long-tuong-quyet/chuong-5775-8LQbmEzIgQV1", "5802": "/thai-co-long-tuong-quyet/chuong-5802-1PYqbdtkLTcw", "5813": "/thai-co-long-tuong-quyet/chuong-5813-HBrUd1xEzPVM", "5826": "/thai-co-long-tuong-quyet/chuong-5826-UNmile8iNcvC", "5850": "/thai-co-long-tuong-quyet/chuong-5850-xK0bvgNfPlFT", "5858": "/thai-co-long-tuong-quyet/chuong-5858-lzPtJhnfQoMD", "5860": "/thai-co-long-tuong-quyet/chuong-5860-jO0SPwueA5sf", "5866": "/thai-co-long-tuong-quyet/chuong-5866-adoBhhDeQrSy", "5874": "/thai-co-long-tuong-quyet/chuong-5874-PIET5iddRvZj", "5879": "/thai-co-long-tuong-quyet/chuong-5879-npjPpLO7p4tp", "5880": "/thai-co-long-tuong-quyet/chuong-5880-HW2CNTwchh93", "5890": "/thai-co-long-tuong-quyet/chuong-5890-r6iRfsL0Y0xF", "5898": "/thai-co-long-tuong-quyet/chuong-5898-gk7j3tlzZ430", "5937": "/thai-co-long-tuong-quyet/chuong-5937-08nf56R10Sdw", "5953": "/thai-co-long-tuong-quyet/chuong-5953-MfKO6Oo9cJ4k", "5955": "/thai-co-long-tuong-quyet/chuong-5955-J5wyCeu9MZaB", "5975": "/thai-co-long-tuong-quyet/chuong-5975-rDxhAAx7tCrZ", "5979": "/thai-co-long-tuong-quyet/chuong-5979-l2AqMfA6OjuR", "5980": "/thai-co-long-tuong-quyet/chuong-5980-FkSdunibGMAf", "5985": "/thai-co-long-tuong-quyet/chuong-5985-dHxZeQT6eVUl", "5999": "/thai-co-long-tuong-quyet/chuong-5999-KABZKCC4vLAp", "6008": "/thai-co-long-tuong-quyet/chuong-6008-cWteGKAYo1Xn", "6013": "/thai-co-long-tuong-quyet/chuong-6013-03Oa0xv3BBrt", "6014": "/thai-co-long-tuong-quyet/chuong-6014-UlhNY5TX4o77", "6016": "/thai-co-long-tuong-quyet/chuong-6016-RBIweLaXo5eY", "6019": "/thai-co-long-tuong-quyet/chuong-6019-sICJIiE2RyRD", "6022": "/thai-co-long-tuong-quyet/chuong-6022-JQ6fw6tX4rEs", "6024": "/thai-co-long-tuong-quyet/chuong-6024-GphE2L0Wp8kJ", "6025": "/thai-co-long-tuong-quyet/chuong-6025-jX01aTY1hl1W", "6035": "/thai-co-long-tuong-quyet/chuong-6035-Vb1t4j40T4ei", "6036": "/thai-co-long-tuong-quyet/chuong-6036-zJJgcrcVLhuw", "6037": "/thai-co-long-tuong-quyet/chuong-6037-T1cSAzA0DKBA", "6040": "/thai-co-long-tuong-quyet/chuong-6040-u8WpoMpVqEyo", "6041": "/thai-co-long-tuong-quyet/chuong-6041-NqpcMUN0jrE2", "6042": "/thai-co-long-tuong-quyet/chuong-6042-rY7OucvVbUUG", "6044": "/thai-co-long-tuong-quyet/chuong-6044-oxjy0s2UMk1h", "6058": "/thai-co-long-tuong-quyet/chuong-6058-VrwzhdlTcahl", "6059": "/thai-co-long-tuong-quyet/chuong-6059-yZFlFlJyUEyz", "6060": "/thai-co-long-tuong-quyet/chuong-6060-SGXYntrTNrEC", "6061": "/thai-co-long-tuong-quyet/chuong-6061-vyqLL0QyFUUQ", "6068": "/thai-co-long-tuong-quyet/chuong-6068-HvwqBtHSNuLx", "6072": "/thai-co-long-tuong-quyet/chuong-6072-Bk9zNOURtQOp", "6076": "/thai-co-long-tuong-quyet/chuong-6076-5ZM8ZuhROxRi", "6170": "/thai-co-long-tuong-quyet/chuong-6170-Shxrft8mdvSX", "6172": "/thai-co-long-tuong-quyet/chuong-6172-Q7YRl8EmOBzz", "6173": "/thai-co-long-tuong-quyet/chuong-6173-tprDJGnHGoFC", "6174": "/thai-co-long-tuong-quyet/chuong-6174-NW90rOLm9RVQ", "6178": "/thai-co-long-tuong-quyet/chuong-6178-HMM93tYleyZI", "6180": "/thai-co-long-tuong-quyet/chuong-6180-Elxj99elPE5j", "6181": "/thai-co-long-tuong-quyet/chuong-6181-iTGWiHCGHrLx", "6187": "/thai-co-long-tuong-quyet/chuong-6187-ai4E01WFXevH", "6189": "/thai-co-long-tuong-quyet/chuong-6189-X7fo6HcFIvSi", "6196": "/thai-co-long-tuong-quyet/chuong-6196-s4mJwAUjQKIF", "6202": "/thai-co-long-tuong-quyet/chuong-6202-kJa2Evnjg7sY", "6217": "/thai-co-long-tuong-quyet/chuong-6217-uu6pSo4Cpapq", "6224": "/thai-co-long-tuong-quyet/chuong-6224-FrDLIhwgx0fO", "6234": "/thai-co-long-tuong-quyet/chuong-6234-1vDCmxSfiKJa", "6239": "/thai-co-long-tuong-quyet/chuong-6239-PSi8WaDA6Tcg", "6257": "/thai-co-long-tuong-quyet/chuong-6257-0A8IOr98sqMc", "6260": "/thai-co-long-tuong-quyet/chuong-6260-RI2e2EodVj9H", "6263": "/thai-co-long-tuong-quyet/chuong-6263-sPw0gcS78dww", "6266": "/thai-co-long-tuong-quyet/chuong-6266-JXqNKz7clWjb", "6272": "/thai-co-long-tuong-quyet/chuong-6272-Bme5ckQb1JJu", "6275": "/thai-co-long-tuong-quyet/chuong-6275-btYSG756eC6Z", "6285": "/thai-co-long-tuong-quyet/chuong-6285-uFGXCG3aXtTX", "6287": "/thai-co-long-tuong-quyet/chuong-6287-rfs6IVAaI9zz", "6293": "/thai-co-long-tuong-quyet/chuong-6293-jugpaGTZYwZI", "6298": "/thai-co-long-tuong-quyet/chuong-6298-7RBlKtE4v5tO", "6315": "/thai-co-long-tuong-quyet/chuong-6315-ERI8f2cXppM7", "6330": "/thai-co-long-tuong-quyet/chuong-6330-O3ovtwt0yIJP", "6333": "/thai-co-long-tuong-quyet/chuong-6333-pAiHXJYVbB64", "6345": "/thai-co-long-tuong-quyet/chuong-6345-YeKj7pAU7lGh", "6362": "/thai-co-long-tuong-quyet/chuong-6362-geR6RyYx0UkQ", "6372": "/thai-co-long-tuong-quyet/chuong-6372-SjSxvE4wmoNc", "6375": "/thai-co-long-tuong-quyet/chuong-6375-tqMKZbjRPhAH", "6377": "/thai-co-long-tuong-quyet/chuong-6377-qGxtfrpR9xgi", "6394": "/thai-co-long-tuong-quyet/chuong-6394-fUnPEHk3dROj", "6403": "/thai-co-long-tuong-quyet/chuong-6403-xrVUAPiXW7li", "6412": "/thai-co-long-tuong-quyet/chuong-6412-GDDZ6Yg1Po7g", "6420": "/thai-co-long-tuong-quyet/chuong-6420-5rdrUY61QrER", "6426": "/thai-co-long-tuong-quyet/chuong-6426-w6RamJP0geol", "6448": "/thai-co-long-tuong-quyet/chuong-6448-5O7c3XBDUUXN", "6488": "/thai-co-long-tuong-quyet/chuong-6488-Cf94zZF9Xj39", "6504": "/thai-co-long-tuong-quyet/chuong-6504-qxyela57ZqHe", "6506": "/thai-co-long-tuong-quyet/chuong-6506-nNZErqB7J6n6", "6512": "/thai-co-long-tuong-quyet/chuong-6512-ecNxAbV6ZtNP", "6521": "/thai-co-long-tuong-quyet/chuong-6521-xy526jTaSZkO", "6522": "/thai-co-long-tuong-quyet/chuong-6522-RgOoer15KC0b", "6546": "/thai-co-long-tuong-quyet/chuong-6546-tdchotG3MLKr", "6564": "/thai-co-long-tuong-quyet/chuong-6564-lTqdH35g6ZVS", "6570": "/thai-co-long-tuong-quyet/chuong-6570-dheMZoOfMM5l", "6574": "/thai-co-long-tuong-quyet/chuong-6574-XXrVlJbers8e", "6576": "/thai-co-long-tuong-quyet/chuong-6576-UwS4rZhec9f5", "6598": "/thai-co-long-tuong-quyet/chuong-6598-0U5NvLqct2Su", "6602": "/thai-co-long-tuong-quyet/chuong-6602-uJIW7q3cOYVm", "6611": "/thai-co-long-tuong-quyet/chuong-6611-Dg0b3y16HEsl", "6634": "/thai-co-long-tuong-quyet/chuong-6634-CvvhfsiYRlvn", "6654": "/thai-co-long-tuong-quyet/chuong-6654-k3wQdPlWxNCB", "6679": "/thai-co-long-tuong-quyet/chuong-6679-gjT5MYYzsAmf", "6789": "/thai-co-long-tuong-quyet/chuong-6789-DRachQGnGbjn", "6834": "/thai-co-long-tuong-quyet/chuong-6834-3rby1RsJCRQd", "6902": "/thai-co-long-tuong-quyet/chuong-6902-MHi71iMmuOZe", "7106": "/thai-co-long-tuong-quyet/chuong-7106-P8CjXs11EPEe", "7107": "/thai-co-long-tuong-quyet/chuong-7107-wQuxzkTXLmyQ", "7108": "/thai-co-long-tuong-quyet/chuong-7108-SibARcv2T9hC", "7109": "/thai-co-long-tuong-quyet/chuong-7109-y0INtVNXbWRz", "7111": "/thai-co-long-tuong-quyet/chuong-7111-1bhonFGXqFuY", "7128": "/thai-co-long-tuong-quyet/chuong-7128-uaaRT6t4wWRp", "7143": "/thai-co-long-tuong-quyet/chuong-7143-9kP865TvUpwv", "7150": "/thai-co-long-tuong-quyet/chuong-7150-ooJdGCbRMP6O", "7155": "/thai-co-long-tuong-quyet/chuong-7155-QHnhVZqwyFmI", "7165": "/thai-co-long-tuong-quyet/chuong-7165-eDnp1JKxDw96", "7178": "/thai-co-long-tuong-quyet/chuong-7178-R1sctf9UpjjF", "7179": "/thai-co-long-tuong-quyet/chuong-7179-xJapLXbzw6S1", "7182": "/thai-co-long-tuong-quyet/chuong-7182-WCgShAwUJCgN", "7189": "/thai-co-long-tuong-quyet/chuong-7189-BFZxrH40Bmpq", "7190": "/thai-co-long-tuong-quyet/chuong-7190-hXGAJ9WVJ9Zc", "7670": "/thai-co-long-tuong-quyet/chuong-7670-ISlhFEVfEliq", "7723": "/thai-co-long-tuong-quyet/chuong-7723-y0o0AXFFmJlE", "7729": "/thai-co-long-tuong-quyet/chuong-7729-7l0HsmwGWWBu", "7732": "/thai-co-long-tuong-quyet/chuong-7732-ge6vEPHltdOF", "7803": "/thai-co-long-tuong-quyet/chuong-7803-mTj5IS6Ogohg", "8040": "/thai-co-long-tuong-quyet/chuong-8040-QYMR8zkPGhSJ", "8123": "/thai-co-long-tuong-quyet/chuong-8123-muNAbWw2WJb7", "8150": "/thai-co-long-tuong-quyet/chuong-8150-tpFvn72arGVB", "8151": "/thai-co-long-tuong-quyet/chuong-8151-P8w8F0T5zdEy", "8155": "/thai-co-long-tuong-quyet/chuong-8155-VIkz3UH6U6B5", "8164": "/thai-co-long-tuong-quyet/chuong-8164-Nx7UAq5SHSA8", "8202": "/thai-co-long-tuong-quyet/chuong-8202-D6gbK36WyTAo", "8238": "/thai-co-long-tuong-quyet/chuong-8238-1fqHZVEZQkgu", "8352": "/thai-co-long-tuong-quyet/chuong-8352-a7Wc38JlXngu", "8372": "/thai-co-long-tuong-quyet/chuong-8372-2zVt4cHn0APX", "8376": "/thai-co-long-tuong-quyet/chuong-8376-7AIks64oVdMe", "8381": "/thai-co-long-tuong-quyet/chuong-8381-jcno8TJJ7U2Y", "8383": "/thai-co-long-tuong-quyet/chuong-8383-mDCE2ECKMDW7", "8390": "/thai-co-long-tuong-quyet/chuong-8390-RG5jCLLpEnfa", "8394": "/thai-co-long-tuong-quyet/chuong-8394-WRsa0q8qjHch", "8396": "/thai-co-long-tuong-quyet/chuong-8396-Z1H0ua1qy15G", "8401": "/thai-co-long-tuong-quyet/chuong-8401-BUm4AxGLarmA", "8402": "/thai-co-long-tuong-quyet/chuong-8402-hnTIcpiqiEWx", "8404": "/thai-co-long-tuong-quyet/chuong-8404-kNsiWZcrxxzV", "8405": "/thai-co-long-tuong-quyet/chuong-8405-HfZvyS3M5KjI", "8408": "/thai-co-long-tuong-quyet/chuong-8408-qYfZK4PrSRwd", "8418": "/thai-co-long-tuong-quyet/chuong-8418-4Uehqotsh8IR", "8420": "/thai-co-long-tuong-quyet/chuong-8420-7438kYmswrm0", "8467": "/thai-co-long-tuong-quyet/chuong-8467-fruAydqSlCPh", "8626": "/thai-co-long-tuong-quyet/chuong-8626-DgmTVqhX9v2V", "8650": "/thai-co-long-tuong-quyet/chuong-8650-kiYbLoRZ7liF", "8660": "/thai-co-long-tuong-quyet/chuong-8660-yeXjqYvaMS53", "8796": "/thai-co-long-tuong-quyet/chuong-8796-1YblFPrpBbHE", "8840": "/thai-co-long-tuong-quyet/chuong-8840-0TM97ratcphZ", "8843": "/thai-co-long-tuong-quyet/chuong-8843-aLSnTTvOzwuv", "8844": "/thai-co-long-tuong-quyet/chuong-8844-6d90vLNu7Jdh", "8848": "/thai-co-long-tuong-quyet/chuong-8848-CoxrjqAucmap", "8850": "/thai-co-long-tuong-quyet/chuong-8850-EPMIda3urW4N", "8851": "/thai-co-long-tuong-quyet/chuong-8851-lh3V5TVPztnA", "8861": "/thai-co-long-tuong-quyet/chuong-8861-zd2dbCzQDZAy", "8863": "/thai-co-long-tuong-quyet/chuong-8863-1DR4VxsRTJdX", "8865": "/thai-co-long-tuong-quyet/chuong-8865-4nqUPhmRi376", "8866": "/thai-co-long-tuong-quyet/chuong-8866-b6XirZEwqQqs", "8881": "/thai-co-long-tuong-quyet/chuong-8881-T5QKXQqTwgN9", "8883": "/thai-co-long-tuong-quyet/chuong-8883-WfolRBkTBQqi", "8884": "/thai-co-long-tuong-quyet/chuong-8884-2xWyt3ByJnaU", "8888": "/thai-co-long-tuong-quyet/chuong-8888-88JphYyyoGXc", "8892": "/thai-co-long-tuong-quyet/chuong-8892-EJ6gV2mzIkTj", "8893": "/thai-co-long-tuong-quyet/chuong-8893-kbotxvDUQ7DW", "8894": "/thai-co-long-tuong-quyet/chuong-8894-GtV7PnfzYUxI", "8897": "/thai-co-long-tuong-quyet/chuong-8897-qmbklP1UvaAd", "8898": "/thai-co-long-tuong-quyet/chuong-8898-M4IxDISz2xtQ", "8899": "/thai-co-long-tuong-quyet/chuong-8899-ZdP6s1r9QpeM", "9260": "/thai-co-long-tuong-quyet/chuong-9260-jMsKEeQvjdqy", "9275": "/thai-co-long-tuong-quyet/chuong-9275-YlMX0l9RaAug", "9512": "/thai-co-long-tuong-quyet/chuong-9512-nUrZrELFnfzN", "9621": "/thai-co-long-tuong-quyet/chuong-9621-rvFVFRFLeHxg", "9623": "/thai-co-long-tuong-quyet/chuong-9623-uWdv8B8Lt1RF", "9706": "/thai-co-long-tuong-quyet/chuong-9706-zhjB9Qj4hPDo", "9740": "/thai-co-long-tuong-quyet/chuong-9740-yyacBQ2WSiCz", "9891": "/thai-co-long-tuong-quyet/chuong-9891-5uIFOGepsREB", "9944": "/thai-co-long-tuong-quyet/chuong-9944-cK5LppuIFWEI", "9971": "/thai-co-long-tuong-quyet/chuong-9971-DN_dO4Oh_GUL", "9980": "/thai-co-long-tuong-quyet/chuong-9980-a7gkSYGHi75w", "9998": "/thai-co-long-tuong-quyet/chuong-9998-jLicYCjZaXgg", "10084": "/thai-co-long-tuong-quyet/chuong-10084-RuOxt2WC2pK!", "10085": "/thai-co-long-tuong-quyet/chuong-10085-nIiIpu!KGeOB", "10087": "/thai-co-long-tuong-quyet/chuong-10087-fOxlO8YazQJm", "10123": "/thai-co-long-tuong-quyet/chuong-10123-!vylhld019jL", "10143": "/thai-co-long-tuong-quyet/chuong-10143-H0!0bjk8ygvC", "10339": "/thai-co-long-tuong-quyet/chuong-10339-9mcOTcvFEXEz", "10340": "/thai-co-long-tuong-quyet/chuong-10340-Sm5obzzKCYeE", "10363": "/thai-co-long-tuong-quyet/chuong-10363-Zhq4EYFHMHKN", "10375": "/thai-co-long-tuong-quyet/chuong-10375-HOmh9xHddB0K", "10379": "/thai-co-long-tuong-quyet/chuong-10379-c2pC_He3_btn", "10416": "/thai-co-long-tuong-quyet/chuong-10416-ZVNSBbthCGf9", "10461": "/thai-co-long-tuong-quyet/chuong-10461-D_9xquer5Cxw", "10544": "/thai-co-long-tuong-quyet/chuong-10544-zwFF_eWmyyRd", "10580": "/thai-co-long-tuong-quyet/chuong-10580-M!tDNYdXkF_q", "10612": "/thai-co-long-tuong-quyet/chuong-10612-GIK_VwGul896", "10683": "/thai-co-long-tuong-quyet/chuong-10683-apjxXsN3tVGY", "10700": "/thai-co-long-tuong-quyet/chuong-10700-7feUL_CBtiG!", "10769": "/thai-co-long-tuong-quyet/chuong-10769-XtDNHB_7Xwve", "10800": "/thai-co-long-tuong-quyet/chuong-10800-FmR8TV5b!ZrS", "10813": "/thai-co-long-tuong-quyet/chuong-10813-ZwgjU4ZQgfXw", "10846": "/thai-co-long-tuong-quyet/chuong-10846-uXYYKu1r57l_", "10890": "/thai-co-long-tuong-quyet/chuong-10890-yZFMgd2s9n1e", "10907": "/thai-co-long-tuong-quyet/chuong-10907-UcEorRxfVgyb", "10911": "/thai-co-long-tuong-quyet/chuong-10911-TnpXD_LQfbqd", "10933": "/thai-co-long-tuong-quyet/chuong-10933-lhp!AGEHn_Va", "11002": "/thai-co-long-tuong-quyet/chuong-11002-3mx1HR5KrcJ4", "11034": "/thai-co-long-tuong-quyet/chuong-11034-u4ERp9HNRByQ", "11192": "/thai-co-long-tuong-quyet/chuong-11192-!aU4mGleaYKD", "11217": "/thai-co-long-tuong-quyet/chuong-11217-Qqbm2huGbNcy"};
 </script>
 <script>
 /* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */
@@ -987,7 +1006,18 @@ const PLACES={
     ['thanh','Nhật Nguyệt thành','Một trong thập đại cổ thành của đông quận Thần Châu, ngang hàng Thiên Thánh thành, có thượng cổ thế lực tọa trấn, là thánh địa tu luyện.',[45,204]],
     ['hiem','Huyết Yêu sơn','Hơn một ngàn yêu ma do một con Hấp Huyết Ma Bức cầm đầu. Mây máu bao phủ, dơi máu tuần tra, nhiều thôn trấn xung quanh bị tàn sát.',[40]],
     ['hiem','Lôi Đao bí cảnh','Nơi giết người không cần lý do. Cơ duyên lớn nhất là "hướng lên trời đoạt mệnh năm năm". Lâm Phong đột phá Võ Vương ở đây.',[568,602],null,3],
-    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa, giúp tăng thực lực mạnh mẽ nhưng dược tính quá cuồng bạo.',[45,49]]
+    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa, giúp tăng thực lực mạnh mẽ nhưng dược tính quá cuồng bạo.',[45,49]],
+    ['gia','Lâm gia','Gia tộc của Lâm Phong ở Chân Võ quốc. Cha hắn là Lâm Bại Thiên, người đã thức tỉnh Bất Tử Thần Thể.',[101, 800],'Chân Võ quốc',3],
+    ['tong','Vũ Hồn Điện','Thế lực cưỡi liệt diễm ma thú, có bảng truy sát ma đạo; cho đệ tử đi điều tra Thanh Dương tông.',[426],null,3],
+    ['tong','Thanh Dương tông','Tông môn bị Vũ Hồn Điện để mắt điều tra; Lâm Phong cũng ghé tới xem.',[426],null,2],
+    ['dao','Hỏa Vân Đảo','Thế lực trên đảo, tinh anh đều ở Âm Dương cảnh; truy sát Lâm Phong vì hắn giết người của đảo.',[751],null,3],
+    ['hiem','Di tích Huyền Thiên Tông','Tông môn thượng cổ từng huy hoàng. Bí điển của nó được đấu giá tới hai tỷ.',[251],null,2],
+    ['gia','Ninh gia','Gia tộc của Ninh Hàn Sương; đem hơn trăm tu sĩ vây chặn Lâm Phong và Thạch Ngưng Mộng.',[800],null,3],
+    ['thanh','Thạch Thành','Quê của Thạch Ngưng Mộng; nàng liều chạy về đây khi bị Ninh gia truy sát.',[800],null,2],
+    ['gia','Thượng Quan gia tộc','Gia tộc truyền bảy tám trăm năm, đứng sau dong binh hiệp hội; nhà của Thượng Quan Phi Nhi.',[326],'Chân Võ quốc',2],
+    ['thanh','Bắc Hoang thành','Thành nằm ngoài phạm vi thế lực Thanh Vân Tông; Vũ Văn gia tộc có thế lực ở đây.',[626, 676],null,2],
+    ['hiem','Hỏa Diệm Sơn','Núi lửa sâu trong sơn mạch, lãnh địa thượng cổ hung thú Cửu Đầu Xích Diễm Sư, nơi mọc Xích Viêm hoa.',[176],null,2],
+    ['thanh','Băng Diễm trấn','Thị trấn có chợ đêm ở góc tây nam; Lâm Phong và Điền Trung Đạo về đây bán chiến lợi phẩm.',[501],null,1]
   ],
   tamthien:[
     ['vung','Đông quận Thần Châu','Vùng có trăm quốc và thập đại cố đô. Chân Võ quốc cũng nằm trong vùng này.',[239,437]],
@@ -1008,7 +1038,13 @@ const PLACES={
     ['toc','Đông Hải Long Cung','Thế lực mạnh nhất Đông Hải, cùng Hải tộc tồn tại thật dù ngoại giới chỉ biết qua truyền thuyết. Có Tà Long tam thái tử.',[691,'~1226'],'Đông Hải thế giới'],
     ['dao','Thần Bằng đảo','Đảo Yêu tộc của Thiên Bằng Thánh Vương, cùng Liệt Diễm Đảo và Kim Ô đảo.',[691,'~1203'],'Đông Hải thế giới'],
     ['hiem','Thiên kiếp yêu cảnh','Bí cảnh có cơ duyên, lối vào được tam hoàng tử mở ra.',['~915','~921']],
-    ['hiem','Mê Vụ Sâm Lâm','Rừng sương mù gần Thiên Thánh thành, sinh linh mạnh thường đại chiến với hung thú trong đó.',[833],'Đông quận Thần Châu']
+    ['hiem','Mê Vụ Sâm Lâm','Rừng sương mù gần Thiên Thánh thành, sinh linh mạnh thường đại chiến với hung thú trong đó.',[833],'Đông quận Thần Châu'],
+    ['hiem','Hàn Chước Thần Phủ','Thần phủ có hàn băng cự long canh giữ; rồng bị mười tám xích sắt xuyên qua, nối vào phủ.',[1000],null,3],
+    ['hiem','Tứ Thánh Sơn','Bốn ngọn núi cao vạn mét giữa hung vực, nơi mọc Thánh Linh quả, nguy hiểm như tử địa.',[1000],null,3],
+    ['thanh','Hàn Thành','Thành có thành chủ treo thưởng lớn tìm luyện dược sư.',[840],null,2],
+    ['toc','Hải Tộc','Chủng tộc biển chiếm vùng Thâm Hải; Lâm Phong cùng bốn nữ thoát khỏi địa bàn của họ.',[1220],'Đông Hải thế giới',3],
+    ['toc','Cự Hùng Tộc','Một tộc thuộc yêu tộc, nổi tiếng thân thể cường đại, người cao hơn hai mét.',[1120],null,2],
+    ['toc','Man tộc','Tộc người ở trần, mặc da thú; cử cường giả trẻ tới thử 99 bậc thang đá.',[1120],null,2]
   ],
   phongtruc:[
     ['vung','Long Môn vực','Vực do Lâm Phong lập ra, biến hắn thành vị Vực Chủ thứ mười ba và trẻ nhất. Tín ngưỡng lực từ đây giúp hắn thành Đại Đế.',['~1471','~1481',4187]],
@@ -1051,7 +1087,22 @@ const PLACES={
     ['tong','Bách Hiểu Các','Các nắm tin tức.',[1854]],
     ['quoc','Thiên Xà đế quốc','Đế quốc ở Cửu Châu.',[2282]],
     ['hiem','Hoa Quả Sơn','Bên trong có sinh linh đáng sợ, khiến người ta nghi là Tề Thiên Đại Thánh.',[2801,2802,2825]],
-    ['hiem','Hỗn Độn chi môn','Sau cánh cửa là một thế giới đáng sợ. Gần đó có tin về Hỗn Độn Cổ Quốc ở Tây Hải.',[2822,2829,2872,2873]]
+    ['hiem','Hỗn Độn chi môn','Sau cánh cửa là một thế giới đáng sợ. Gần đó có tin về Hỗn Độn Cổ Quốc ở Tây Hải.',[2822,2829,2872,2873]],
+    ['vung','Cổ Yêu Châu','Châu của yêu tộc, có nhiều căn cứ; các đại thành rất phồn thịnh vì vạn tộc và chủng tộc vực ngoại qua lại.',[2995],null,3],
+    ['thanh','Hỏa Nha thành','Thành lớn ở Cổ Yêu Châu, tới bằng trùng động thời không; phía tây bắc là tổ địa Hỏa Nha tộc.',[2995],'Cổ Yêu Châu',3],
+    ['hiem','Vọng Tiên Lĩnh','Tử vong tuyệt địa giấu nhiều bí mật; có người thấy một tòa kiến trúc thần bí gần đó.',[2995],'Cổ Yêu Châu',3],
+    ['toc','Thạch Tộc','Tộc người đá; Thanh Đế vốn là Thạch Tộc hóa thành Thánh Linh. Tu sĩ Thạch Tộc chặn được thạch hoa hóa đá.',[2635],null,3],
+    ['tong','Thiên Đạo thánh địa','Thánh địa nơi Nhược Lan đưa Tử Uyên đi; Lâm Phong từng tới tìm nàng.',[2995],null,3],
+    ['thanh','Lục Thần Thành','Thành có vạn tộc và chủng tộc vực ngoại tụ tập; Lâm Phong tới gây sóng gió.',[2815],null,3],
+    ['hiem','Thiên Hoang cấm địa','Khu cấm sinh mệnh đáng sợ; Bảo Sơn xuất hiện ở đây, nhiều tu sĩ ùa vào đào bảo.',[2140],'Thiên Hoang Thần vực',2],
+    ['hiem','Thiên Yêu lĩnh','Dãy núi yêu thú; kẻ địch chạy về phía đông bắc lĩnh khiến Lâm Phong nghi ngờ.',[2500],null,2],
+    ['dao','Vạn Tiên Đảo','Đảo có đấu giá hội lớn, tu sĩ khắp nơi kéo tới; có cường giả Thiên Thần cảnh tọa trấn.',[1870],null,3],
+    ['hiem','Thánh Tổ Sơn','Núi thử thách của Luân Hồi Tiên Tông; Thông Thiên Lộ kéo từ đỉnh xuống, rất ít người leo tới đỉnh.',[1740, 1748],null,3],
+    ['hiem','Luân Hồi Cốc','Thung lũng phong ấn thiên hỏa trong Luân Hồi Tiên Tông, nơi Mặc tiền bối ở.',[1752, 1760],null,2],
+    ['thanh','Trọng Lê Thành','Thành có thần tượng Xích Đế, thủy tổ nhân tộc; nhiều thánh tử tới bái.',[1772],null,2],
+    ['hiem','Nguyên Khư Giới','Bí giới có thiên đạo trật tự riêng; vong hồn của sinh linh chết trong đó bị thu lại.',[2335, 2350],null,3],
+    ['toc','Thần Nhật Tộc','Tộc mang thể chất nóng bỏng; Bạch Uyển Du là cháu gái một cường giả cấp Thánh Đế của tộc.',[2410],null,2],
+    ['quoc','Hỗn Độn Cổ Quốc','Cổ quốc mờ ảo giam người trong một vùng biển nhỏ; phía tây bắc có thời không vặn vẹo.',[2920, 2930],null,3]
   ],
   cohoang:[
     ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],
@@ -1065,7 +1116,14 @@ const PLACES={
     ['hiem','Tà Long Ma ngục','Ngục của Tà Long. Lâm Phong diệt Tà Long đời thứ tám, đối mặt Thủy Tổ Tà Long.',[2100,2101,2105]],
     ['bau','Nguyền rủa chi thuyền','Con thuyền bị nguyền rủa, từng trở lại dương gian.',[1972,1974]],
     ['bau','Tinh Không Cổ Thuyền','Cổ thuyền vô địch của Hiên Viên.',[1962]],
-    ['gia','Hậu nhân Cơ Phát','Hậu nhân của văn võ Thánh Nhân Cơ Phát, giúp Lâm Phong xem bói.',[2096,2097]]
+    ['gia','Hậu nhân Cơ Phát','Hậu nhân của văn võ Thánh Nhân Cơ Phát, giúp Lâm Phong xem bói.',[2096,2097]],
+    ['tong','Long Môn','Thế lực Lâm Phong lập trên Long Môn đảo, giữa Quy Khư hải vực và Nam Cực băng nguyên.',[1964, 2013],null,4],
+    ['vung','Thâm Hải','Vùng biển sâu có Thâm Hải cự quái và Thâm Hải yêu quốc; ai gặp cự quái đều mất mạng.',[1971, 2006],null,3],
+    ['tong','Tà Long Cung','Thế lực hải ngoại lớn ngang Phù Tang Đảo; Lâm Phong một chiêu giết Long Thánh Khung của cung.',[1964, 2006],null,3],
+    ['dao','Phù Tang Đảo','Thế lực hải ngoại cỡ lớn, ngang Tà Long Cung.',[1964],null,3],
+    ['quoc','Đà Xá Tiên Quốc','Tiên quốc cổ; quốc chủ dùng Thánh Đế hoàng kim đúc Đà Xá cổ tệ, nghe nói có thọ nguyên bất tử.',[1971],null,2],
+    ['dao','Vạn Tinh Đảo','Đảo có Cự Kình Bang; đệ tử nhiều thế lực lớn đi ngang qua.',[1957],null,2],
+    ['dao','Tiên Tuyết Đảo','Đảo nơi Tiết tiền bối ở; Lâm Phong tới xin gặp.',[2013],null,2]
   ],
   minhgioi:[
     ['vung','Minh Hải','Có tứ đại thế lực, gọi là "một quốc gia ba đảo".',['~1659']],
@@ -1087,7 +1145,10 @@ const PLACES={
     ['toc','Hắc Ngục Ma Quân','Cường giả Minh giới, xuất hiện cùng Khô Lâu Tà Quân.',[2336]],
     ['toc','Tử Vong Kỵ Sĩ','Kỵ sĩ của Minh giới, cùng Long kỵ sĩ.',[2587]],
     ['bau','Minh Vương Chung','Chuông của Minh Vương.',[2585]],
-    ['bau','Ngũ Sát Bi','Bia đá Lâm Phong gặp khi làm sứ giả Minh giới.',[2340]]
+    ['bau','Ngũ Sát Bi','Bia đá Lâm Phong gặp khi làm sứ giả Minh giới.',[2340]],
+    ['thanh','Minh Vương Thành','Thành lớn của Minh giới, nhà ở rất đắt; nữ Quỷ vương có trạch viện ở đây.',[5955],null,3],
+    ['dao','Quần Ma Đảo','Thế lực chiếm gần hết Minh Hải sau khi Minh Hải Thần Quốc và giao nhân đế quốc thất thủ.',[2275],'Minh Hải',3],
+    ['quoc','Giao nhân đế quốc','Đế quốc của giao nhân ở Minh Hải, thất thủ trước Quần Ma Đảo.',[2275],'Minh Hải',2]
   ],
   battu:[
     ['vung','Cửu Linh vực','Do Cửu Linh Tông nắm giữ.',[3632]],
@@ -1108,7 +1169,25 @@ const PLACES={
     ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]],
     ['tong','Huyết Ngục sát thủ','Huyết Ngục sát thủ vương triều, tổ chức sát thủ khủng bố.',[4512,4564]],
     ['hiem','Thiên Tàn Cốc','Thung lũng đáng sợ của Thiên Tàn tứ quái.',[4541,4543,4544]],
-    ['toc','Diệt Long kỵ sĩ','Diệt Long kỵ sĩ quân đoàn.',[4579]]
+    ['toc','Diệt Long kỵ sĩ','Diệt Long kỵ sĩ quân đoàn.',[4579]],
+    ['tong','Bát Cực Cung','Thế lực lớn; lão tổ là kẻ thù của Lâm Phong, thiên kiêu Tư Đồ Thiên Dạ bị phế.',[4720, 4960],null,3],
+    ['tong','Đạo Thánh Cung','Người sáng lập từng tranh ngôi Thiên Đế với đời thứ ba; lối vào là Bắc Thiên Môn.',[4300],null,4],
+    ['hiem','Bắc Thiên Môn','Cửa vào Đạo Thánh Cung, đối xứng với Nam Thiên Môn của Thiên Đình.',[4300],null,2],
+    ['thanh','Thiên Thủy Thành','Thành có Tôn gia và Thủy gia là các thế gia lớn.',[5140],null,2],
+    ['gia','Tôn gia','Một trong vài thế gia đứng đầu Thiên Thủy Thành.',[5140],null,2],
+    ['dao','Long đảo','Đảo phong ấn của tiền sử Long hoàng, nhốt Long tộc và sinh linh cổ xưa.',[4840],null,3],
+    ['hiem','Long cốc','Thung lũng sâu trong núi chất đầy hài cốt Long tộc.',[5260],null,2],
+    ['quoc','Huyền Vực đế quốc','Đế quốc Lâm Phong lập khi thống nhất biển sao Huyền Vực.',[4120],null,3],
+    ['gia','Sở gia','Gia tộc cai quản cổ binh khí; dòng Hắc Sa vực lão tổ tách ra từ đây.',[4720],null,3],
+    ['vung','Nhân Ngư hải vực','Vùng biển của nhân ngư; phải mang Ác Xú thảo mới đi vào được.',[5200],null,3],
+    ['toc','Thánh Linh tộc','Tộc của Mộc Ngạo San; chấn động trước chiến lực của Lâm Phong.',[4420],null,2],
+    ['vung','Loạn Kiếm vực','Vực phía đông nam; vực chủ Kiếm Thập Tam bề ngoài trung thành với Thiên Đế.',[4608],null,3],
+    ['vung','Cửu Thần vực','Vực ở chính nam; vực chủ Huyền Thần lạnh nhạt với Thiên Đế.',[4608],null,3],
+    ['hiem','Hoang Thiên Lĩnh','Một trong bảy tử vong tuyệt địa của Bất Tử giới, núi rừng đầy lực lượng "hoang".',[4540],'Hoang Thiên vực',3],
+    ['thanh','Hạ gia thôn','Sơn thôn cổ xưa; lão thôn trưởng cụt một chân, dân làng săn được hung thú rất mạnh.',[4524, 4530],null,1],
+    ['tong','Cửu U Ma Cung','Ma cung có Huyết U công tử bị Lâm Phong giết; U Ma tôn chủ muốn liên lạc.',[4548],null,2],
+    ['tong','Thiên Nhạc Lâu','Lầu nơi thiên kiêu tụ hội.',[4536],null,1],
+    ['bau','Hậu Nghệ Cung','Chí bảo là cây cung lớn; nhiều thế lực tranh, Lâm Phong quyết đoạt lấy.',[4500, 4506],null,3]
   ],
   toivuc:[
     ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
@@ -1137,7 +1216,15 @@ const PLACES={
     ['bau','Hồng Quân tiên kinh','Tiên kinh Lâm Phong có được ở Long giới.',[5775]],
     ['bau','Trảm Long Kiếm','Thanh kiếm Lâm Phong có được.',[5860]],
     ['toc','Cửu Văn Long','Một loài rồng mạnh ở Long giới.',[5813]],
-    ['toc','Viêm Hỏa thiên tướng','Bị Lâm Phong tru sát.',[5770]]
+    ['toc','Viêm Hỏa thiên tướng','Bị Lâm Phong tru sát.',[5770]],
+    ['toc','Hắc Long tộc','Long tộc Lâm Phong thu phục nhờ một nữ tu Long tộc.',[5706],null,3],
+    ['hiem','Chân Long bí cảnh','Bí cảnh tranh đoạt tài nguyên; tu sĩ chém giết hỗn loạn.',[5762, 5898],null,3],
+    ['dao','Hải Quy Đảo','Nơi quân đoàn thần bí chiêu mộ tu sĩ; Trùng tộc kéo tới tấn công.',[5866],null,2],
+    ['hiem','Đoạn Long Uyên','Vực sâu khổng lồ phun ma khí.',[5714, 5730],null,3],
+    ['toc','Thánh Long tộc','Tổ địa có nhiều đảo quanh để thu xếp gia quyến của tu sĩ quân.',[5850, 5866],null,3],
+    ['tong','Thiên Tượng Thần Cung','Cung ở trung tâm tinh cầu Thiên Tượng, nơi Thiên Tượng chân quân ở.',[5802],null,2],
+    ['vung','Hắc Hải','Vùng biển đen; Lâm Phong cùng Long Thế U bay vào chỗ sâu.',[5858],null,3],
+    ['toc','Trùng tộc','Đại quân do ba Trùng Hoàng dẫn, tàn phá vùng biển.',[5866, 5874],null,3]
   ],
   magioi:[
     ['vung','Ma Thiên vực','Vùng Lâm Phong nắm được ngay khi tới Ma giới, sau khi thu phục Đại Ma Thiên.',[6014]],
@@ -1153,7 +1240,12 @@ const PLACES={
     ['toc','Thiên Ma Bát Bộ','Đại quân Thiên Ma kéo tới, mở màn đại chiến.',[6060,6061]],
     ['toc','Ôn dịch chi thần','Từng cầu xin tha thứ, sau lại hiển uy trong trận chiến.',[6022,6058]],
     ['bau','Tám khối Vĩnh Trấn Bia','Phát hiện trọng đại ở Ma giới.',[6019]],
-    ['thanh','Tô Viên','Chỗ ở cũ của một vị đại nho.',[6042]]
+    ['thanh','Tô Viên','Chỗ ở cũ của một vị đại nho.',[6042]],
+    ['thanh','Ma Thiên Thành','Thành chính của phe Lâm Phong ở Ma giới; Đại Ma Nguyệt ở lại chủ trì.',[6036, 6044],null,4],
+    ['tong','Tắc Hạ Học Cung','Học cung Nho đạo hiển hách; muốn vào phải đối được câu đối.',[6016],null,3],
+    ['hiem','Đạo thống Nho môn','Di tích Nho môn trong rừng nguyên thủy năm mươi dặm phía tây bắc thành, đã bị phong tỏa.',[6016],null,2],
+    ['vung','Lăng Thiên vực','Vực bị hải ma tàn phá.',[6068, 6076],null,3],
+    ['vung','Ma Hỏa vực','Vực lớn gấp ba Lăng Thiên vực, ít người lui tới vì địa hình khắc nghiệt.',[6076],null,3]
   ],
   thiengioi:[
     ['vung','Ba mươi ba trọng thiên','Thiên Giới có 33 tầng trời và 33 vị thiên chủ.',[3475,6174]],
@@ -1175,7 +1267,19 @@ const PLACES={
     ['dao','Huyền Hoàng Đảo','Đảo ở Quỷ Vụ vùng biển, nơi vong linh chi thư thôn phệ âm tà quỷ vật.',[6272]],
     ['toc','Ám Dạ Tu La tộc','Cùng Hoàng Thiên đạo thống và Thánh Đường tộc.',[6285]],
     ['toc','Hỗn Độn tộc','Tu sĩ từ Hỗn Độn Huyền Hoàng giới.',[6275]],
-    ['bau','Tam Tiên động phủ','Có sách cổ không chữ, liên quan nhân quả Cửu Châu Đăng.',[6298]]
+    ['bau','Tam Tiên động phủ','Có sách cổ không chữ, liên quan nhân quả Cửu Châu Đăng.',[6298]],
+    ['hiem','Sở La Môn','Cánh cửa quỷ dị nuốt sương máu của tu sĩ và hung thú.',[6170],null,3],
+    ['vung','Hoàng Thiên vực','Vùng tràn sinh cơ, nơi Hoàng Thiên táng thân; vào bằng thông đạo do tàn hồn trời xanh mở.',[6330],null,3],
+    ['vung','Thương Thiên Vực','Vùng đè nén như địa ngục, đối lập với Hoàng Thiên vực.',[6330],null,3],
+    ['vung','Hỗn Độn vực','Vùng mà Bất Tử gia tộc có thể ẩn thân.',[6426],null,3],
+    ['vung','Huyền Hoàng vực','Vùng Nguyệt Cung tới bằng truyền tống trận.',[6506],null,3],
+    ['tong','Nguyệt Cung','Thế lực nữ tu lạnh lùng; Lâm Phong cần họ để lên được mặt trăng.',[6506, 6522],'Huyền Hoàng vực',3],
+    ['toc','Chúa tể Đế tộc','Tộc bên mẹ Lâm Phong, từng có cường giả cấp Chúa Sáng Thế.',[6362, 6426],null,4],
+    ['toc','Đế Tiên tộc','Sinh linh dị vực từ Thời Gian vũ trụ, bị diệt gần Bất Chu Sơn.',[6266],null,2],
+    ['toc','Diệt Thiên tộc','Cấu kết với hoàng tộc phía sau màn phá chư thiên vạn giới, khiến Nữ Oa phải vá trời.',[6394],null,3],
+    ['toc','Hắc Bào tộc','Tộc mạnh hơn Hắc Vụ tộc, đóng quân ở tầng thứ hai Thiên giới.',[6202, 6394],null,3],
+    ['toc','Hắc Vụ tộc','Tộc bị Lâm Phong diệt toàn quân.',[6202],null,2],
+    ['hiem','Hắc Phong Ma vực','Vùng nguy hiểm trong vực sâu ác ma.',[6602],null,2]
   ],
   phetho:[
     ['tong','Phế thổ liên minh','Liên minh của Phế thổ thế giới. Nhiều thế lực theo dõi xem nó sẽ phát triển ra sao.',[7165,7178]],
@@ -1189,7 +1293,14 @@ const PLACES={
     ['tong','Tiên Vũ Cung','Có Ngọc Tinh tiên tử.',[7109]],
     ['dao','Quần Tinh Đảo','Nơi Lâm Phong từ biệt Ngọc Tinh tiên tử.',[7128]],
     ['bau','Chấn Thiên Thạch Bi','Lâm Phong trấn áp rồi luyện hóa khối Chấn Thiên Thạch Bi thứ chín.',[7111,7179,7182]],
-    ['bau','Tứ Phương Thần ấn','Thần ấn Lâm Phong có được.',[7143]]
+    ['bau','Tứ Phương Thần ấn','Thần ấn Lâm Phong có được.',[7143]],
+    ['toc','Thánh Thần tộc','Chủng tộc mạnh; thiên kiêu hàng đầu Thánh Nguyên Đạo được trọng điểm bồi dưỡng.',[2875, 2930],null,3],
+    ['toc','Thiên Sứ Tộc','Tộc có đôi cánh; một nữ tu sa ngã cánh đen gây chấn động khi xuất hiện.',[2875, 2880],null,3],
+    ['hiem','Băng hồ','Hồ băng có vực sâu dưới đáy; kỵ sĩ giáp đen mang khói đen lặn vào.',[2945],null,2],
+    ['dao','Xích Long Đảo','Đảo đoàn của Lâm Phong đi tới sau trận thắng của Phế thổ liên minh.',[7150, 7165],null,2],
+    ['tong','Phi Tiên Tông','Tông môn trong Phế thổ liên minh; thái thượng trưởng lão dự họp.',[7155],null,2],
+    ['tong','Vấn Thiên Tông','Tông môn trong Phế thổ liên minh, cùng Phi Tiên Tông và Vạn Tiên Đảo.',[7155],null,2],
+    ['toc','Báo Tộc','Tộc nổi tiếng tốc độ, như Lôi Báo, Vân Báo, Phong Báo.',[2940],null,2]
   ],
   cuuu:[
     ['hiem','Cửu U địa ngục','Bị phong ấn, chỉ linh hồn ra vào được. Thông đạo mỗi năm mở một canh giờ.',[1756]],
@@ -1216,7 +1327,10 @@ const PLACES={
     ['bau','Côn Lôn Thiên Dương kiếm','Xếp thứ ba trong trăm đại cấm khí.',[8390,8404]],
     ['bau','Đạo nguyên chi thảo','Dị thảo nghịch thiên, Lâm Phong thu được thành công.',[8418,8420]],
     ['bau','Vườn thuốc đỉnh cấp','Một trong những vườn thuốc đỉnh cấp nhất.',[8405]],
-    ['toc','Trích tiên nhân','Thân phận bí ẩn, khiến Lâm Phong phải truy xét.',[8394,8396]]
+    ['toc','Trích tiên nhân','Thân phận bí ẩn, khiến Lâm Phong phải truy xét.',[8394,8396]],
+    ['tong','Vạn Thần Sơn','Thế lực do Kỳ Vân sơn chủ đứng đầu; mất ba cao thủ trước người đá khôi lỗi.',[8404],null,3],
+    ['tong','Nam Tiên môn','Thế lực cổ xưa ít người biết; thủ lĩnh cầm Kết Hồn trượng.',[8404],null,2],
+    ['bau','Yêu Thành','Bảo vật nuốt được mọi thứ; Lâm Phong dùng nó thử nuốt hoa đá.',[8408],null,2]
   ],
   hoangchi:[
     ['hiem','Quân đoàn hoang chi âm binh','Cường giả cũng tránh đối đầu trực diện.',[8851]],
@@ -1248,7 +1362,15 @@ const PLACES={
     ['toc','Thạch Ma tộc','Tộc ở tầng đất đáy.',[9944]],
     ['tong','Hắc Ám Thiên điện','Lâm Phong cướp khí vận của điện chủ.',[10087,10123]],
     ['dao','Tinh Lạc đảo','Thế lực đảo ở Nam hải thế giới, chống lại Lâm Phong rồi thất bại.',[10375,10379],'Nam hải thế giới'],
-    ['tong','Vĩnh Sinh hoàng tộc','Tám hoàng gia của Vĩnh sinh chi môn; con trai vĩnh sinh chi chủ là Cơ Tương Thiên.',[10612,10683]]
+    ['tong','Vĩnh Sinh hoàng tộc','Tám hoàng gia của Vĩnh sinh chi môn; con trai vĩnh sinh chi chủ là Cơ Tương Thiên.',[10612,10683]],
+    ['tong','Côn Lôn sơn','Thế lực của Côn Lôn vũ trụ; chỉ người xuất thân Côn Lôn mới được danh sơn đại xuyên công nhận.',[8660],'Côn Lôn vũ trụ',3],
+    ['vung','Tinh Vũ giới','Giới sinh ra nhiều kỳ vật; cần môn hộ riêng mới vào được.',[10580, 10700],null,3],
+    ['gia','Cơ gia','Gia tộc ẩn thế lớn của Côn Lôn vũ trụ.',[10340],'Côn Lôn vũ trụ',3],
+    ['toc','Ma Huyết Lang tộc','Tộc sói cùng tộc chồn đối đầu Lâm Phong trong bí địa.',[9260],null,2],
+    ['dao','Cửu Yêu đảo','Phe đối địch Chư đảo liên minh trong đại chiến.',[9740],'Nam hải thế giới',2],
+    ['tong','Vấn Thiên các','Đồng minh của Cửu Yêu đảo, thua Chư đảo liên minh.',[9740],'Nam hải thế giới',2],
+    ['tong','Chư đảo liên minh','Liên minh các đảo, chia cắt và tiêu diệt quân của Cửu Yêu đảo.',[9740],'Nam hải thế giới',3],
+    ['toc','Linh tộc Lý thị','Tộc của Lý Mộ Nguyệt, được Lâm Phong cứu.',[9980],null,2]
   ]
 };
 STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||(typeof PLACE_SIZE!=='undefined'&&PLACE_SIZE[w.id+'|'+n])||2}))});
@@ -1410,7 +1532,7 @@ STORIES[0].people=PEOPLE;STORIES[0].journey=JOURNEY;STORIES[0].arts=ARTS;
 <script>
 /* ===== Tiện ích ===== */
 const NS='http://www.w3.org/2000/svg';
-function el(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n}
+function el(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)if(attrs[k]!=null)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n}
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}};
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
@@ -1581,12 +1703,12 @@ const hexRGB=h=>{const n=parseInt(h.slice(1),16);return[n>>16,n>>8&255,n&255]};
 const mixC=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
 const sstep=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 
-/* w: thế giới; shape: chuỗi path SVG của khối đất; box: khung bản đồ; spots: [{x,y,r}] chỗ cần đất bằng (thành, tông môn…) */
-function reliefMap(w,shape,box,spots,sea){
-  const key=w.id+'|'+shape.length;if(RELIEF[key])return RELIEF[key];
-  const sc=1.3,W=Math.round(1000*sc),H=Math.round(640*sc),pal=RPAL[w.kind]||RPAL.start,C={};Object.keys(pal).forEach(k=>{if(k!=='lava')C[k]=hexRGB(pal[k])});
+/* Trường địa hình của một thế giới: hàm độ cao/độ ẩm theo toạ độ bản đồ (1000×640), dùng chung cho ảnh nền và các mảnh phóng to.
+   w: thế giới; shape: chuỗi path SVG của khối đất; box: khung bản đồ; spots: [{x,y,r} | {x,y,rx,ry}] chỗ cần đất bằng/nổi lên */
+function reliefField(w,shape,box,spots,sea){
+  const pal=RPAL[w.kind]||RPAL.start,C={};Object.keys(pal).forEach(k=>{if(k!=='lava')C[k]=hexRGB(pal[k])});
   const seed=w.id.length*977+w.x*13+w.y,n1=vnoise(seed),n2=vnoise(seed+1),n3=vnoise(seed+2),n4=vnoise(seed+3);
-  // Mặt nạ đất + khoảng cách tới bờ (tính trên lưới thô, đơn vị: px bản đồ 1000×640)
+  // Khoảng cách tới bờ (lưới thô, nội suy song tuyến)
   const q=4,GW=Math.ceil(1000/q),GH=Math.ceil(640/q),mc=document.createElement('canvas');mc.width=GW;mc.height=GH;const mx=mc.getContext('2d');
   mx.scale(1/q,1/q);mx.fill(new Path2D(shape));const md=mx.getImageData(0,0,GW,GH).data,D=new Float32Array(GW*GH);
   for(let i=0;i<GW*GH;i++)D[i]=md[i*4+3]>127?1e6:0;
@@ -1595,61 +1717,68 @@ function reliefMap(w,shape,box,spots,sea){
   const rg=(n,rev)=>{const a=[...Array(n).keys()];return rev?a.reverse():a};pass(rg(GW),rg(GH),1,1);pass(rg(GW,1),rg(GH,1),-1,-1);
   const dist=(x,y)=>{const gx=Math.min(GW-1.001,Math.max(0,x/q-.5)),gy=Math.min(GH-1.001,Math.max(0,y/q-.5)),ix=Math.floor(gx),iy=Math.floor(gy),fx=gx-ix,fy=gy-iy,i=iy*GW+ix;
     return q*((D[i]*(1-fx)+D[i+1]*fx)*(1-fy)+(D[i+GW]*(1-fx)+D[i+GW+1]*fx)*fy)};
-  // Mặt nạ đất ở độ phân giải đầy đủ (viền mịn, dùng làm độ trong suốt)
-  const fm=document.createElement('canvas');fm.width=W;fm.height=H;const fx2=fm.getContext('2d');fx2.scale(sc,sc);fx2.fill(new Path2D(shape));const FA=fx2.getImageData(0,0,W,H).data;
   // Dãy núi: 2–3 đường gãy khúc qua vùng trong, tránh xa các địa danh
   const r=rng(seed+9),ridges=[];
   for(let k=0;k<3;k++){let best=null;for(let t=0;t<30;t++){const x=box.cx+(r()*2-1)*box.rx*.7,y=box.cy+(r()*2-1)*box.ry*.6,a=r()*Math.PI,L=120+r()*160;
       const p=[[x-Math.cos(a)*L/2,y-Math.sin(a)*L/2*.6],[x,y+(r()-.5)*30],[x+Math.cos(a)*L/2,y+Math.sin(a)*L/2*.6]];
-      const clear=Math.min(...spots.map(s=>Math.min(...p.map(([u,v])=>Math.hypot(u-s.x,v-s.y)-s.r))));if(!best||clear>best.c)best={p,c:clear}}
+      const clear=spots.length?Math.min(...spots.map(s=>Math.min(...p.map(([u,v])=>Math.hypot(u-s.x,v-s.y)-(s.r||Math.max(s.rx,s.ry)*.3))))):0;if(!best||clear>best.c)best={p,c:clear}}
     ridges.push(best.p)}
   const segD=(x,y,[a,b])=>{const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-dx*t,y-a[1]-dy*t)};
-  const E=new Float32Array(W*H),M=new Float32Array(W*H),IN=new Uint8Array(W*H);
   const fbm=(f,x,y,o)=>{let s=0,a=.5,fr=1;for(let i=0;i<o;i++){s+=a*f(x*fr,y*fr);a*=.5;fr*=2.03}return s/(1-Math.pow(.5,o))};
-  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const x=px/sc,y=py/sc,i=py*W+px;if(FA[i*4+3]<8)continue;const d=Math.max(.5,dist(x,y));IN[i]=1;
-    const nx=x/170,ny=y/170;let e=fbm(n1,nx,ny,6);const coast=sstep(0,sea?40:110,d);
-    let rd=1e9;ridges.forEach(R=>{rd=Math.min(rd,segD(x,y,[R[0],R[1]]),segD(x,y,[R[1],R[2]]))});
-    const ridged=1-Math.abs(fbm(n3,x/42,y/42,5)*2-1),det=1-Math.abs(fbm(n4,x/30+5,y/30+9,4)*2-1),mt=Math.exp(-(rd/55)*(rd/55))*(.55+.45*ridged);
+  // xo: số octave thêm khi phóng to (chi tiết nhỏ hơn hiện ra)
+  const elev=(x,y,xo=0)=>{const d=Math.max(.5,dist(x,y));let e=fbm(n1,x/170,y/170,6+xo);const coast=sstep(0,sea?40:110,d);
+    let rd=1e9;for(const R of ridges)rd=Math.min(rd,segD(x,y,[R[0],R[1]]),segD(x,y,[R[1],R[2]]));
+    const ridged=1-Math.abs(fbm(n3,x/42,y/42,5+xo)*2-1),det=1-Math.abs(fbm(n4,x/30+5,y/30+9,4+xo)*2-1),mt=Math.exp(-(rd/55)*(rd/55))*(.55+.45*ridged);
     if(sea)e=(e*1.15-.12)+mt*.25;
     else{e=.25+coast*(.06+.34*e+.07*det*det)+mt*.42*coast*(.7+.3*det);const lk=fbm(n2,x/95+7,y/95+3,3);if(d>45)e-=sstep(.6,.76,lk)*.3}
-    spots.forEach(s=>{const rx=s.rx||s.r,ry=s.ry||s.r,u=(x-s.x)/rx,v=(y-s.y)/ry,qd=u*u+v*v;if(qd>9)return;const k=s.rx?Math.exp(-qd*qd*qd):Math.exp(-qd);
-      e=sea?Math.max(e,e*(1-k)+(s.rx?.55+e*.3:.62)*k):e*(1-k*.7)+.42*k*.7});
-    E[i]=e;M[i]=fbm(n2,x/220,y/220,4)}
-  // Tô màu + đổ bóng
+    for(const s of spots){const rx=s.rx||s.r,ry=s.ry||s.r,u=(x-s.x)/rx,v=(y-s.y)/ry,qd=u*u+v*v;if(qd>9)continue;const k=s.rx?Math.exp(-qd*qd*qd):Math.exp(-qd);
+      e=sea?Math.max(e,e*(1-k)+(s.rx?.55+e*.3:.62)*k):e*(1-k*.7)+.42*k*.7}
+    return e};
+  return{w,shape,box,sea,pal,C,n2,n4,elev,moist:(x,y)=>fbm(n2,x/220,y/220,4),dist,lv:sea?.5:.2,seed};
+}
+const hash2=(x,y)=>{const h=Math.sin(x*12.9898+y*78.233)*43758.5453;return h-Math.floor(h)};
+/* Vẽ vùng (x0,y0,vw,vh) của bản đồ ra canvas W×H. Khi phóng to (k lớn) thêm octave để thấy chi tiết. */
+function reliefPaint(F,x0,y0,vw,vh,W,H){
+  const kx=W/vw,ky=H/vh,zoom=kx/1.3,xo=Math.max(0,Math.min(4,Math.round(Math.log2(Math.max(1,zoom))))),{C,pal,lv,n4}=F;
+  const fm=document.createElement('canvas');fm.width=W;fm.height=H;const fc=fm.getContext('2d');fc.setTransform(kx,0,0,ky,-x0*kx,-y0*ky);fc.fill(new Path2D(F.shape));
+  const FA=fc.getImageData(0,0,W,H).data,E=new Float32Array(W*H),M=new Float32Array(W*H);
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const i=py*W+px;if(FA[i*4+3]<8){E[i]=-9;continue}const x=x0+(px+.5)/kx,y=y0+(py+.5)/ky;E[i]=F.elev(x,y,xo);M[i]=F.moist(x,y)}
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d'),img=cx.createImageData(W,H),o=img.data;
-  const lv=sea?.5:.2,gr=rng(seed+5),L=[-.6,-.7,.75],ln=Math.hypot(...L);L[0]/=ln;L[1]/=ln;L[2]/=ln;
-  for(let py=1;py<H-1;py++)for(let px=1;px<W-1;px++){const i=py*W+px;if(!IN[i])continue;const e=E[i],m=M[i];let c,water=false;
-    const dd=dist(px/sc,py/sc);
+  const L=[-.6,-.7,.75],ln=Math.hypot(...L);L[0]/=ln;L[1]/=ln;L[2]/=ln;
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const i=py*W+px;if(E[i]===-9)continue;const e=E[i],m=M[i],x=x0+(px+.5)/kx,y=y0+(py+.5)/ky;let c,water=false;
     if(e<lv){water=true;c=mixC(C.deep,C.water,sstep(lv-.18,lv,e))}
-    else if(sea?e<lv+.02:(dd<4||e<lv+.012))c=C.beach;
-    else{const t=sstep(lv,.75,e);c=mixC(mixC(C.dry,C.wet,sstep(.28,.6,m)),C.low,.4);
-      if(m>.5&&e<.68){const tex=n4(px/3.1+.37,py/2.7+.71)*.6+gr()*.4;c=mixC(c,C.forest,sstep(.5,.58,m)*(.7+.3*tex));if(tex>.62)c=mixC(c,C.forest,.4)}
-      c=mixC(c,C.high,sstep(.56,.68,e));c=mixC(c,C.rock,sstep(.68,.8,e));c=mixC(c,C.snow,sstep(.86,.92,e+(n4(px/9,py/9)-.5)*.05));
-      // vân đất nhỏ
-      const g=(gr()-.5)*12;c=[c[0]+g,c[1]+g,c[2]+g];}
-    // hillshade
-    const ex=water?0:(E[i+1]-E[i-1])*sc*95,ey=water?0:(E[i+W]-E[i-W])*sc*95,nl=Math.hypot(ex,ey,1),sh=(-ex*L[0]-ey*L[1]+L[2])/nl,k=water?1:Math.max(.45,Math.min(1.35,.35+sh*.85));
+    else if(F.sea?e<lv+.02:(F.dist(x,y)<4||e<lv+.012))c=C.beach;
+    else{c=mixC(mixC(C.dry,C.wet,sstep(.28,.6,m)),C.low,.4);
+      if(m>.5&&e<.68){const tex=n4(x*.42+.37,y*.48+.71)*.45+n4(x*2.1+3,y*2.1+7)*.25+hash2(x*7,y*7)*.3;c=mixC(c,C.forest,sstep(.5,.58,m)*(.7+.3*tex));if(tex>.6)c=mixC(c,C.forest,.4)}
+      c=mixC(c,C.high,sstep(.56,.68,e));c=mixC(c,C.rock,sstep(.68,.8,e));c=mixC(c,C.snow,sstep(.86,.92,e+(n4(x*.144,y*.144)-.5)*.05));
+      const g=(hash2(Math.floor(x*5),Math.floor(y*5))-.5)*12;c=[c[0]+g,c[1]+g,c[2]+g]}
+    // Đổ bóng theo độ dốc thật (đơn vị bản đồ), nên phóng to vẫn đúng hướng sáng
+    const gx=water?0:((px+1<W&&E[i+1]!==-9?E[i+1]:e)-(px>0&&E[i-1]!==-9?E[i-1]:e))*kx*95,gy=water?0:((py+1<H&&E[i+W]!==-9?E[i+W]:e)-(py>0&&E[i-W]!==-9?E[i-W]:e))*ky*95;
+    const nl=Math.hypot(gx,gy,1),sh=(-gx*L[0]-gy*L[1]+L[2])/nl,k=water?1:Math.max(.45,Math.min(1.35,.35+sh*.85));
     const j=i*4;o[j]=c[0]*k;o[j+1]=c[1]*k;o[j+2]=c[2]*k;o[j+3]=FA[j+3];
-    if(water&&pal.lava){o[j]=Math.min(255,c[0]*1.1);o[j+1]=Math.min(255,c[1]*(.8+.4*n4(px/6,py/6)))}}
+    if(water&&pal.lava){o[j]=Math.min(255,c[0]*1.1);o[j+1]=Math.min(255,c[1]*(.8+.4*n4(x/4.6,y/4.6)))}}
   cx.putImageData(img,0,0);
-  // Viền tối dọc bờ để đất có độ dày
-  cx.save();cx.scale(sc,sc);const sp=new Path2D(shape);cx.lineWidth=3;cx.strokeStyle='rgba(30,20,10,.45)';cx.stroke(sp);cx.restore();
-  // Sông: bắt đầu ở chỗ cao, đi theo hướng dốc nhất trên lưới thô tới bờ hoặc hồ
-  const falls=[],at=(x,y)=>{const px=Math.round(x*sc),py=Math.round(y*sc);return px<0||py<0||px>=W||py>=H||!IN[py*W+px]?-1:E[py*W+px]};
-  const cand=[];for(let t=0;t<600;t++){const x=box.cx+(r()*2-1)*box.rx,y=box.cy+(r()*2-1)*box.ry,e=at(x,y);if(e>.6)cand.push([x,y,e])}
-  cand.sort((a,b)=>b[2]-a[2]);const src=[];cand.forEach(c=>{if(src.length<(sea?0:4)&&src.every(s=>Math.hypot(s[0]-c[0],s[1]-c[1])>140))src.push(c)});
-  cx.save();cx.scale(sc,sc);cx.lineCap='round';cx.lineJoin='round';
+  cx.setTransform(kx,0,0,ky,-x0*kx,-y0*ky);cx.lineWidth=3;cx.strokeStyle='rgba(30,20,10,.45)';cx.stroke(new Path2D(F.shape));
+  return cv;
+}
+/* Sông: bắt đầu ở chỗ cao, đi theo hướng dốc nhất tới bờ hoặc hồ. Trả về đường (vẽ bằng SVG cho sắc nét khi phóng to) và chỗ thác đổ. */
+function reliefRivers(F){
+  const{box,lv,n2}=F,r=rng(F.seed+9),inside=(x,y)=>F.dist(x,y)>1.5,at=(x,y)=>x<0||y<0||x>1000||y>640||!inside(x,y)?-1:F.elev(x,y);
+  const falls=[],rivers=[],cand=[];for(let t=0;t<600;t++){const x=box.cx+(r()*2-1)*box.rx,y=box.cy+(r()*2-1)*box.ry,e=at(x,y);if(e>.6)cand.push([x,y,e])}
+  cand.sort((a,b)=>b[2]-a[2]);const src=[];cand.forEach(c=>{if(src.length<(F.sea?0:4)&&src.every(s=>Math.hypot(s[0]-c[0],s[1]-c[1])>140))src.push(c)});
   src.forEach(([x0,y0])=>{let x=x0,y=y0;const pts=[[x,y]],st=6;let prev=null;
     for(let s=0;s<260;s++){const e=at(x,y);if(e<0||e<lv)break;let best=null;
       for(let a=0;a<16;a++){const ang=a/16*Math.PI*2;if(prev!==null&&Math.cos(ang-prev)<-.2)continue;const nx=x+Math.cos(ang)*st,ny=y+Math.sin(ang)*st,ne=at(nx,ny);const v=ne<0?-1:ne+(n2(nx/40,ny/40)-.5)*.02;
         if(!best||v<best[2])best=[nx,ny,v,ang]}
       if(!best||(best[2]>=0&&best[2]>e+.004))break;prev=best[3];x=best[0];y=best[1];if(pts.length>4&&pts.slice(0,-3).some(([u,v])=>Math.hypot(u-x,v-y)<st*.9))break;pts.push([x,y]);if(best[2]<0){falls.push([x,y]);break}}
-    if(pts.length<8)return;
-    for(let k=1;k<pts.length;k++){const t=k/pts.length,wd=1+t*4.5;cx.beginPath();cx.moveTo(...pts[k-1]);cx.lineTo(...pts[k]);
-      cx.strokeStyle=pal.lava?'#ff7a2a':'#3f7fc0';if(pal.lava){cx.shadowColor='#ff5a1f';cx.shadowBlur=8}cx.lineWidth=wd;cx.stroke();cx.shadowBlur=0;
-      cx.strokeStyle=pal.lava?'rgba(255,230,140,.8)':'rgba(170,215,255,.55)';cx.lineWidth=wd*.35;cx.stroke()}});
-  cx.restore();
-  return RELIEF[key]={url:cv.toDataURL('image/png'),falls};
+    if(pts.length>=8)rivers.push(pts)});
+  return{rivers,falls};
+}
+/* Ảnh nền cả bản đồ (lưu đệm theo thế giới) */
+function reliefMap(w,shape,box,spots,sea){
+  const key=w.id+'|'+shape.length;if(RELIEF[key])return RELIEF[key];
+  const F=reliefField(w,shape,box,spots,sea),cv=reliefPaint(F,0,0,1000,640,1300,832),rv=reliefRivers(F);
+  return RELIEF[key]={url:cv.toDataURL('image/png'),F,rivers:rv.rivers,falls:rv.falls};
 }
 </script>
 <script>
@@ -1753,7 +1882,13 @@ const SZ=s=>({r:12+s*2.6,fs:11+s,ic:.6+s*.1});
 const markRect=(x,y,name,s=2)=>{const z=SZ(s),w=Math.max(z.r*2+8,name.length*z.fs*.6+10);return[x-w/2,y-z.r-5,x+w/2,y+z.r+z.fs+8]};
 const labelRect=(x,y,name,s=3)=>{const fs=12+s*1.6,w=name.length*fs*.78+24;return[x-w/2,y-fs,x+w/2,y+fs*.5]};
 const hit=(a,b,m=6)=>a[0]<b[2]+m&&b[0]<a[2]+m&&a[1]<b[3]+m&&b[1]<a[3]+m;
-function layoutPlaces(places,box,avoid){
+/* Bản đồ dày: chỉ các địa danh lớn hiện ở mức 1×; địa danh nhỏ (minor) hiện khi phóng ≥ MINOR_Z và được xếp chỗ theo kích thước lúc đó */
+const MINOR_Z=2.4,MINOR_K=Math.pow(MINOR_Z,-.62);
+function markMinor(places){const terr=places.filter(p=>p.t==='quoc'||p.t==='vung'),rest=places.filter(p=>!(p.t==='quoc'||p.t==='vung')),keep=Math.max(8,19-terr.length);
+  const order=[...rest].sort((a,b)=>b.s-a.s);places.forEach(p=>{p.minor=false});if(places.length>20)order.slice(keep).forEach(p=>{p.minor=true})}
+const shrinkR=(R,x,y,f)=>[x+(R[0]-x)*f,y+(R[1]-y)*f,x+(R[2]-x)*f,y+(R[3]-y)*f];
+function layoutPlaces(allPlaces,box,avoid){
+  const places=allPlaces.filter(p=>!p.minor);
   const out=new Map(),rects=avoid.map(a=>a.slice()),terr=places.filter(p=>(p.t==='quoc'||p.t==='vung')&&!p.in);
   const n=terr.length,A=ANCHORS[Math.min(n,7)]||[];
   terr.forEach((p,i)=>{let[ax,ay]=A[i]||[Math.cos(i*2.4)*.6,Math.sin(i*2.4)*.5];const x=box.cx+ax*box.rx,y=box.cy+ay*box.ry;
@@ -1785,10 +1920,25 @@ function layoutPlaces(places,box,avoid){
   terr.forEach(T=>{const P=out.get(T),rs=[P.L,...places.filter(q=>q.in===T.n&&out.get(q)).map(q=>out.get(q).R)];
     const x1=Math.min(...rs.map(r=>r[0])),y1=Math.min(...rs.map(r=>r[1])),x2=Math.max(...rs.map(r=>r[2])),y2=Math.max(...rs.map(r=>r[3]));
     P.bx=(x1+x2)/2;P.by=(y1+y2)/2;P.rx=Math.max(60+T.s*22,(x2-x1)/2*1.12+18);P.ry=Math.max(34+T.s*13,(y2-y1)/2*1.18+16)});
+  // Địa danh nhỏ: xếp với khung đã thu nhỏ (như khi phóng to), tránh khung thu nhỏ của địa danh lớn
+  const minors=allPlaces.filter(p=>p.minor).sort((a,b)=>b.s-a.s);
+  if(minors.length){const f=MINOR_K,r2=avoid.map(a=>a.slice());out.forEach(v=>r2.push(v.terr?shrinkR(v.L,v.x,v.y,f):shrinkR(v.R,v.x,v.y,f)));
+    minors.forEach(p=>{const T=p.in?[...out.entries()].find(([q,v])=>v.terr&&q.n===p.in):null;let best=null,bs=-1e9,bR=null;
+      const pts=[...out.values()].map(v=>[v.x,v.y]);
+      for(const c of cand){const R=shrinkR(markRect(c[0],c[1],p.n,p.sv),c[0],c[1],f);if(r2.some(r=>hit(R,r,3)))continue;
+        let sc;if(T){const v=T[1];sc=-Math.hypot(c[0]-v.x,(c[1]-v.y-20)*1.3)}else{const d=Math.min(...pts.map(u=>Math.hypot(u[0]-c[0],(u[1]-c[1])*1.4)));sc=Math.min(d,90)}
+        if(sc>bs){bs=sc;best=c;bR=R}}
+      if(!best){best=cand[Math.floor(cand.length/2)];bR=shrinkR(markRect(best[0],best[1],p.n,p.sv),best[0],best[1],f)}
+      out.set(p,{x:best[0],y:best[1],R:bR,minor:true});r2.push(bR)})}
   return out;
 }
 
 let curPlace=null,placeFilter=null,placeIndex=[];
+/* Sông vẽ bằng SVG: rộng dần về hạ lưu; dung nham thì phát sáng */
+function riversSVG(g,rel,w){const lava=(RPAL[w.kind]||{}).lava,G=el('g',{class:'rivers'},g);
+  rel.rivers.forEach(pts=>{const n=pts.length,parts=5;for(let k=0;k<parts;k++){const a=Math.floor(k*n/parts),b=Math.min(n-1,Math.floor((k+1)*n/parts)),d='M'+pts.slice(a,b+1).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L'),wd=1.2+k*1.1;
+    el('path',{d,fill:'none',stroke:lava?'#ff7a2a':'#3f7fc0','stroke-width':wd,'stroke-linecap':'round','stroke-linejoin':'round',filter:lava?'url(#glow)':null},G);
+    el('path',{d,fill:'none',stroke:lava?'#ffe08a':'#a8d4ff','stroke-width':wd*.35,opacity:.7,'stroke-linecap':'round'},G)}})}
 /* opt (màn 2D phóng to trong 3D): {svg, sfx: hậu tố id để không trùng gradient, onPick(i), onPortal(id)} */
 function renderRegion(w,opt){
   opt=opt||{};const sfx=opt.sfx||'',pick=i=>opt.onPick?opt.onPick(i):selectPlace(i);
@@ -1805,8 +1955,8 @@ function renderRegion(w,opt){
   [[170,560,.35],[860,120,.0],[60,200,.22]].forEach(([x,y,s])=>{if(s)island(el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.45},svg),120,shade(base,-.2))});
 
   const dense=w.places.length>18,box=dense?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
-  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
-  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
+  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];if((adj[w.id]||[]).length>2)avoid.push([0,452,330,520]);if((adj[w.id]||[]).length>3)avoid.push([670,452,1000,520]);
+  markMinor(w.places);const nMaj=w.places.filter(p=>!p.minor).length,shrink=nMaj>20?1.3:nMaj>15?.8:nMaj>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const pos=layoutPlaces(w.places,box,avoid);
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   // Địa hình chân thật (ảnh sinh theo độ cao) cho lục địa và biển đảo; chỗ có thành/tông môn được san bằng
@@ -1818,7 +1968,7 @@ function renderRegion(w,opt){
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
     if(rel){el('path',{d:shape,fill:'#3b2e24',transform:'translate(0,12)'},land);el('path',{d:shape,fill:'#2a2019',opacity:.6,transform:'translate(0,6)'},land);
-      el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);
+      el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);el('g',{class:'detail'},land);riversSVG(land,rel,w);
       // Thác nước nơi sông chảy ra mép đảo phía trước
       rel.falls.filter(([x,y])=>y>box.cy).forEach(([x,y],k)=>{const h=70+k*25,id='fall'+sfx+k;
         el('defs',{},land).innerHTML=`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8efff" stop-opacity=".95"/><stop offset="1" stop-color="#d8efff" stop-opacity="0"/></linearGradient>`;
@@ -1828,7 +1978,7 @@ function renderRegion(w,opt){
     el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':`url(#landTop${sfx})`,stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land)}
   }else if(mode==='sea'){
     el('path',{d:blob(box.cx,box.cy+10,box.rx*1.04,box.ry*1.06,seed+1,.05),fill:'#071f44',opacity:.6,filter:'url(#soft)'},land);
-    if(rel)el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);else el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
+    if(rel){el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);el('g',{class:'detail'},land)}else el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
   }else if(mode==='void'){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.04,ry:box.ry*1.06,fill:'#ff6a1f',opacity:.35,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#2a120c',stroke:'#ff8a3a','stroke-width':3},land);
@@ -1843,9 +1993,10 @@ function renderRegion(w,opt){
     el('path',{d:shape,fill:'#14123f',opacity:.55,stroke:'#9b8cff','stroke-width':1.5,'stroke-dasharray':'6 6'},land);
   }
   if(!rel)terrain(land,mode,base,box,seed+3);
+  svg._rel=rel;svg._ver=(svg._ver||0)+1;
 
   if(!opt.svg)placeIndex=w.places;
-  const roadG=el('g',{},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
+  const roadG=el('g',{class:'roads'},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
   if(mode==='land'||mode==='cloud'){const hubs=w.places.map(p=>pos.get(p)).filter((P,i)=>P&&['thanh','tong','quoc'].includes(w.places[i].t)&&!P.terr);
     const inT=[hubs[0]],rest=hubs.slice(1);while(rest.length&&inT[0]){let bi=0,bj=0,bd=1e9;rest.forEach((b,i)=>inT.forEach((a,j)=>{const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<bd){bd=d;bi=i;bj=j}}));
       const a=inT[bj],b=rest[bi];if(bd<330)el('path',{d:`M${a.x},${a.y} Q${(a.x+b.x)/2+(a.y-b.y)*.12},${(a.y+b.y)/2+(b.x-a.x)*.12} ${b.x},${b.y}`,fill:'none',stroke:'#e9d6a0','stroke-width':2,'stroke-dasharray':'5 5',opacity:.55},roadG);
@@ -1865,7 +2016,7 @@ function renderRegion(w,opt){
     bindOpen(g,()=>pick(i));
   });
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P||P.terr)return;
-    const c=PTYPE[p.t].c,g=el('g',{class:'place mk','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
+    const c=PTYPE[p.t].c,g=el('g',{class:'place mk'+(p.minor?' minor':''),'data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
     const z=SZ(p.sv);
     el('ellipse',{cx:2,cy:z.r*.75,rx:z.r*.9,ry:z.r*.3,fill:'#000',opacity:.35,filter:'url(#soft)'},g);
     if(p.s>=4)el('circle',{cx:0,cy:-2,r:z.r+5,fill:'none',stroke:'#f2c76e','stroke-width':p.s>=5?2.6:1.6,opacity:.85,filter:'url(#glow)'},g);
@@ -1905,6 +2056,8 @@ function selectPlace(i,quiet){
   curPlace=i;const d=document.getElementById('placeDetail');
   document.querySelectorAll('#scene .place,.pchip').forEach(n=>n.classList.toggle('sel',Number(n.dataset.pi)===i));
   if(i===null||!placeIndex[i]){d.innerHTML='<p class="meta">Bấm vào một địa danh trên bản đồ để xem chi tiết.</p>';return}
+  // Địa danh nhỏ đang ẩn ở mức 1×: phóng tới chỗ nó
+  if(!quiet&&window.WZ&&placeIndex[i].minor&&WZ.level()<MINOR_Z){const g=document.querySelector(`#scene .place[data-pi="${i}"]`),m=g&&/translate\(([\d.-]+),([\d.-]+)\)/.exec(g.dataset.t0||g.getAttribute('transform'));if(m)WZ.focus(+m[1],+m[2],3)}
   const p=placeIndex[i],T=PTYPE[p.t],parent=p.in?placeIndex.findIndex(q=>q.n===p.in):-1,kids=placeIndex.map((q,j)=>q.in===p.n?j:-1).filter(j=>j>=0);
   d.innerHTML=`<span class="eyebrow" style="color:${T.c}">${T.name}</span><h3 class="pname">${esc(p.n)}</h3>
     ${parent>=0?`<p class="meta">Thuộc <button type="button" class="linkish" data-pi="${parent}">${esc(p.in)}</button></p>`:''}
@@ -1929,6 +2082,48 @@ function renderRealmBadge(w,box){
   box.innerHTML=`<span class="rb-h">Cảnh giới ở đây${w.rGuess?' <em>(ước lượng)</em>':''}</span>
     <span class="rb-range">${esc(REALMS[a].name)} → ${esc(REALMS[b].name)} · ${b-a+1} bậc</span>
     <ol>${rows.map(({r,i})=>`<li><button type="button" data-realm="${r.id}" aria-pressed="${r.id===curRealm}"><i style="background:${GBY[r.g].c}"></i>${esc(r.name)}<span>${i+1}</span></button></li>`).join('')}</ol>`;
+}
+</script>
+<script>
+/* ===== Phóng/kéo bản đồ vùng (tới 10 lần) =====
+   Lăn chuột, chụm 2 ngón, kéo, hoặc nút. Khi phóng to: biểu tượng và chữ không phình theo (giữ dễ đọc),
+   viền lãnh thổ/đường giữ nét mảnh, và địa hình của vùng đang xem được vẽ lại ở độ phân giải cao (thấy thêm đồi, khe, rừng). */
+function attachZoom(stage,svg,opt={}){
+  const Z={vb:{x:0,y:0,w:1000,h:640},minW:opt.minW||100,timer:null};
+  const box=()=>stage.getBoundingClientRect();
+  const unit=()=>{const r=box(),v=Z.vb;return Math.max(v.w/r.width,v.h/r.height)};// đơn vị bản đồ trên 1px màn hình
+  function lod(){const z=Math.max(1,1000/Z.vb.w),s=Math.pow(z,-.62);svg.classList.toggle('lod-near',z>=MINOR_Z);
+    svg.querySelectorAll('.place.mk,.portal').forEach(g=>{if(!g.dataset.t0)g.dataset.t0=g.getAttribute('transform')||'';g.setAttribute('transform',g.dataset.t0+(s<1?` scale(${s.toFixed(3)})`:''))});
+    svg.querySelectorAll('text.tlabel').forEach(t=>{const x=t.getAttribute('x'),y=t.getAttribute('y');t.setAttribute('transform',s<1?`translate(${x},${y}) scale(${s.toFixed(3)}) translate(${-x},${-y})`:'')})}
+  function detail(){const rel=svg._rel,layer=svg.querySelector('.detail');if(!rel||!layer||!rel.F)return;const u=unit(),v=Z.vb;
+    if(1/u<1.7){layer.innerHTML='';return}
+    const x0=Math.max(0,v.x),y0=Math.max(0,v.y),x1=Math.min(1000,v.x+v.w),y1=Math.min(640,v.y+v.h);if(x1-x0<2||y1-y0<2)return;
+    let W=Math.round((x1-x0)/u),H=Math.round((y1-y0)/u);const cap=Math.sqrt(1.3e6/(W*H));if(cap<1){W=Math.round(W*cap);H=Math.round(H*cap)}
+    const ver=svg._ver,cv=reliefPaint(rel.F,x0,y0,x1-x0,y1-y0,W,H);if(ver!==svg._ver)return;
+    layer.innerHTML='';el('image',{href:cv.toDataURL('image/png'),x:x0,y:y0,width:x1-x0,height:y1-y0,preserveAspectRatio:'none'},layer)}
+  Z.set=()=>{const v=Z.vb;svg.setAttribute('viewBox',`${v.x.toFixed(2)} ${v.y.toFixed(2)} ${v.w.toFixed(2)} ${v.h.toFixed(2)}`);lod();
+    clearTimeout(Z.timer);Z.timer=setTimeout(detail,320);if(opt.onChange)opt.onChange(Z)};
+  Z.fit=()=>{const r=box(),a=r.width/Math.max(1,r.height);
+    if(a<.9){const w=560,h=w/a;Z.vb={x:500-w/2,y:320-h/2,w,h}}else Z.vb={x:0,y:0,w:1000,h:640};Z.set()};
+  Z.zoom=(k,px,py)=>{const r=box(),v=Z.vb,sc=unit(),ox=v.x+(v.w-r.width*sc)/2,oy=v.y+(v.h-r.height*sc)/2;
+    const mx=ox+((px??r.left+r.width/2)-r.left)*sc,my=oy+((py??r.top+r.height/2)-r.top)*sc;
+    const nw=Math.min(2000,Math.max(Z.minW,v.w*k)),f=nw/v.w;Z.vb={x:mx-(mx-v.x)*f,y:my-(my-v.y)*f,w:nw,h:v.h*f};Z.set()};
+  Z.level=()=>1000/Z.vb.w;
+  Z.focus=(x,y,z)=>{const w=1000/z,h=w*Z.vb.h/Z.vb.w;Z.vb={x:x-w/2,y:y-h/2,w,h};Z.set()};
+  const pts=new Map();let moved=0,pinch=null;
+  stage.addEventListener('wheel',e=>{e.preventDefault();Z.zoom(Math.exp(e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
+  stage.addEventListener('pointerdown',e=>{if(e.target.closest('.realm-badge,.v2d-card,.map-zoom,button,a'))return;pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;stage.classList.add('drag');
+    if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1])}}});
+  stage.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);
+    if(pts.size===1&&moved>4){if(!stage.hasPointerCapture(e.pointerId))stage.setPointerCapture(e.pointerId);const sc=unit();Z.vb.x-=dx*sc;Z.vb.y-=dy*sc;Z.set()}
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2&&pinch){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d>0){Z.zoom(pinch.d/d,(a[0]+b[0])/2,(a[1]+b[1])/2);pinch.d=d}}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!pts.size)stage.classList.remove('drag')};
+  stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
+  // Kéo thì không tính là bấm vào địa danh
+  stage.addEventListener('click',e=>{if(moved>6){e.stopPropagation();e.preventDefault();moved=0}},true);
+  stage.addEventListener('dblclick',e=>{if(!e.target.closest('.place'))Z.zoom(.5,e.clientX,e.clientY)});
+  return Z;
 }
 </script>
 <script>
@@ -2232,7 +2427,7 @@ function paintFactions(P,w,pos,X,Z,FS){
 }
 function factions3D(grp,w,R,pick){
   const k=w.kind;if(!w.places.length)return;
-  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
+  markMinor(w.places);const nP=w.places.length,nMaj=w.places.filter(p=>!p.minor).length,shrink=nMaj>20?1.3:nMaj>15?.8:nMaj>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const box=nP>18?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},pos=layoutPlaces(w.places,box,[]);
   const spread=k==='sun'?R*2.3:k==='galaxy'?R*1.9:R*.9,baseY=k==='heaven'?.3:k==='nine'?.75:k==='sun'||k==='galaxy'?-R*.15:.38;
   const X=x=>(x-box.cx)/box.rx*spread,Z=y=>(y-box.cy)/box.ry*spread*(k==='sun'||k==='galaxy'?.75:1);
@@ -2250,7 +2445,7 @@ function factions3D(grp,w,R,pick){
       zone.userData={wid:w.id,pi:i};pick.push(zone);return}
     const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*.58);m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);
     const hit=new THREE.Mesh(new THREE.SphereGeometry((.35+p.s*.07)*FS,8,6),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(X(P.x),baseY+.35*FS,Z(P.y));hit.userData={wid:w.id,pi:i};grp.add(hit);pick.push(hit);
-    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.5+p.s*.1)*FS,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
+    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut||p.minor;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.5+p.s*.1)*FS,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
   });
 }
 
@@ -2282,7 +2477,7 @@ function build3D(){
   host.appendChild(renderer.domElement);
   const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05060f,.0017);
   const camera=new THREE.PerspectiveCamera(48,W/H,.3,4000);
-  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=4;controls.maxDistance=900;
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=1.5;controls.maxDistance=900;
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;controls.autoRotate=!reduce;controls.autoRotateSpeed=.45;
   scene.add(new THREE.HemisphereLight(0xc7d6ff,0x1a1030,.7));const sun=new THREE.DirectionalLight(0xfff1d6,.95);sun.position.set(30,60,25);scene.add(sun);
   const top=new THREE.PointLight(0xffd76e,1.2,260);top.position.set(0,90,0);scene.add(top);
@@ -2364,16 +2559,16 @@ function build3D(){
   renderer.domElement.addEventListener('pointerleave',()=>{document.getElementById('v3dTip').hidden=true});
   window.addEventListener('resize',resize3D);
 }
-function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
+function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.H=document.fullscreenElement?window.innerHeight:Math.round(Math.max(420,Math.min(980,window.innerHeight-120)));V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
 let fly=null;
 function flyTo(pos,target,ms=1100){fly={p0:V3D.camera.position.clone(),t0:V3D.controls.target.clone(),p1:pos,t1:target,start:performance.now(),ms}}
 function setPivot(p,keep){const off=V3D.camera.position.clone().sub(V3D.controls.target);flyTo(keep?p.clone().add(off):V3D.camera.position.clone(),p.clone(),700);V3D.controls.autoRotate=false;const b=document.getElementById('v3dRot');if(b)b.setAttribute('aria-pressed','false');
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed','false'))}
 function pivotTier(t){const k=Math.max(1,1.35/V3D.camera.aspect);V3D.selWid=null;V3D.sel.visible=false;
-  if(t==='all'){flyTo(new THREE.Vector3(0,110*k,235*k),new THREE.Vector3(0,58,0))}
+  if(t==='all'){flyTo(new THREE.Vector3(0,62*k,150*k),new THREE.Vector3(0,52,0))}
   else{const y=TIER_Y[t],r=TIER_R[t]+RM[t];flyTo(new THREE.Vector3(0,y+r*.8*k,r*1.5*k),new THREE.Vector3(0,y,0))}
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pivot===String(t)))}
-function resetView(){V3D.selWid=null;const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,110*k,235*k);V3D.controls.target.set(0,58,0);V3D.sel.visible=false;fly=null;panel3D(null)}
+function resetView(){V3D.selWid=null;const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,62*k,150*k);V3D.controls.target.set(0,52,0);V3D.sel.visible=false;fly=null;panel3D(null)}
 function select3D(wid,zoom){
   V3D.selWid=wid;
   const g=V3D.nodes[wid];if(!g)return;const R=g.userData.R;
@@ -2429,13 +2624,14 @@ document.addEventListener('click',e=>{const pv=e.target.closest('[data-pivot]');
   const b=e.target.closest('[data-v3d]');if(!b||!V3D.ready)return;const k=b.dataset.v3d;
   if(k==='rot'){V3D.controls.autoRotate=!V3D.controls.autoRotate;b.setAttribute('aria-pressed',V3D.controls.autoRotate)}
   else if(k==='reset')resetView();
+  else if(k==='full'){const wrap=document.querySelector('.v3d-wrap');if(document.fullscreenElement)document.exitFullscreen();else if(wrap.requestFullscreen)wrap.requestFullscreen().catch(()=>{})}
   else if(k==='top')flyTo(new THREE.Vector3(0,420,.1),new THREE.Vector3(0,40,0));
   else if(k==='side')flyTo(new THREE.Vector3(0,62,300),new THREE.Vector3(0,62,0));});
 
 /* ===== Màn 2D phóng to: bấm một thế giới trong 3D → bay tới rồi mở bản đồ vùng toàn màn hình, phóng/kéo tự do ===== */
 const V2={wid:null,vb:null,timer:null};
 function open2D(wid){
-  const w=byId[wid];if(!w)return;V2.wid=wid;clearTimeout(V2.timer);
+  const w=byId[wid];if(!w)return;V2.wid=wid;clearTimeout(V2.timer);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
   const ov=document.getElementById('v2d'),svg=document.getElementById('scene2d');ov.hidden=false;
   document.getElementById('v2dName').textContent=w.name;document.getElementById('v2dFull').href=`#${S.id}--${wid}`;
   renderRegion(w,{svg,sfx:'2d',onPick:i=>card2D(i),onPortal:n=>{close2D();select3D(n,true);V2.timer=setTimeout(()=>open2D(n),1150)}});
@@ -2451,37 +2647,19 @@ function card2D(i){
     <div class="pb" style="height:8px"><i style="width:${p.s*20}%;background:${T.c}"></i></div><p class="meta">Quy mô ${p.s}/5${p.in?` · thuộc ${esc(p.in)}`:''}</p><p>${esc(p.d)}</p><div class="refs">${p.ch.map(chLink).join('')}</div>`;
   c.hidden=false;
 }
-function setVB(){const v=V2.vb;document.getElementById('scene2d').setAttribute('viewBox',`${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${v.h.toFixed(1)}`)}
-function fit2D(){const r=document.getElementById('v2dStage').getBoundingClientRect(),a=r.width/Math.max(1,r.height);
-  // Màn dọc (điện thoại): mở sẵn ở mức phóng to vừa phải, giữa bản đồ
-  if(a<.9){const w=560,h=w/a;V2.vb={x:500-w/2,y:320-h/2,w,h}}else V2.vb={x:0,y:0,w:1000,h:640};setVB()}
-/* Phóng quanh điểm (px,py) theo toạ độ màn hình; k<1 là phóng to */
-function zoom2D(k,px,py){
-  const st=document.getElementById('v2dStage'),r=st.getBoundingClientRect(),v=V2.vb;
-  const sc=Math.max(v.w/r.width,v.h/r.height),ox=v.x+(v.w-r.width*sc)/2,oy=v.y+(v.h-r.height*sc)/2;
-  const mx=ox+((px??r.left+r.width/2)-r.left)*sc,my=oy+((py??r.top+r.height/2)-r.top)*sc;
-  const nw=Math.min(2000,Math.max(200,v.w*k)),f=nw/v.w;V2.vb={x:mx-(mx-v.x)*f,y:my-(my-v.y)*f,w:nw,h:v.h*f};setVB();
-}
+/* Phóng/kéo dùng chung bộ điều khiển với bản đồ vùng (js/thu-phong.js) */
+const V2Z=()=>V2.z||(V2.z=attachZoom(document.getElementById('v2dStage'),document.getElementById('scene2d')));
+function fit2D(){V2Z().fit()}
+function zoom2D(k,px,py){V2Z().zoom(k,px,py)}
 (function(){
-  const st=document.getElementById('v2dStage');if(!st)return;const pts=new Map();let moved=0,pinch=null;
-  const scale=()=>{const r=st.getBoundingClientRect(),v=V2.vb;return Math.max(v.w/r.width,v.h/r.height)};
-  st.addEventListener('wheel',e=>{e.preventDefault();zoom2D(Math.exp(e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
-  st.addEventListener('pointerdown',e=>{if(e.target.closest('.v2d-card,.realm-badge'))return;pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;st.classList.add('drag');
-    if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1])}}});
-  st.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);
-    if(pts.size===1&&moved>4){if(!st.hasPointerCapture(e.pointerId))st.setPointerCapture(e.pointerId);const sc=scale();V2.vb.x-=dx*sc;V2.vb.y-=dy*sc;setVB()}
-    pts.set(e.pointerId,[e.clientX,e.clientY]);
-    if(pts.size===2&&pinch){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d>0){zoom2D(pinch.d/d,(a[0]+b[0])/2,(a[1]+b[1])/2);pinch.d=d}}});
-  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!pts.size)st.classList.remove('drag')};
-  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
-  // Kéo thì không tính là bấm vào địa danh
-  st.addEventListener('click',e=>{if(moved>6){e.stopPropagation();e.preventDefault()}},true);
   document.addEventListener('click',e=>{const b=e.target.closest('[data-v2d]');if(!b)return;const k=b.dataset.v2d;
     if(k==='close')close2D();else if(k==='fit')fit2D();else if(k==='in')zoom2D(.7);else if(k==='out')zoom2D(1/.7);
     else if(k==='card'){document.getElementById('v2dCard').hidden=true;document.querySelectorAll('#scene2d .place.sel').forEach(n=>n.classList.remove('sel'))}
     else if(k==='open'&&b.dataset.wid)open2D(b.dataset.wid)});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&V2.wid)close2D()});
 })();
+
+document.addEventListener('fullscreenchange',()=>{setTimeout(resize3D,50);const b=document.querySelector('[data-v3d="full"]');if(b)b.textContent=document.fullscreenElement?'Thoát toàn màn hình':'Toàn màn hình'});
 </script>
 <script>
 /* ===== Trạng thái ===== */
@@ -2655,6 +2833,7 @@ function renderWorld(wid){
   document.getElementById('wName').textContent=w.name;
   document.getElementById('wAbout').textContent=w.about;
   renderRegion(w);
+  requestAnimationFrame(()=>{if(!window.WZ)window.WZ=attachZoom(document.getElementById('wStage'),document.getElementById('scene'),{onChange:z=>{document.getElementById('mzLv').textContent=(Math.round(z.level()*10)/10)+'×'}});WZ.fit()});
   document.getElementById('dossier').innerHTML=
     `<figure class="quote" style="margin:0"><q>${esc(w.quote[0])}</q><figcaption class="meta">Nguyên văn bản convert, ${chLink(w.quote[1])}</figcaption></figure>`+
     w.secs.map(([h,t,chs])=>`<section class="card clamp${h.startsWith('Lâm Phong')?' lp':''}" tabindex="0"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
@@ -2692,6 +2871,9 @@ function router(){
 document.addEventListener('click',e=>{const a=e.target.closest('a[href$="--3d"]');if(a&&curWorld&&!document.getElementById('vWorld').hidden)window.pend3D=curWorld});
 window.addEventListener('hashchange',router);
 router();
+
+/* Nút phóng to/thu nhỏ bản đồ vùng */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mz]');if(!b||!window.WZ)return;const k=b.dataset.mz;if(k==='in')WZ.zoom(.6);else if(k==='out')WZ.zoom(1/.6);else WZ.fit()});
 </script>
 </body>
 </html>

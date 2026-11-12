@@ -101,3 +101,16 @@ Loại: `quoc` quốc gia, `vung` vùng/vực, `thanh` thành trì, `gia` gia t�
 - Nhãn trong ứng dụng: **theo truyện** (tóm tắt từ chương), **bách khoa** (từ bách khoa trên web), **diễn giải** (suy ra từ tên gọi), **ước lượng** (chưa có chương xác nhận).
 - Đã đọc khoảng 490 chương: mẫu cứ 40 chương một lần để dựng mạch truyện, cộng các chương giới thiệu từng thế lực, nhân vật, cảnh giới; cộng tên toàn bộ 11.341 chương. Còn thiếu cách đột phá chi tiết của Hư Thần; cảnh giới ở Thiên Giới vẫn là ước lượng; thứ tự giữa Kẻ Khai Hoang và vũ trụ đại lão suy từ số tiên điện.
 - Ghi chú người dùng lưu trong `localStorage` của trình duyệt, không đồng bộ giữa các máy.
+
+## Tìm địa danh mới trong các chương đã tải
+
+```bash
+python tools/tim_dia_danh.py thai-co-long-tuong-quyet 25
+```
+
+In ra theo từng thế giới các tên tông môn, gia tộc, thành, vực… xuất hiện nhiều mà chưa có trong `dia-danh.js`, kèm chương và câu ví dụ, để đọc lại rồi thêm vào dữ liệu.
+
+## Bản đồ vùng phóng to tới 10×
+
+Lăn chuột, chụm hai ngón hoặc bấm nút +/−. Khi phóng to, địa hình của vùng đang xem được vẽ lại chi tiết hơn (`js/dia-hinh.js`, `js/thu-phong.js`). Bản đồ dày chỉ hiện thế lực lớn ở 1×; địa danh nhỏ hiện từ khoảng 2,4×.
+

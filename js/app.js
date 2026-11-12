@@ -169,6 +169,7 @@ function renderWorld(wid){
   document.getElementById('wName').textContent=w.name;
   document.getElementById('wAbout').textContent=w.about;
   renderRegion(w);
+  requestAnimationFrame(()=>{if(!window.WZ)window.WZ=attachZoom(document.getElementById('wStage'),document.getElementById('scene'),{onChange:z=>{document.getElementById('mzLv').textContent=(Math.round(z.level()*10)/10)+'×'}});WZ.fit()});
   document.getElementById('dossier').innerHTML=
     `<figure class="quote" style="margin:0"><q>${esc(w.quote[0])}</q><figcaption class="meta">Nguyên văn bản convert, ${chLink(w.quote[1])}</figcaption></figure>`+
     w.secs.map(([h,t,chs])=>`<section class="card clamp${h.startsWith('Lâm Phong')?' lp':''}" tabindex="0"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
@@ -206,3 +207,6 @@ function router(){
 document.addEventListener('click',e=>{const a=e.target.closest('a[href$="--3d"]');if(a&&curWorld&&!document.getElementById('vWorld').hidden)window.pend3D=curWorld});
 window.addEventListener('hashchange',router);
 router();
+
+/* Nút phóng to/thu nhỏ bản đồ vùng */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mz]');if(!b||!window.WZ)return;const k=b.dataset.mz;if(k==='in')WZ.zoom(.6);else if(k==='out')WZ.zoom(1/.6);else WZ.fit()});

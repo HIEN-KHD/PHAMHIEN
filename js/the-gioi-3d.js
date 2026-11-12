@@ -225,7 +225,7 @@ function paintFactions(P,w,pos,X,Z,FS){
 }
 function factions3D(grp,w,R,pick){
   const k=w.kind;if(!w.places.length)return;
-  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
+  markMinor(w.places);const nP=w.places.length,nMaj=w.places.filter(p=>!p.minor).length,shrink=nMaj>20?1.3:nMaj>15?.8:nMaj>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const box=nP>18?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},pos=layoutPlaces(w.places,box,[]);
   const spread=k==='sun'?R*2.3:k==='galaxy'?R*1.9:R*.9,baseY=k==='heaven'?.3:k==='nine'?.75:k==='sun'||k==='galaxy'?-R*.15:.38;
   const X=x=>(x-box.cx)/box.rx*spread,Z=y=>(y-box.cy)/box.ry*spread*(k==='sun'||k==='galaxy'?.75:1);
@@ -243,7 +243,7 @@ function factions3D(grp,w,R,pick){
       zone.userData={wid:w.id,pi:i};pick.push(zone);return}
     const m=marker3D(p,PTYPE[p.t].c);m.scale.setScalar(FS*.58);m.position.set(X(P.x),baseY,Z(P.y));grp.add(m);
     const hit=new THREE.Mesh(new THREE.SphereGeometry((.35+p.s*.07)*FS,8,6),new THREE.MeshBasicMaterial({visible:false}));hit.position.set(X(P.x),baseY+.35*FS,Z(P.y));hit.userData={wid:w.id,pi:i};grp.add(hit);pick.push(hit);
-    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.5+p.s*.1)*FS,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
+    const lb=textSprite(p.n,p.s>=4?'#f2c76e':'#ffffff',(.17+p.s*.028)*LS);lb.userData.minor=p.s<cut||p.minor;lb.center.set(.5,0);lb.position.set(X(P.x),baseY+(.5+p.s*.1)*FS,Z(P.y));lb.material.depthTest=false;lb.renderOrder=9;grp.add(lb);labels.push(lb);
   });
 }
 
@@ -275,7 +275,7 @@ function build3D(){
   host.appendChild(renderer.domElement);
   const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05060f,.0017);
   const camera=new THREE.PerspectiveCamera(48,W/H,.3,4000);
-  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=4;controls.maxDistance=900;
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=1.2;controls.dampingFactor=.08;controls.minDistance=1.5;controls.maxDistance=900;
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;controls.autoRotate=!reduce;controls.autoRotateSpeed=.45;
   scene.add(new THREE.HemisphereLight(0xc7d6ff,0x1a1030,.7));const sun=new THREE.DirectionalLight(0xfff1d6,.95);sun.position.set(30,60,25);scene.add(sun);
   const top=new THREE.PointLight(0xffd76e,1.2,260);top.position.set(0,90,0);scene.add(top);
@@ -357,16 +357,16 @@ function build3D(){
   renderer.domElement.addEventListener('pointerleave',()=>{document.getElementById('v3dTip').hidden=true});
   window.addEventListener('resize',resize3D);
 }
-function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
+function resize3D(){if(!V3D.ready)return;const host=document.getElementById('v3d');const W=host.clientWidth;if(!W)return;V3D.H=document.fullscreenElement?window.innerHeight:Math.round(Math.max(420,Math.min(980,window.innerHeight-120)));V3D.camera.aspect=W/V3D.H;V3D.camera.updateProjectionMatrix();V3D.renderer.setSize(W,V3D.H)}
 let fly=null;
 function flyTo(pos,target,ms=1100){fly={p0:V3D.camera.position.clone(),t0:V3D.controls.target.clone(),p1:pos,t1:target,start:performance.now(),ms}}
 function setPivot(p,keep){const off=V3D.camera.position.clone().sub(V3D.controls.target);flyTo(keep?p.clone().add(off):V3D.camera.position.clone(),p.clone(),700);V3D.controls.autoRotate=false;const b=document.getElementById('v3dRot');if(b)b.setAttribute('aria-pressed','false');
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed','false'))}
 function pivotTier(t){const k=Math.max(1,1.35/V3D.camera.aspect);V3D.selWid=null;V3D.sel.visible=false;
-  if(t==='all'){flyTo(new THREE.Vector3(0,110*k,235*k),new THREE.Vector3(0,58,0))}
+  if(t==='all'){flyTo(new THREE.Vector3(0,62*k,150*k),new THREE.Vector3(0,52,0))}
   else{const y=TIER_Y[t],r=TIER_R[t]+RM[t];flyTo(new THREE.Vector3(0,y+r*.8*k,r*1.5*k),new THREE.Vector3(0,y,0))}
   document.querySelectorAll('[data-pivot]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pivot===String(t)))}
-function resetView(){V3D.selWid=null;const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,110*k,235*k);V3D.controls.target.set(0,58,0);V3D.sel.visible=false;fly=null;panel3D(null)}
+function resetView(){V3D.selWid=null;const k=Math.max(1,1.35/V3D.camera.aspect);V3D.camera.position.set(0,62*k,150*k);V3D.controls.target.set(0,52,0);V3D.sel.visible=false;fly=null;panel3D(null)}
 function select3D(wid,zoom){
   V3D.selWid=wid;
   const g=V3D.nodes[wid];if(!g)return;const R=g.userData.R;
@@ -422,13 +422,14 @@ document.addEventListener('click',e=>{const pv=e.target.closest('[data-pivot]');
   const b=e.target.closest('[data-v3d]');if(!b||!V3D.ready)return;const k=b.dataset.v3d;
   if(k==='rot'){V3D.controls.autoRotate=!V3D.controls.autoRotate;b.setAttribute('aria-pressed',V3D.controls.autoRotate)}
   else if(k==='reset')resetView();
+  else if(k==='full'){const wrap=document.querySelector('.v3d-wrap');if(document.fullscreenElement)document.exitFullscreen();else if(wrap.requestFullscreen)wrap.requestFullscreen().catch(()=>{})}
   else if(k==='top')flyTo(new THREE.Vector3(0,420,.1),new THREE.Vector3(0,40,0));
   else if(k==='side')flyTo(new THREE.Vector3(0,62,300),new THREE.Vector3(0,62,0));});
 
 /* ===== Màn 2D phóng to: bấm một thế giới trong 3D → bay tới rồi mở bản đồ vùng toàn màn hình, phóng/kéo tự do ===== */
 const V2={wid:null,vb:null,timer:null};
 function open2D(wid){
-  const w=byId[wid];if(!w)return;V2.wid=wid;clearTimeout(V2.timer);
+  const w=byId[wid];if(!w)return;V2.wid=wid;clearTimeout(V2.timer);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
   const ov=document.getElementById('v2d'),svg=document.getElementById('scene2d');ov.hidden=false;
   document.getElementById('v2dName').textContent=w.name;document.getElementById('v2dFull').href=`#${S.id}--${wid}`;
   renderRegion(w,{svg,sfx:'2d',onPick:i=>card2D(i),onPortal:n=>{close2D();select3D(n,true);V2.timer=setTimeout(()=>open2D(n),1150)}});
@@ -444,34 +445,16 @@ function card2D(i){
     <div class="pb" style="height:8px"><i style="width:${p.s*20}%;background:${T.c}"></i></div><p class="meta">Quy mô ${p.s}/5${p.in?` · thuộc ${esc(p.in)}`:''}</p><p>${esc(p.d)}</p><div class="refs">${p.ch.map(chLink).join('')}</div>`;
   c.hidden=false;
 }
-function setVB(){const v=V2.vb;document.getElementById('scene2d').setAttribute('viewBox',`${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${v.h.toFixed(1)}`)}
-function fit2D(){const r=document.getElementById('v2dStage').getBoundingClientRect(),a=r.width/Math.max(1,r.height);
-  // Màn dọc (điện thoại): mở sẵn ở mức phóng to vừa phải, giữa bản đồ
-  if(a<.9){const w=560,h=w/a;V2.vb={x:500-w/2,y:320-h/2,w,h}}else V2.vb={x:0,y:0,w:1000,h:640};setVB()}
-/* Phóng quanh điểm (px,py) theo toạ độ màn hình; k<1 là phóng to */
-function zoom2D(k,px,py){
-  const st=document.getElementById('v2dStage'),r=st.getBoundingClientRect(),v=V2.vb;
-  const sc=Math.max(v.w/r.width,v.h/r.height),ox=v.x+(v.w-r.width*sc)/2,oy=v.y+(v.h-r.height*sc)/2;
-  const mx=ox+((px??r.left+r.width/2)-r.left)*sc,my=oy+((py??r.top+r.height/2)-r.top)*sc;
-  const nw=Math.min(2000,Math.max(200,v.w*k)),f=nw/v.w;V2.vb={x:mx-(mx-v.x)*f,y:my-(my-v.y)*f,w:nw,h:v.h*f};setVB();
-}
+/* Phóng/kéo dùng chung bộ điều khiển với bản đồ vùng (js/thu-phong.js) */
+const V2Z=()=>V2.z||(V2.z=attachZoom(document.getElementById('v2dStage'),document.getElementById('scene2d')));
+function fit2D(){V2Z().fit()}
+function zoom2D(k,px,py){V2Z().zoom(k,px,py)}
 (function(){
-  const st=document.getElementById('v2dStage');if(!st)return;const pts=new Map();let moved=0,pinch=null;
-  const scale=()=>{const r=st.getBoundingClientRect(),v=V2.vb;return Math.max(v.w/r.width,v.h/r.height)};
-  st.addEventListener('wheel',e=>{e.preventDefault();zoom2D(Math.exp(e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
-  st.addEventListener('pointerdown',e=>{if(e.target.closest('.v2d-card,.realm-badge'))return;pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;st.classList.add('drag');
-    if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1])}}});
-  st.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);
-    if(pts.size===1&&moved>4){if(!st.hasPointerCapture(e.pointerId))st.setPointerCapture(e.pointerId);const sc=scale();V2.vb.x-=dx*sc;V2.vb.y-=dy*sc;setVB()}
-    pts.set(e.pointerId,[e.clientX,e.clientY]);
-    if(pts.size===2&&pinch){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d>0){zoom2D(pinch.d/d,(a[0]+b[0])/2,(a[1]+b[1])/2);pinch.d=d}}});
-  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!pts.size)st.classList.remove('drag')};
-  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
-  // Kéo thì không tính là bấm vào địa danh
-  st.addEventListener('click',e=>{if(moved>6){e.stopPropagation();e.preventDefault()}},true);
   document.addEventListener('click',e=>{const b=e.target.closest('[data-v2d]');if(!b)return;const k=b.dataset.v2d;
     if(k==='close')close2D();else if(k==='fit')fit2D();else if(k==='in')zoom2D(.7);else if(k==='out')zoom2D(1/.7);
     else if(k==='card'){document.getElementById('v2dCard').hidden=true;document.querySelectorAll('#scene2d .place.sel').forEach(n=>n.classList.remove('sel'))}
     else if(k==='open'&&b.dataset.wid)open2D(b.dataset.wid)});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&V2.wid)close2D()});
 })();
+
+document.addEventListener('fullscreenchange',()=>{setTimeout(resize3D,50);const b=document.querySelector('[data-v3d="full"]');if(b)b.textContent=document.fullscreenElement?'Thoát toàn màn hình':'Toàn màn hình'});

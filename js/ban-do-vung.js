@@ -98,7 +98,13 @@ const SZ=s=>({r:12+s*2.6,fs:11+s,ic:.6+s*.1});
 const markRect=(x,y,name,s=2)=>{const z=SZ(s),w=Math.max(z.r*2+8,name.length*z.fs*.6+10);return[x-w/2,y-z.r-5,x+w/2,y+z.r+z.fs+8]};
 const labelRect=(x,y,name,s=3)=>{const fs=12+s*1.6,w=name.length*fs*.78+24;return[x-w/2,y-fs,x+w/2,y+fs*.5]};
 const hit=(a,b,m=6)=>a[0]<b[2]+m&&b[0]<a[2]+m&&a[1]<b[3]+m&&b[1]<a[3]+m;
-function layoutPlaces(places,box,avoid){
+/* Bản đồ dày: chỉ các địa danh lớn hiện ở mức 1×; địa danh nhỏ (minor) hiện khi phóng ≥ MINOR_Z và được xếp chỗ theo kích thước lúc đó */
+const MINOR_Z=2.4,MINOR_K=Math.pow(MINOR_Z,-.62);
+function markMinor(places){const terr=places.filter(p=>p.t==='quoc'||p.t==='vung'),rest=places.filter(p=>!(p.t==='quoc'||p.t==='vung')),keep=Math.max(8,19-terr.length);
+  const order=[...rest].sort((a,b)=>b.s-a.s);places.forEach(p=>{p.minor=false});if(places.length>20)order.slice(keep).forEach(p=>{p.minor=true})}
+const shrinkR=(R,x,y,f)=>[x+(R[0]-x)*f,y+(R[1]-y)*f,x+(R[2]-x)*f,y+(R[3]-y)*f];
+function layoutPlaces(allPlaces,box,avoid){
+  const places=allPlaces.filter(p=>!p.minor);
   const out=new Map(),rects=avoid.map(a=>a.slice()),terr=places.filter(p=>(p.t==='quoc'||p.t==='vung')&&!p.in);
   const n=terr.length,A=ANCHORS[Math.min(n,7)]||[];
   terr.forEach((p,i)=>{let[ax,ay]=A[i]||[Math.cos(i*2.4)*.6,Math.sin(i*2.4)*.5];const x=box.cx+ax*box.rx,y=box.cy+ay*box.ry;
@@ -130,10 +136,25 @@ function layoutPlaces(places,box,avoid){
   terr.forEach(T=>{const P=out.get(T),rs=[P.L,...places.filter(q=>q.in===T.n&&out.get(q)).map(q=>out.get(q).R)];
     const x1=Math.min(...rs.map(r=>r[0])),y1=Math.min(...rs.map(r=>r[1])),x2=Math.max(...rs.map(r=>r[2])),y2=Math.max(...rs.map(r=>r[3]));
     P.bx=(x1+x2)/2;P.by=(y1+y2)/2;P.rx=Math.max(60+T.s*22,(x2-x1)/2*1.12+18);P.ry=Math.max(34+T.s*13,(y2-y1)/2*1.18+16)});
+  // Địa danh nhỏ: xếp với khung đã thu nhỏ (như khi phóng to), tránh khung thu nhỏ của địa danh lớn
+  const minors=allPlaces.filter(p=>p.minor).sort((a,b)=>b.s-a.s);
+  if(minors.length){const f=MINOR_K,r2=avoid.map(a=>a.slice());out.forEach(v=>r2.push(v.terr?shrinkR(v.L,v.x,v.y,f):shrinkR(v.R,v.x,v.y,f)));
+    minors.forEach(p=>{const T=p.in?[...out.entries()].find(([q,v])=>v.terr&&q.n===p.in):null;let best=null,bs=-1e9,bR=null;
+      const pts=[...out.values()].map(v=>[v.x,v.y]);
+      for(const c of cand){const R=shrinkR(markRect(c[0],c[1],p.n,p.sv),c[0],c[1],f);if(r2.some(r=>hit(R,r,3)))continue;
+        let sc;if(T){const v=T[1];sc=-Math.hypot(c[0]-v.x,(c[1]-v.y-20)*1.3)}else{const d=Math.min(...pts.map(u=>Math.hypot(u[0]-c[0],(u[1]-c[1])*1.4)));sc=Math.min(d,90)}
+        if(sc>bs){bs=sc;best=c;bR=R}}
+      if(!best){best=cand[Math.floor(cand.length/2)];bR=shrinkR(markRect(best[0],best[1],p.n,p.sv),best[0],best[1],f)}
+      out.set(p,{x:best[0],y:best[1],R:bR,minor:true});r2.push(bR)})}
   return out;
 }
 
 let curPlace=null,placeFilter=null,placeIndex=[];
+/* Sông vẽ bằng SVG: rộng dần về hạ lưu; dung nham thì phát sáng */
+function riversSVG(g,rel,w){const lava=(RPAL[w.kind]||{}).lava,G=el('g',{class:'rivers'},g);
+  rel.rivers.forEach(pts=>{const n=pts.length,parts=5;for(let k=0;k<parts;k++){const a=Math.floor(k*n/parts),b=Math.min(n-1,Math.floor((k+1)*n/parts)),d='M'+pts.slice(a,b+1).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L'),wd=1.2+k*1.1;
+    el('path',{d,fill:'none',stroke:lava?'#ff7a2a':'#3f7fc0','stroke-width':wd,'stroke-linecap':'round','stroke-linejoin':'round',filter:lava?'url(#glow)':null},G);
+    el('path',{d,fill:'none',stroke:lava?'#ffe08a':'#a8d4ff','stroke-width':wd*.35,opacity:.7,'stroke-linecap':'round'},G)}})}
 /* opt (màn 2D phóng to trong 3D): {svg, sfx: hậu tố id để không trùng gradient, onPick(i), onPortal(id)} */
 function renderRegion(w,opt){
   opt=opt||{};const sfx=opt.sfx||'',pick=i=>opt.onPick?opt.onPick(i):selectPlace(i);
@@ -150,8 +171,8 @@ function renderRegion(w,opt){
   [[170,560,.35],[860,120,.0],[60,200,.22]].forEach(([x,y,s])=>{if(s)island(el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.45},svg),120,shade(base,-.2))});
 
   const dense=w.places.length>18,box=dense?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
-  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
-  const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
+  const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];if((adj[w.id]||[]).length>2)avoid.push([0,452,330,520]);if((adj[w.id]||[]).length>3)avoid.push([670,452,1000,520]);
+  markMinor(w.places);const nMaj=w.places.filter(p=>!p.minor).length,shrink=nMaj>20?1.3:nMaj>15?.8:nMaj>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const pos=layoutPlaces(w.places,box,avoid);
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   // Địa hình chân thật (ảnh sinh theo độ cao) cho lục địa và biển đảo; chỗ có thành/tông môn được san bằng
@@ -163,7 +184,7 @@ function renderRegion(w,opt){
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
     if(rel){el('path',{d:shape,fill:'#3b2e24',transform:'translate(0,12)'},land);el('path',{d:shape,fill:'#2a2019',opacity:.6,transform:'translate(0,6)'},land);
-      el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);
+      el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);el('g',{class:'detail'},land);riversSVG(land,rel,w);
       // Thác nước nơi sông chảy ra mép đảo phía trước
       rel.falls.filter(([x,y])=>y>box.cy).forEach(([x,y],k)=>{const h=70+k*25,id='fall'+sfx+k;
         el('defs',{},land).innerHTML=`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8efff" stop-opacity=".95"/><stop offset="1" stop-color="#d8efff" stop-opacity="0"/></linearGradient>`;
@@ -173,7 +194,7 @@ function renderRegion(w,opt){
     el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':`url(#landTop${sfx})`,stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land)}
   }else if(mode==='sea'){
     el('path',{d:blob(box.cx,box.cy+10,box.rx*1.04,box.ry*1.06,seed+1,.05),fill:'#071f44',opacity:.6,filter:'url(#soft)'},land);
-    if(rel)el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);else el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
+    if(rel){el('image',{href:rel.url,x:0,y:0,width:1000,height:640,preserveAspectRatio:'none'},land);el('g',{class:'detail'},land)}else el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
   }else if(mode==='void'){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.04,ry:box.ry*1.06,fill:'#ff6a1f',opacity:.35,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#2a120c',stroke:'#ff8a3a','stroke-width':3},land);
@@ -188,9 +209,10 @@ function renderRegion(w,opt){
     el('path',{d:shape,fill:'#14123f',opacity:.55,stroke:'#9b8cff','stroke-width':1.5,'stroke-dasharray':'6 6'},land);
   }
   if(!rel)terrain(land,mode,base,box,seed+3);
+  svg._rel=rel;svg._ver=(svg._ver||0)+1;
 
   if(!opt.svg)placeIndex=w.places;
-  const roadG=el('g',{},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
+  const roadG=el('g',{class:'roads'},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
   if(mode==='land'||mode==='cloud'){const hubs=w.places.map(p=>pos.get(p)).filter((P,i)=>P&&['thanh','tong','quoc'].includes(w.places[i].t)&&!P.terr);
     const inT=[hubs[0]],rest=hubs.slice(1);while(rest.length&&inT[0]){let bi=0,bj=0,bd=1e9;rest.forEach((b,i)=>inT.forEach((a,j)=>{const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<bd){bd=d;bi=i;bj=j}}));
       const a=inT[bj],b=rest[bi];if(bd<330)el('path',{d:`M${a.x},${a.y} Q${(a.x+b.x)/2+(a.y-b.y)*.12},${(a.y+b.y)/2+(b.x-a.x)*.12} ${b.x},${b.y}`,fill:'none',stroke:'#e9d6a0','stroke-width':2,'stroke-dasharray':'5 5',opacity:.55},roadG);
@@ -210,7 +232,7 @@ function renderRegion(w,opt){
     bindOpen(g,()=>pick(i));
   });
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P||P.terr)return;
-    const c=PTYPE[p.t].c,g=el('g',{class:'place mk','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
+    const c=PTYPE[p.t].c,g=el('g',{class:'place mk'+(p.minor?' minor':''),'data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
     const z=SZ(p.sv);
     el('ellipse',{cx:2,cy:z.r*.75,rx:z.r*.9,ry:z.r*.3,fill:'#000',opacity:.35,filter:'url(#soft)'},g);
     if(p.s>=4)el('circle',{cx:0,cy:-2,r:z.r+5,fill:'none',stroke:'#f2c76e','stroke-width':p.s>=5?2.6:1.6,opacity:.85,filter:'url(#glow)'},g);
@@ -250,6 +272,8 @@ function selectPlace(i,quiet){
   curPlace=i;const d=document.getElementById('placeDetail');
   document.querySelectorAll('#scene .place,.pchip').forEach(n=>n.classList.toggle('sel',Number(n.dataset.pi)===i));
   if(i===null||!placeIndex[i]){d.innerHTML='<p class="meta">Bấm vào một địa danh trên bản đồ để xem chi tiết.</p>';return}
+  // Địa danh nhỏ đang ẩn ở mức 1×: phóng tới chỗ nó
+  if(!quiet&&window.WZ&&placeIndex[i].minor&&WZ.level()<MINOR_Z){const g=document.querySelector(`#scene .place[data-pi="${i}"]`),m=g&&/translate\(([\d.-]+),([\d.-]+)\)/.exec(g.dataset.t0||g.getAttribute('transform'));if(m)WZ.focus(+m[1],+m[2],3)}
   const p=placeIndex[i],T=PTYPE[p.t],parent=p.in?placeIndex.findIndex(q=>q.n===p.in):-1,kids=placeIndex.map((q,j)=>q.in===p.n?j:-1).filter(j=>j>=0);
   d.innerHTML=`<span class="eyebrow" style="color:${T.c}">${T.name}</span><h3 class="pname">${esc(p.n)}</h3>
     ${parent>=0?`<p class="meta">Thuộc <button type="button" class="linkish" data-pi="${parent}">${esc(p.in)}</button></p>`:''}

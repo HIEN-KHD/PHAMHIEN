@@ -118,8 +118,14 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 /* Thế giới */
 .w-head{display:flex;flex-direction:column;gap:6px}
 .w-map{position:relative;margin:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#070818}
-.w-scroll{overflow-x:auto;overscroll-behavior-x:contain}
-.w-scroll svg{display:block;width:100%;min-width:760px;height:auto}
+.w-stage{position:relative;aspect-ratio:1000/640;max-height:calc(100vh - 120px);width:100%;overflow:hidden;touch-action:none;cursor:grab}
+.w-stage.drag{cursor:grabbing}
+.w-stage svg{display:block;width:100%;height:100%}
+.map-zoom{position:absolute;left:12px;bottom:54px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.map-zoom .btn{width:38px;height:38px;padding:0;justify-content:center;font-size:18px;background:rgba(8,9,30,.85)}
+.mz-lv{font:600 11px var(--body);color:var(--muted);background:rgba(8,9,30,.8);border-radius:999px;padding:2px 7px}
+svg .edge,svg .roads path{vector-effect:non-scaling-stroke}
+@media (max-width:720px){.w-stage{aspect-ratio:auto;height:68vh}}
 .portal{cursor:pointer}
 .portal:hover ellipse:first-child{stroke-width:4}
 .portal text{font:600 15px var(--body);fill:#eef;paint-order:stroke;stroke:#070818;stroke-width:4px}
@@ -254,6 +260,7 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .tile b{font:700 26px var(--body);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .tile span{font-size:12px;color:var(--muted)}
 /* Vũ trụ 3D */
+.v3d-wrap:fullscreen{border-radius:0;border:0}
 .v3d-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#05060f}
 .v3d-canvas canvas{display:block;width:100%!important;touch-action:none}
 .v3d-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:15px}
@@ -293,3 +300,7 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .v2d-hint{position:absolute;right:16px;bottom:10px;margin:0;padding:4px 10px;border-radius:999px;background:rgba(8,9,30,.7);font-size:12px;pointer-events:none}
 .v2d #scene2d .place.sel .bg{stroke:#fff;stroke-width:3}
 @media (max-width:720px){.v2d-hint{display:none}.v2d .realm-badge{width:min(190px,48%);font-size:12px}}
+
+/* Địa danh nhỏ chỉ hiện khi phóng to */
+svg .place.minor{display:none}
+svg.lod-near .place.minor{display:inline}
