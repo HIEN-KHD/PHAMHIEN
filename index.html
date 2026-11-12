@@ -49,10 +49,19 @@
 
   <!-- Màn 3: Thế giới -->
   <section class="view" id="vWorld" hidden>
-    <figure class="w-hero">
-      <svg id="scene" viewBox="0 0 800 440" role="img"></svg>
-      <figcaption class="w-title"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></figcaption>
+    <header class="w-head"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></header>
+    <figure class="w-map">
+      <div class="w-scroll"><svg id="scene" viewBox="0 0 1000 640" role="img"></svg></div>
+      <div class="realm-badge" id="realmBadge"></div>
+      <figcaption class="place-legend" id="placeLegend"></figcaption>
     </figure>
+    <div class="places">
+      <aside class="panel place-detail" id="placeDetail" aria-live="polite"></aside>
+      <div class="place-groups">
+        <div class="dossier-head"><h2 class="h-sec">Quốc gia, gia tộc &amp; thế lực</h2><span class="meta" id="placeCount"></span></div>
+        <div id="placeGroups" class="pgs"></div>
+      </div>
+    </div>
     <div class="dossier-head"><h2 class="h-sec">Thế giới này như thế nào</h2><span class="meta">Theo lời truyện · bấm số chương để đọc nguyên văn</span></div>
     <div class="dossier" id="dossier"></div>
     <div class="w-grid">
@@ -75,8 +84,11 @@
 <!-- Thứ tự nạp quan trọng: dữ liệu → tiện ích → hình vẽ → ứng dụng -->
 <script src="js/canh-gioi.js"></script>
 <script src="js/truyen/thai-co-long-tuong-quyet.js"></script>
+<script src="js/truyen/thai-co-long-tuong-quyet.chuong.js"></script>
+<script src="js/truyen/thai-co-long-tuong-quyet.dia-danh.js"></script>
 <script src="js/tien-ich.js"></script>
 <script src="js/hinh-ve.js"></script>
+<script src="js/ban-do-vung.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

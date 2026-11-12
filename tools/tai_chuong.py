@@ -23,7 +23,14 @@ def main():
         if os.path.exists(f):
             continue
         ten, duong_dan = chi_muc[n]
-        trang = tai(GOC + duong_dan)
+        if not duong_dan.startswith('/'):
+            print(f"Bỏ qua {n}: chương không có liên kết")
+            continue
+        try:
+            trang = tai(GOC + duong_dan)
+        except Exception as e:  # noqa: BLE001
+            print(f"Lỗi {n}: {e}")
+            continue
         m = re.search(r'<div class="truyen">(.*?)<div class="chapter_control"', trang, re.S) or re.search(r'<div class="truyen">(.*)', trang, re.S)
         noi_dung = html_sang_chu(m.group(1)) if m else ""
         open(f, "w", encoding="utf-8").write(ten + "\n" + noi_dung)

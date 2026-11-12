@@ -115,29 +115,6 @@ let pvSel=null;
 document.getElementById('tierList').addEventListener('mouseover',e=>{const c=e.target.closest('[data-pv]');if(c)showPreview(c.dataset.pv)});
 
 /* ===== Màn 3: Thế giới ===== */
-function renderScene(w){
-  const svg=document.getElementById('scene'),[top,bot,neb]=SKY[w.kind];
-  svg.setAttribute('aria-label','Cảnh quan '+w.name);svg.innerHTML='';
-  el('defs',{},svg).innerHTML=`<linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>`;
-  el('rect',{width:800,height:440,fill:'url(#sceneSky)'},svg);
-  const r=rng(w.id.length*97+w.x);
-  for(let i=0;i<4;i++)el('ellipse',{cx:r()*800,cy:r()*300,rx:120+r()*120,ry:70+r()*60,fill:neb,opacity:.22,filter:'url(#blur)'},svg);
-  const st=stars(svg,170,800,440,w.x*3+w.y);sparkle(st,60,50,6);sparkle(st,740,70,5);
-  el('ellipse',{cx:400,cy:470,rx:520,ry:90,fill:neb,opacity:.18,filter:'url(#soft)'},svg);
-  [[150,120,.3],[650,250,.26],[560,90,.2]].forEach(([x,y,s])=>{const g=el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.5},svg);island(g,120,bot)});
-  ART[w.kind](el('g',{transform:`translate(470,${w.kind==='sun'||w.kind==='galaxy'?225:215}) scale(2.2)`},svg));
-  // Cổng không gian sang các giới kề bên (tránh góc dưới trái nơi đặt tiêu đề)
-  const slots=[[720,320],[720,170],[90,110],[300,70]];
-  adj[w.id].forEach((n,i)=>{
-    const [x,y]=slots[i],up=linkType(w.id,n)==='up',c=up?'#f2c76e':'#8fd6ff';
-    const g=el('g',{class:'portal',tabindex:0,role:'link','aria-label':'Sang '+byId[n].name,transform:`translate(${x},${y})`},svg);
-    el('ellipse',{cx:0,cy:0,rx:26,ry:10,fill:'#05060f',stroke:c,'stroke-width':3,filter:'url(#glow)'},g);
-    el('ellipse',{cx:0,cy:-30,rx:16,ry:34,fill:c,opacity:.18,filter:'url(#soft)'},g);
-    el('text',x>400?{x:30,y:-22,style:'text-anchor:end'}:{x:-30,y:-22,style:'text-anchor:start'},g).textContent=(up?'⇡ ':'')+short(byId[n].name);
-    bindOpen(g,()=>go(`${S.id}--${n}`));
-  });
-}
-
 function renderLadder(w){
   const [a,b]=rangeOf(w),box=document.getElementById('ladder');
   document.getElementById('realmRange').textContent=w.rGuess
@@ -180,7 +157,7 @@ function renderRealm(){
     <p class="meta">"Theo truyện": tóm tắt từ chương truyện (bản convert). "Bách khoa": từ bách khoa trên web. "Diễn giải": suy ra từ tên gọi.</p>`;
   const ta=p.querySelector('#rnote'),sv=p.querySelector('#rsaved');let t;
   ta.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(()=>{sv.textContent=store.set(`rnote:${S.id}:${r.id}`,ta.value)?'Đã lưu trên trình duyệt này':'Trình duyệt không cho lưu ghi chú'},400)});
-  document.querySelectorAll('.rung').forEach(b=>b.setAttribute('aria-pressed',b.dataset.realm===curRealm));
+  document.querySelectorAll('[data-realm]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.realm===curRealm));
 }
 
 function renderWorld(wid){
@@ -191,11 +168,11 @@ function renderWorld(wid){
   document.getElementById('wTier').textContent=`Tầng ${w.tier} · ${S.tiers[w.tier].name} · ${w.type}`;
   document.getElementById('wName').textContent=w.name;
   document.getElementById('wAbout').textContent=w.about;
-  renderScene(w);
+  renderRegion(w);
   document.getElementById('dossier').innerHTML=
     `<figure class="quote" style="margin:0"><q>${esc(w.quote[0])}</q><figcaption class="meta">Nguyên văn bản convert, ${chLink(w.quote[1])}</figcaption></figure>`+
     w.secs.map(([h,t,chs])=>`<section class="card${h.startsWith('Lâm Phong')?' lp':''}"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
-  const facts=[['Loại không gian',w.type],['Vị trí',(w.tier===4?'Ngoài':'Trong')+' Cửu Châu vũ trụ · '+S.tiers[w.tier].name],[w.rGuess?'Cảnh giới (ước lượng)':'Cảnh giới Lâm Phong khi ở đây',`${REALMS[lo].name} → ${REALMS[hi].name}`],['Đường hầm',`${adj[wid].length} lối (${adj[wid].filter(n=>linkType(wid,n)==='up').length} lối vàng)`],['Biểu tượng trên bản đồ',w.sym]];
+  const facts=[['Loại không gian',w.type],['Vị trí',(w.tier===4?'Ngoài':'Trong')+' Cửu Châu vũ trụ · '+S.tiers[w.tier].name],[w.rGuess?'Cảnh giới (ước lượng)':'Cảnh giới Lâm Phong khi ở đây',`${REALMS[lo].name} → ${REALMS[hi].name}`],['Đường hầm',`${adj[wid].length} lối (${adj[wid].filter(n=>linkType(wid,n)==='up').length} lối vàng)`],['Địa danh đã ghi',`${w.places.length} (quốc gia, gia tộc, thế lực…)`],['Biểu tượng trên bản đồ',w.sym]];
   document.getElementById('wFacts').innerHTML=facts.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
   const path=route(S.start,wid)||[wid],steps=path.length-1;
   document.getElementById('routeHead').textContent='Đường đi từ '+short(byId[S.start].name);
@@ -204,9 +181,10 @@ function renderWorld(wid){
   const ups=path.slice(1).filter((p,i)=>linkType(path[i],p)==='up').length;
   document.getElementById('wRouteMeta').textContent=steps?`${steps} lần qua đường hầm${ups?`, trong đó ${ups} lần lên cấp cao hơn`:''}.`:'Đây là nơi hành trình bắt đầu.';
   document.getElementById('wNear').innerHTML=adj[wid].map(n=>`<a class="chip${linkType(wid,n)==='up'?' gold':''}" href="#${S.id}--${n}">${esc(short(byId[n].name))}</a>`).join('');
-  renderLadder(w);renderRealm();
+  renderLadder(w);renderRealm();renderRealmBadge(w);
 }
 
+document.getElementById('realmBadge').addEventListener('click',e=>{const b=e.target.closest('[data-realm]');if(!b)return;curRealm=b.dataset.realm;store.set(`realm:${S.id}:${curWorld}`,curRealm);renderRealm();if(window.matchMedia('(max-width:720px)').matches)document.getElementById('realmPanel').scrollIntoView({behavior:'smooth',block:'start'})});
 document.getElementById('ladder').addEventListener('click',e=>{const b=e.target.closest('[data-realm]');if(!b)return;curRealm=b.dataset.realm;store.set(`realm:${S.id}:${curWorld}`,curRealm);renderRealm();if(window.matchMedia('(max-width:720px)').matches)document.getElementById('realmPanel').scrollIntoView({behavior:'smooth',block:'start'})});
 document.getElementById('realmPanel').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b||b.disabled)return;const i=RIDX[curRealm]+Number(b.dataset.step);curRealm=REALMS[i].id;store.set(`realm:${S.id}:${curWorld}`,curRealm);const [a,z]=rangeOf(byId[curWorld]);if(i<a||i>z)showAll=true;renderLadder(byId[curWorld]);renderRealm()});
 document.getElementById('toggleAll').addEventListener('click',()=>{showAll=!showAll;renderLadder(byId[curWorld]);renderRealm()});

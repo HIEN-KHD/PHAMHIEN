@@ -1,0 +1,210 @@
+/* ===== Địa danh của từng thế giới =====
+   Mỗi mục: [loại, tên, mô tả, [chương], thuộc]
+   loại: quoc (quốc gia), vung (vùng/vực), thanh (thành trì), gia (gia tộc), tong (tông môn/thế lực),
+         toc (chủng tộc), dao (đảo), hiem (hiểm địa/bí cảnh), bau (bảo vật)
+   "thuộc": tên một quoc/vung trong cùng thế giới; địa danh sẽ được vẽ bên trong vùng đó.
+   Chương dạng '~1441' là chương không ghi số trong tên, đánh theo vị trí trong danh sách. */
+const PLACES={
+  thienvo:[
+    ['quoc','Chân Võ quốc','Quốc gia nơi Lâm Phong lớn lên, thuộc đông quận Thần Châu. Phía đông giáp Đông Hải thế giới bằng một đường bờ biển dài.',[279,239]],
+    ['quoc','Thú Nhân Đế Quốc','Đế quốc thú nhân xâm lấn Chân Võ quốc. Trận Trụy Nguyệt thành khiến nó mất mấy chục vạn đại quân và sĩ khí sụp đổ.',[204,239]],
+    ['quoc','Cổ Man Quốc','Quốc độ cấp dưới của Thanh Vân Tông, khai quốc hoàng đế là một trưởng lão của tông. Có các khu mỏ dùng tử tù và tù binh đào quặng.',[635]],
+    ['vung','Hoang vực','Vùng đất có thập đại cố đô và tứ đại viễn cổ thế lực. Phong Lôi cốc mở ra cho đệ tử bốn đại tông môn trước, rồi mới tới các thế gia và tán tu.',[477,536]],
+    ['thanh','Thanh Vân trấn','Quê của Lâm Phong và Tô Nguyệt Tịch, hai thiên tài cùng năm vào Già Lam học viện.',[1],'Chân Võ quốc'],
+    ['tong','Già Lam học viện','Học viện nơi Lâm Phong tu luyện khi còn là Võ Giả và bị coi là phế vật.',[1],'Chân Võ quốc'],
+    ['thanh','Trụy Nguyệt thành','Thành trì nơi Lâm Phong cùng đệ tử Thanh Long học phủ đánh tan quân Thú Nhân Đế Quốc.',[224,239],'Chân Võ quốc'],
+    ['tong','Thanh Long học phủ','Học phủ có nhiều thế lực đệ tử như Huyết Long hội, Cuồng Hổ bang, Tế Vũ lâu, Phong Tuyết các, Lôi Tiêu tông. Lâm Phong lập "Long Môn" đầu tiên ở đây.',[200,262],'Chân Võ quốc'],
+    ['tong','Thanh Vân Tông','Tông môn nắm quyền trên cả Cổ Man Quốc.',[635],'Cổ Man Quốc'],
+    ['tong','Tinh Vân Các','Bá chủ Tinh Vân Thành, một trong tứ đại viễn cổ thế lực của Hoang vực, truyền thừa rất lâu đời.',[477],'Hoang vực'],
+    ['gia','Nạp Lan gia tộc','Gia tộc ở Hoang vực có hai lão tổ bế quan 300 năm không xuất hiện. Lâm Phong giết Nạp Lan Hồng.',[477],'Hoang vực'],
+    ['gia','Hách Liên gia tộc','Mất Hách Liên Chân dưới tay Lâm Phong, đang loạn trong giặc ngoài.',[477],'Hoang vực'],
+    ['tong','Phệ Hồn điện','Thế lực ma đạo cổ xưa. Theo quy tắc ba ngàn châu, thế lực như vậy không được nhúng tay vào chiến tranh thế tục.',[19,81,204]],
+    ['gia','Thái cổ Khương gia','Có những phương thuốc do một vị Thánh Tổ truyền lại. Lão tổ Khương Hoàn về sau trấn giữ Trung Châu.',[318,'~1327']],
+    ['thanh','Nhật Nguyệt thành','Một trong thập đại cổ thành của đông quận Thần Châu, ngang hàng Thiên Thánh thành, có thượng cổ thế lực tọa trấn, là thánh địa tu luyện.',[45,204]],
+    ['hiem','Huyết Yêu sơn','Hơn một ngàn yêu ma do một con Hấp Huyết Ma Bức cầm đầu. Mây máu bao phủ, dơi máu tuần tra, nhiều thôn trấn xung quanh bị tàn sát.',[40]],
+    ['hiem','Lôi Đao bí cảnh','Nơi giết người không cần lý do. Cơ duyên lớn nhất là "hướng lên trời đoạt mệnh năm năm". Lâm Phong đột phá Võ Vương ở đây.',[568,602]],
+    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa, giúp tăng thực lực mạnh mẽ nhưng dược tính quá cuồng bạo.',[45,49]]
+  ],
+  tamthien:[
+    ['vung','Đông quận Thần Châu','Vùng có trăm quốc và thập đại cố đô. Chân Võ quốc cũng nằm trong vùng này.',[239,437]],
+    ['vung','Trung Châu','Có tứ đại Cổ Hoàng Triều. Lão tổ Thái cổ Khương gia trấn giữ khi Trung Châu đại loạn.',['~1001','~1327']],
+    ['vung','Đông Hải thế giới','Thế giới hải ngoại phía đông Chân Võ quốc. Thế lực mạnh nhất là Đông Hải Long Cung, nhưng rất thần bí và khó tiếp xúc.',[279,691]],
+    ['thanh','Ngạo Thiên cổ đô','Cố đô mạnh nhất và thần bí nhất đông quận Thần Châu, đất của Độc Cô gia tộc. Bị liên quân bốn thành do Lâm Phong dẫn tấn công.',[437,855],'Đông quận Thần Châu'],
+    ['thanh','Thiên Thánh thành','Một trong thập đại cố đô, có thượng cổ thế lực trong nội thành. Lâm Phong từng ở xóm nghèo của thành.',[19,45,833],'Đông quận Thần Châu'],
+    ['thanh','Quân Tử Thành','Thành chủ Hàn Tử Họa đích thân dẫn quân các gia tộc trong thành tham gia liên quân diệt Độc Cô.',[855],'Đông quận Thần Châu'],
+    ['gia','Độc Cô gia tộc','Hành sự tàn nhẫn, diệt tộc bất kỳ thế lực nào dám phản kháng để mở rộng thế lực.',[437,855],'Đông quận Thần Châu'],
+    ['gia','Tống gia','Gia tộc ở Thiên Thánh thành, nhờ Lâm Phong mà vươn lên và kết giao được với hội trưởng linh trận sư tổng công đoàn.',[833],'Đông quận Thần Châu'],
+    ['quoc','Đại Tần đế quốc','Một trong tứ đại Cổ Hoàng Triều của Trung Châu, thuộc cấp bá đạo ở ba ngàn châu. Có thất hoàng tử Doanh Thiếu Khang.',['~1001','~1142'],'Trung Châu'],
+    ['quoc','Vũ Hóa Tiên Triều','Thế lực truyền thừa lâu đời, phồn vinh xa hoa, cao thủ trẻ nhiều như mây, sinh ra đỉnh cấp thiên kiêu Hoàng Phủ Thanh Thiên.',['~915']],
+    ['gia','Thái cổ Ninh gia','Chúa tể Ninh Châu, một trong tám châu tiếp giáp phía nam U Vân 16 châu.',['~1097']],
+    ['gia','Tần gia','Thái cổ thế gia của Tần Mộ Bạch, siêu cấp thiên kiêu cao cấp nhất ba ngàn châu, giỏi đàn cổ.',[279,'~1279']],
+    ['thanh','Nộ Phủ thành','Nơi Lâm Phong gặp lại vị đoán tạo sư thần bí và bị Hoàng Phủ Sùng chặn đường.',['~881']],
+    ['quoc','Dục Vọng quốc độ','Nắm toàn bộ Đông Hải và một phần Nam Hải.',['~1571','~1574'],'Đông Hải thế giới'],
+    ['tong','Tử Quang thánh địa','Một trong những thế lực xưa nhất ba ngàn châu, bá chủ hải ngoại ở Đông Hải. Tương truyền từng có người tu tới Thần cảnh.',[279],'Đông Hải thế giới'],
+    ['toc','Đông Hải Long Cung','Thế lực mạnh nhất Đông Hải, cùng Hải tộc tồn tại thật dù ngoại giới chỉ biết qua truyền thuyết. Có Tà Long tam thái tử.',[691,'~1226'],'Đông Hải thế giới'],
+    ['dao','Thần Bằng đảo','Đảo Yêu tộc của Thiên Bằng Thánh Vương, cùng Liệt Diễm Đảo và Kim Ô đảo.',[691,'~1203'],'Đông Hải thế giới'],
+    ['hiem','Thiên kiếp yêu cảnh','Bí cảnh có cơ duyên, lối vào được tam hoàng tử mở ra.',['~915','~921']],
+    ['hiem','Mê Vụ Sâm Lâm','Rừng sương mù gần Thiên Thánh thành, sinh linh mạnh thường đại chiến với hung thú trong đó.',[833],'Đông quận Thần Châu']
+  ],
+  phongtruc:[
+    ['vung','Long Môn vực','Vực do Lâm Phong lập ra, biến hắn thành vị Vực Chủ thứ mười ba và trẻ nhất. Tín ngưỡng lực từ đây giúp hắn thành Đại Đế.',['~1471','~1481',4187]],
+    ['vung','Thiên Châu vực','Có một Vực Chủ (Quân Thiên Đế) và năm phó Vực Chủ đến từ ngũ đại thế lực thâm căn cố đế. Lâm Phong giết Quân Thiên Đế rồi thu phục vực này.',['~1441','~1481']],
+    ['vung','Độc Vực','Vực Chủ Mục Thiên Tông dùng khôi lỗi ngưng từ kịch độc, bị Lâm Phong giết.',['~1471','~1472','~1481']],
+    ['vung','Nam Hoang vực','Vực có thập đại cố đô. Lúc Lâm Phong mới quật khởi, chẳng ai ở đây nhận ra hắn.',['~1471','~1481',4198]],
+    ['vung','Thiên Thương vực','Tu sĩ quân rất mạnh, quân Long Môn không địch nổi khi giao chiến.',[4198]],
+    ['vung','Trảm Tiên vực','Tu sĩ quân giao chiến với đại quân oán khí ác linh của Lâm Phong.',[4198]],
+    ['thanh','Thiên Đô Thành','Một trong thập đại cố đô của Nam Hoang vực.',['~1481'],'Nam Hoang vực'],
+    ['tong','Ám Hắc Thần Lâu','Thế lực khủng bố mà mười hai Vực Chủ đều kiêng dè. Lâu chủ Mặc Tử Tà bị Lâm Phong giết.',['~1447','~1481'],'Thiên Châu vực'],
+    ['tong','Thiên Đạo Tông','Được xưng là "hỏi đạo chi địa", dù Lâm Phong cho rằng chưa phải nơi cầu tiên thật sự.',['~1559']],
+    ['bau','Thần miếu Lâm Phong','Thần miếu nhận tín ngưỡng của dân chúng, nguồn tín ngưỡng lực để Lâm Phong đột phá Đại Đế và Đế Tôn.',[4187],'Long Môn vực']
+  ],
+  cuuchau:[
+    ['quoc','Cửu Châu tiên quốc','Tiên quốc mang ma tính, khiến nhiều người kiêng kỵ vì làm người ta mất đi tâm tính ban đầu.',[2431]],
+    ['vung','Thiên Hoang Thần vực','Đất của Mộc gia, một trong những gia tộc xưa nhất Cửu Châu.',[2124]],
+    ['vung','Nam Tiên Hải Vực','Hải vực có rất nhiều hòn đảo cổ, thế lực phức tạp. Vạn tộc kéo tới Cửu Châu vì đại cơ duyên ở đây.',[2047,2589]],
+    ['gia','Mộc gia','Hậu nhân cổ Thánh Hoàng, một trong những gia tộc xưa nhất Cửu Châu.',[2124],'Thiên Hoang Thần vực'],
+    ['tong','Luân Hồi Tiên Tông','Tông môn của Lâm Phong ở Cửu Châu. Với tông, với cả Cửu Châu vũ trụ, hắn là một truyền kỳ.',[2299,8202]],
+    ['tong','Thái Thượng Tiên Tông','Một tiên tông lớn của Cửu Châu.',['~1675']],
+    ['gia','Quy gia','Tiên Tông Quy gia. Quy gia nhận Lâm Phong làm đồ đệ: "còn sống là đồ đệ, chết rồi thành quỷ cũng là đồ đệ".',[1744,1942]],
+    ['gia','Long gia','Thế lực ở Long Huyết Thành, cùng Tà Long Cung và Phù Tang Đảo.',[1942]],
+    ['tong','Âm Dương Hợp Hoan Tông','Bị cả chính đạo, ma đạo lẫn tà đạo xem thường.',[1717]],
+    ['tong','Vạn Hoa Lâu','Có thánh nữ Diệu Khả Nhi, có phân nhánh ở Thiên Võ đại lục.',[1987]],
+    ['tong','Bắc Minh sơn','Thế lực của Bắc Minh Hiên.',['~1596']],
+    ['toc','Kim Ô tộc','Yêu tộc có lãnh địa và đất phong hầu. Tộc trưởng rèn luyện các con để chọn người kế vị.',[1902,5642]],
+    ['toc','Hắc Lân tộc','Tộc giao nhân hùng mạnh.',['~1641']],
+    ['toc','Cổ Thần Tộc','Có một vị đại đế từ thời viễn cổ tọa trấn Cửu Châu, mạnh hơn Tà Hình Đại Đế rất nhiều.',[2734,2739]],
+    ['toc','Huyết Dực Thiên Lang tộc','Chủng tộc có một tôn đại đế giáng lâm Cửu Châu.',[2734],'Nam Tiên Hải Vực'],
+    ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực']
+  ],
+  cohoang:[
+    ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],
+    ['vung','Nam Cực băng nguyên','Băng nguyên ở đầu kia của Cổ Hoang hải vực.',[1964]],
+    ['dao','Long Môn đảo','Đảo hoang không người được Lâm Phong chọn. Đại lực Hải Ma xây tiên sơn cung điện, đại trận bao quanh.',[1964]],
+    ['dao','Hỏa Hạt Đảo','Thế lực đảo cho người dò xét Long Môn, định diệt môn. Sau phải quỳ trước Vạn Hoa Lâu.',[1964,1987]],
+    ['dao','Ác Giao đảo','Bị Long Môn tiêu diệt, chấn động Cổ Hoang hải vực.',[2000,1987]],
+    ['tong','Tán Tu Liên Minh','Đại diện các thế lực Cổ Hoang tới quy phục Lâm Phong. Bốn trưởng lão ủng hộ hắn vào hội nghị bàn tròn.',[2106,1987]],
+    ['hiem','Vùng hung thú biển','Nơi hung thú biển tụ tập, rất nguy hiểm nên trở thành đất không ai quản.',[1964]]
+  ],
+  minhgioi:[
+    ['vung','Minh Hải','Có tứ đại thế lực, gọi là "một quốc gia ba đảo".',['~1659']],
+    ['quoc','Minh Hải Thần Quốc','"Một quốc gia" của Minh Hải, mạnh hơn cả ba đảo cộng lại.',['~1659'],'Minh Hải'],
+    ['dao','Huyết Vân đảo','Một trong ba đảo của Minh Hải.',['~1659'],'Minh Hải'],
+    ['dao','Xích Diễm đảo','Một trong ba đảo của Minh Hải.',['~1659'],'Minh Hải'],
+    ['dao','Ma Ngục đảo','Một trong ba đảo của Minh Hải.',['~1659'],'Minh Hải'],
+    ['thanh','Phong Đô','Đô thành của Địa phủ. Ở dương gian người ta gọi là quỷ thành hay Minh phủ.',[5980]],
+    ['tong','Địa phủ','Thế lực mạnh nhất Minh giới, âm binh thuộc về Địa phủ.',[2334]],
+    ['tong','Thập điện Diêm vương','Thống trị Minh giới. Từ khi Minh Chủ biến mất, nhiều sinh linh mạnh bắt đầu không phục.',[2584]],
+    ['tong','Thiên Phủ minh quân','Kéo quân tới Long giới khi thông đạo Minh giới mở rộng. Nói về "thiên nhân ngũ suy".',[5879,5880]],
+    ['toc','Minh binh & âm binh','Phần lớn vong linh thành vật tiếp tế cho cường giả Minh giới. Số ít mạnh hoặc có quan hệ được bổ sung vào minh binh, âm binh.',[6234]],
+    ['hiem','Ba mươi ba trọng Minh giới','Minh giới có 33 tầng, giống 33 trọng thiên của Thiên Giới.',[3475]]
+  ],
+  battu:[
+    ['vung','Cửu Linh vực','Do Cửu Linh Tông nắm giữ.',[3632]],
+    ['vung','Hắc Sa vực','Có mười tám tòa chủ thành, như Thiên Khô Thành.',[4356]],
+    ['vung','Nhược Thủy vực','Có lão tổ Nhược Thủy vực, người bị Lâm Phong đuổi kịp nhờ tốc độ bộc phát.',[4707]],
+    ['vung','Tây Thiên vực','Vực nhỏ có Phục Long tông.',[4910]],
+    ['vung','Cổ Yêu vực','Tiếp giáp Bạch Cốt vực, trên đường về Tội vực. Có cố nhân từ Cửu Châu.',[4990]],
+    ['vung','Hoang Thiên vực','Đất của Hoa gia.',[4793]],
+    ['tong','Cửu Linh Tông','Một trong những tông môn xưa nhất và mạnh nhất Bất Tử Giới.',[3632],'Cửu Linh vực'],
+    ['thanh','Thiên Khô Thành','Một trong mười tám chủ thành của Hắc Sa vực, ngày nào cũng có đoàn vận thạch tới.',[4356],'Hắc Sa vực'],
+    ['tong','Phục Long tông','Tông môn lớn nhất trong phạm vi mười mấy vạn dặm, có danh ở Tây Thiên vực.',[4910],'Tây Thiên vực'],
+    ['gia','Hoa gia','Gia tộc ở Hoang Thiên vực.',[4793],'Hoang Thiên vực'],
+    ['gia','Bất Tử gia tộc','Truyền thừa cổ xưa từ bảy vị cường giả. Lâm Phong mang huyết mạch gia tộc này qua cha là Lâm Bại Thiên.',[3183,3286]],
+    ['gia','Nam Cung gia tộc','Có tổ địa riêng. Nam Cung Huyên Nhi đưa Lâm Phong tới bằng cổ thuyền.',[3881]],
+    ['gia','Mộ Dung gia tộc','Một trong hai thế lực Lâm Phong đặc biệt chú ý, cùng Ninh gia.',[4082]],
+    ['gia','Quách gia','Một thế lực cực kỳ bất phàm.',[4396]],
+    ['tong','Thánh Tà Tông','Một trong bảy đại thế lực tà đạo, không ai dám trêu.',[4778]],
+    ['toc','Thiên Nhân tộc','Từ khi huyết mạch Tiên Thiên Nhân tộc lắng xuống, thiên nhân huyết mạch mới nổi bật lên.',[4475]],
+    ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]]
+  ],
+  toivuc:[
+    ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
+    ['toc','Hậu nhân tội huyết','Bị thần thánh quân đoàn chèn ép, cướp bảo vật và truyền thừa.',[4586,4504]],
+    ['gia','Diêm Hỗn Thiên','Cường giả tội huyết lừng danh năm xưa.',[4789]],
+    ['toc','Chân Tiên Tội vực','Một nhóm Chân Tiên ở Tội vực.',[5108]],
+    ['bau','Tội Huyết Thạch','Gồm Chân Long Tội Huyết Thạch và Bất Tử Tội Huyết Thạch, được rao bán ở Bất Tử giới.',[4462,4463,4464]],
+    ['hiem','Ý chí tội huyết','Ý chí của vô số hậu nhân tội huyết đã chết hòa vào pháp tắc, có thể ngưng ra một tôn Thánh Hoàng.',[4504]],
+    ['vung','Bạch Cốt vực','Vực nằm trên đường về Tội vực, giáp Cổ Yêu vực.',[4990]]
+  ],
+  longgioi:[
+    ['quoc','Kim Long tộc','Đứng đầu một trong năm phe đang tranh ngôi Long giới chi chủ.',[5698]],
+    ['quoc','Dực Long tộc','Đứng đầu một trong năm phe của Long giới.',[5698]],
+    ['quoc','Thiên Long tộc','Đứng đầu một trong năm phe của Long giới.',[5698]],
+    ['quoc','Tà Long tộc','Đứng đầu một trong năm phe của Long giới.',[5698]],
+    ['quoc','Cổ Long tộc','Đứng đầu một trong năm phe của Long giới.',[5698]],
+    ['toc','Chân Long tộc','Từ khi đời thứ chín Chân Long Đại Đế vẫn lạc thì bặt tin, không rõ còn tộc nhân hay không.',[5698]],
+    ['toc','Đông Thần Long tộc','Long tộc phương Đông, rất mạnh.',[5698]],
+    ['toc','Long tộc tạp huyết','Long tộc thuần huyết rất hiếm, đa số là tạp huyết.',[5698]],
+    ['toc','Thiên Ma tộc','Kẻ xâm nhập. Lâm Phong một chiêu chém đôi cường giả Thiên Ma tộc.',[5703]],
+    ['bau','Bản nguyên Long giới','Chỉ Long giới chi chủ mới câu thông được, vì vậy các phe tranh nhau ngôi chủ.',[5698]],
+    ['hiem','Vùng biển Long giới','Vùng biển nguy hiểm của Long giới.',[5753]]
+  ],
+  magioi:[
+    ['vung','Ma Thiên vực','Vùng Lâm Phong nắm được ngay khi tới Ma giới, sau khi thu phục Đại Ma Thiên.',[6014]],
+    ['thanh','Thương Minh thành','Thành cổ hiển hách của Ma giới, xưa có tên là Huyết Ma thành.',[6035]],
+    ['tong','Cửu đại Ma Chủ','Đạo thống chiếu sáng chư thế. Ai có lệnh bài ma chủ thì thống lĩnh được các thế lực Ma giới.',[2576,4287]],
+    ['gia','Đại Ma Thiên','Nhân vật từng đảo loạn thiên địa phong vân, thoát khốn rồi bị Lâm Phong thu phục.',[6014,6035],'Ma Thiên vực'],
+    ['toc','Thiên Ma tộc','Chủng tộc ma đạo mạnh, xuất hiện cả ở Long giới.',[5703,6060]],
+    ['toc','Si ma · Oán ma · Hận ma','Các ma đầu canh giữ bản nguyên Ma giới.',[6014]],
+    ['bau','Trấn Ma Bia','Có thủ đoạn phi phàm, phát hiện được cả đội thuyền đang tàng hình.',[6060]],
+    ['bau','Ngũ đại chí bảo','Năm chí bảo của Ma giới, tìm được nhờ lệnh bài ma chủ.',[4287]],
+    ['bau','Bản nguyên Ma giới','Khác thường, rất dễ bị dòm ngó.',[6014]]
+  ],
+  thiengioi:[
+    ['vung','Ba mươi ba trọng thiên','Thiên Giới có 33 tầng trời và 33 vị thiên chủ.',[3475,6174]],
+    ['vung','Bồng Lai vực','Có Bồng Lai thành và Bồng Lai thánh địa.',[6178,318]],
+    ['toc','Long cung liên minh','Các Long cung hợp lại thành thế lực không ai chống nổi. Long hoàng có thể đã vượt mức thường.',[6178,6217]],
+    ['gia','Phong gia','Lão tổ Phong gia có sức hiệu triệu lớn, có thể lập cả một đạo tu sĩ quân.',[6298]],
+    ['gia','Anh gia','Thiên giới Anh gia, có Anh Thanh Tuyết. Bị cho là đã hại chết đời thứ bảy thiên sư Mục Tu Hàn.',[4606,6287]],
+    ['toc','Phượng Hoàng tộc','Đang tính chuyện thông gia với Yêu Long tộc. Hỏa Vũ là một người được đề cử.',[6377]],
+    ['toc','Yêu Long tộc','Bên kia của cuộc thông gia với Phượng Hoàng tộc.',[6377,9512]],
+    ['toc','Phệ Hồn tộc','Một chủng tộc Di tộc kỷ nguyên, thủ đoạn đáng sợ đến mức các Di tộc cổ hơn cũng không dám động vào.',[6257]],
+    ['tong','Thái Sơn phủ','Thái Sơn phủ quân bị nghi là một trong những kẻ đứng sau màn.',[6298,6420]],
+    ['tong','Xích Minh Hòa Dương Thiên chủ','Một vị thiên chủ.',[5953],'Ba mươi ba trọng thiên'],
+    ['bau','Truyền thừa Thanh Loan Tôn Giả','Nơi truyền thừa của Thanh Loan Tôn Giả.',[2938]],
+    ['bau','Bia đá Thiên Giới','Tấm bia đá to lớn rơi từ Thiên Giới xuống phàm trần.',[2589],'Bồng Lai vực']
+  ],
+  phetho:[
+    ['tong','Phế thổ liên minh','Liên minh của Phế thổ thế giới. Nhiều thế lực theo dõi xem nó sẽ phát triển ra sao.',[7165,7178]],
+    ['toc','Phế Thổ sinh linh','Sinh linh từ Phế Thổ đi ra mạnh đến khó tưởng tượng, tham chiến cùng dị vực sinh linh và sinh linh vượt kỷ nguyên.',[2883,3311,3564]],
+    ['hiem','Cánh Cổng Vĩnh Sinh','Thế giới bên trong cánh cổng khiến giới tu luyện gió tanh mưa máu. Ngạc Tổ suýt bước vào thì bị đánh trọng thương.',[2883,3564]],
+    ['tong','Vĩnh Sinh tổ chức','Do vĩnh sinh chi chủ nắm giữ, người được cho là đi ra từ Vĩnh sinh chi môn.',[8040]],
+    ['tong','Liên minh ác niệm kẻ khai hoang','Tàn sát bừa bãi, diệt cả một số thế lực đỉnh cấp.',[7106]],
+    ['hiem','Mộ địa cường giả','Đại đế Quân Mạc Tiếu chết ở đây. Phế Thổ chứng kiến bao kỷ nguyên ra đời và hủy diệt.',[2883]],
+    ['toc','Hậu nhân tội huyết','Cũng có mặt ở Phế Thổ.',[6902]]
+  ],
+  cuuu:[
+    ['hiem','Cửu U địa ngục','Bị phong ấn, chỉ linh hồn ra vào được. Thông đạo mỗi năm mở một canh giờ.',[1756]],
+    ['bau','Hài cốt Chân Long','Xương thủy tổ long nằm trong địa ngục, Lâm Phong từng thử kéo ra nhưng thất bại.',[1756,8238]],
+    ['toc','Cửu U quỷ mẫu','Chủ nhân nơi đây, việc gì trong địa ngục cũng không giấu được bà.',[8238]],
+    ['tong','Cửu U sát thủ','Kẻ nào bị Cửu U sát thủ để mắt tới thì không có kết cục tốt.',[333,602]],
+    ['bau','Cửu U Hoàng Tuyền thủy','Linh dịch quý nhất thiên địa.',[45]]
+  ],
+  thienchi:[
+    ['toc','Thái Tây tộc','Từng thống trị Cửu Châu vũ trụ, phát hiện và tiến vào Thiên Chi Giới, rồi bị Mạc Hậu Hắc Thủ thế giới tiêu diệt.',[7723,8381]],
+    ['quoc','Mạc Hậu Hắc Thủ thế giới','Được nhiều thế lực đỉnh cấp ủng hộ để diệt Thái Tây tộc, có hoàng tộc và chúa tể riêng.',[7723,8381]],
+    ['toc','Đồ Thần tộc','Vương tộc của thế giới đứng sau màn.',[6333],'Mạc Hậu Hắc Thủ thế giới'],
+    ['hiem','Thông đạo thời không','Nhiều thông đạo nối tới các thời không khác nhau, có lúc truyền ra đạo âm. Vương tộc canh giữ những thông đạo khó trấn phong.',[8381]],
+    ['bau','Thiên chi thần thân thể','Vừa sinh ra đã ở cấp Chúa Sáng Thế, có thể thành kẻ khai hoang thứ hai.',[8381]],
+    ['bau','Bảo vật chư thiên','Pháp bảo và thiên tài địa bảo khắp chư thiên bị hút về đây.',[8381]]
+  ],
+  hoangchi:[
+    ['hiem','Quân đoàn hoang chi âm binh','Cường giả cũng tránh đối đầu trực diện.',[8851]],
+    ['bau','Máu bản nguyên kẻ khai hoang','Có thể nằm trong một bí địa ở đây.',[8851]],
+    ['tong','Kỳ Liên sơn','Kỳ Liên sơn chủ đi cùng Lâm Phong tới Hoang chi địa.',[8840,8851]],
+    ['toc','Trời xanh con','Hóa thân của hắn rất mạnh, thề truy sát Lâm Phong vì bị phá việc lớn.',[8850,8851]]
+  ],
+  dongphuong:[
+    ['vung','Côn Lôn vũ trụ','Vũ trụ gốc, lớn nhất trong tứ đại vũ trụ.',[4087,6420]],
+    ['vung','Tây vũ trụ','Vũ trụ phương Tây, có các mạch chủ không bao giờ thiếu tài nguyên.',[10143,10416]],
+    ['vung','Tịch Diệt vũ trụ','Lang tộc ở đây thờ ba đầu lang thần.',[6412]],
+    ['vung','Cửu Châu vũ trụ','Vũ trụ của Cửu Châu, giống Côn Luân nhất.',[4087]],
+    ['gia','Hoàng Phủ gia tộc','Truyền thừa vô tận năm tháng ở Tần Lĩnh cổ địa, một trong những thế lực xưa và mạnh nhất Côn Lôn vũ trụ.',[6420],'Côn Lôn vũ trụ'],
+    ['tong','Chư Lão điện','Giống một liên minh hơn là một thế lực đơn lẻ.',[8150]],
+    ['toc','Cửu Tiêu tộc','Có ba vị lão tổ. Chỉ lão tổ thứ ba đã mạnh khó tưởng.',[11002]],
+    ['toc','Thiên Ảnh tộc','Có Thiên Tiểu Ngũ, cực mạnh nhưng khiêm tốn.',[10846]],
+    ['quoc','Nam hải thế giới','Chưa từng được thống nhất, cho đến khi Lâm Phong làm được.',[10379]],
+    ['dao','Huyền Vũ đảo','Chọn đầu hàng Lâm Phong.',[10379],'Nam hải thế giới']
+  ]
+};
+STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn])=>({t,n,d,ch,in:inn||null}))});
