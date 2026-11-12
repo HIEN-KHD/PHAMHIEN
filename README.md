@@ -2,11 +2,13 @@
 
 Ứng dụng web xem chi tiết các truyện tôi đọc. Hiện có truyện đầu tiên: **Thái Cổ Long Tượng Quyết** (Vượng Tử Lão Man Đầu).
 
-Ứng dụng có ba màn:
+Ứng dụng có ba màn chính và một khu hồ sơ:
 
 1. **Thư viện**: bìa các truyện.
 2. **Bản đồ**: các thế giới và đường hầm không gian. Rê chuột để xem trước, bấm để vào.
 3. **Thế giới**: bản đồ vùng có quốc gia, vùng/vực, gia tộc, tông môn, chủng tộc, thành trì, hiểm địa và bảo vật (bấm để xem chi tiết, lọc theo loại); khung cảnh giới ở góc trên bên phải; hồ sơ thế giới theo lời truyện (có số chương); tháp cảnh giới và cách đột phá.
+
+4. **Hồ sơ truyện**: Nhân vật (theo nhóm quan hệ), Hành trình của Lâm Phong (mốc theo chương, kèm cảnh giới đạt được), Công pháp & bảo vật (công pháp, huyết mạch, thần thông, bảng thiên hỏa có xếp hạng, bảo vật).
 
 Không cần cài đặt gì: mở `index.html` bằng trình duyệt là chạy.
 
@@ -19,6 +21,8 @@ js/canh-gioi.js                Hệ thống cảnh giới: tên, phân tầng, �
 js/truyen/<slug>.js            Dữ liệu một truyện: thế giới, đường hầm, hồ sơ
 js/truyen/<slug>.dia-danh.js   Quốc gia, gia tộc, thế lực… của từng thế giới (kèm số chương)
 js/truyen/<slug>.chuong.js     Bảng liên kết chương, tạo tự động — không sửa tay
+js/truyen/<slug>.ho-so.js      Nhân vật, hành trình, công pháp/huyết mạch/thiên hỏa/bảo vật
+js/ho-so.js                    Vẽ các trang hồ sơ
 js/ban-do-vung.js              Vẽ bản đồ vùng của một thế giới và sắp xếp địa danh không chồng nhau
 js/tien-ich.js                 Hàm tiện ích nhỏ
 js/hinh-ve.js                  Vẽ SVG: đảo bay, núi, mặt trời, sao, hiệu ứng mờ và phát sáng
@@ -91,5 +95,5 @@ Loại: `quoc` quốc gia, `vung` vùng/vực, `thanh` thành trì, `gia` gia t�
 
 - Lời truyện: bản convert trên [metruyenchu.com.vn](https://metruyenchu.com.vn/thai-co-long-tuong-quyet). Mỗi thông tin trong hồ sơ thế giới đều ghi số chương.
 - Nhãn trong ứng dụng: **theo truyện** (tóm tắt từ chương), **bách khoa** (từ bách khoa trên web), **diễn giải** (suy ra từ tên gọi), **ước lượng** (chưa có chương xác nhận).
-- Đã đọc khoảng 440 chương: mẫu cứ 40 chương một lần để dựng mạch truyện, cộng các chương giới thiệu từng thế lực. Còn thiếu cách đột phá của Hư Thần, Thánh Đế, Đế Chủ, Thiên Tiên, Thánh cảnh; cảnh giới ở Thiên Giới vẫn là ước lượng.
+- Đã đọc khoảng 490 chương: mẫu cứ 40 chương một lần để dựng mạch truyện, cộng các chương giới thiệu từng thế lực, nhân vật, cảnh giới; cộng tên toàn bộ 11.341 chương. Còn thiếu cách đột phá chi tiết của Hư Thần; cảnh giới ở Thiên Giới vẫn là ước lượng; thứ tự giữa Kẻ Khai Hoang và vũ trụ đại lão suy từ số tiên điện.
 - Ghi chú người dùng lưu trong `localStorage` của trình duyệt, không đồng bộ giữa các máy.

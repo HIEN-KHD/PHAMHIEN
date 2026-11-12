@@ -74,12 +74,20 @@ const PLACES={
     ['gia','Long gia','Thế lực ở Long Huyết Thành, cùng Tà Long Cung và Phù Tang Đảo.',[1942]],
     ['tong','Âm Dương Hợp Hoan Tông','Bị cả chính đạo, ma đạo lẫn tà đạo xem thường.',[1717]],
     ['tong','Vạn Hoa Lâu','Có thánh nữ Diệu Khả Nhi, có phân nhánh ở Thiên Võ đại lục.',[1987]],
-    ['tong','Bắc Minh sơn','Thế lực của Bắc Minh Hiên.',['~1596']],
     ['toc','Kim Ô tộc','Yêu tộc có lãnh địa và đất phong hầu. Tộc trưởng rèn luyện các con để chọn người kế vị.',[1902,5642]],
     ['toc','Hắc Lân tộc','Tộc giao nhân hùng mạnh.',['~1641']],
     ['toc','Cổ Thần Tộc','Có một vị đại đế từ thời viễn cổ tọa trấn Cửu Châu, mạnh hơn Tà Hình Đại Đế rất nhiều.',[2734,2739]],
     ['toc','Huyết Dực Thiên Lang tộc','Chủng tộc có một tôn đại đế giáng lâm Cửu Châu.',[2734],'Nam Tiên Hải Vực'],
-    ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực']
+    ['toc','Thiên Yêu Hoàng','Con của Thiên Yêu Hoàng nắm Hắc Diễm Phệ Thần Hỏa, thiên hỏa xếp thứ tám. Lâm Phong giết hắn.',[2299,2968],'Nam Tiên Hải Vực'],
+    ['tong','Hồng Trần Tiên Tông','Tiên tông gắn với Hồng Trần Tiên Tôn; nơi Lâm Phong gặp lại cố nhân. Cửu Châu có thập đại tiên tông.',[1929,'~1672']],
+    ['vung','Bắc Man Châu','Có hai đại thế lực, trong đó có Đổng gia.',['~1703']],
+    ['gia','Đổng gia','Một trong hai đại thế lực của Bắc Man Châu.',['~1703'],'Bắc Man Châu'],
+    ['toc','Tuyết tộc & Băng tộc','Hai tộc ở vùng băng, có Tuyết Ưng Thành và Liệt băng cốc.',['~1682','~1683',1720,1721]],
+    ['thanh','Địa Hạ Thành','Thành dưới lòng đất, gắn với Thiên Kiêu Bảng.',[1716,2175]],
+    ['tong','Bách Hiểu Các','Các nắm tin tức.',[1854]],
+    ['quoc','Thiên Xà đế quốc','Đế quốc ở Cửu Châu.',[2282]],
+    ['hiem','Hoa Quả Sơn','Bên trong có sinh linh đáng sợ, khiến người ta nghi là Tề Thiên Đại Thánh.',[2801,2802,2825]],
+    ['hiem','Hỗn Độn chi môn','Sau cánh cửa là một thế giới đáng sợ. Gần đó có tin về Hỗn Độn Cổ Quốc ở Tây Hải.',[2822,2829,2872,2873]]
   ],
   cohoang:[
     ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],

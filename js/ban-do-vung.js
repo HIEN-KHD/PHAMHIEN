@@ -135,7 +135,7 @@ function renderRegion(w){
   const st=stars(svg,200,1000,640,w.x*3+w.y);sparkle(st,40,300,5);sparkle(st,960,600,5);
   [[170,560,.35],[860,120,.0],[60,200,.22]].forEach(([x,y,s])=>{if(s)island(el('g',{transform:`translate(${x},${y}) scale(${s})`,opacity:.45},svg),120,shade(base,-.2))});
 
-  const box={cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
+  const dense=w.places.length>18,box=dense?{cx:492,cy:312,rx:432,ry:214}:{cx:500,cy:300,rx:395,ry:188},seed=w.id.length*131+w.y;
   const land=el('g',{},svg),shape=blob(box.cx,box.cy,box.rx,box.ry,seed,.07);
   if(mode==='land'||mode==='cloud'){
     if(mode==='land'){
