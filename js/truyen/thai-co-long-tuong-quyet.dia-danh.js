@@ -115,7 +115,11 @@ const PLACES={
     ['gia','Quách gia','Một thế lực cực kỳ bất phàm.',[4396]],
     ['tong','Thánh Tà Tông','Một trong bảy đại thế lực tà đạo, không ai dám trêu.',[4778]],
     ['toc','Thiên Nhân tộc','Từ khi huyết mạch Tiên Thiên Nhân tộc lắng xuống, thiên nhân huyết mạch mới nổi bật lên.',[4475]],
-    ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]]
+    ['toc','U Minh tộc','Tu sĩ có lực xung kích rất mạnh.',[4079]],
+    ['tong','Huyết Ngục sát thủ vương triều','Tổ chức sát thủ khủng bố.',[4512,4564]],
+    ['hiem','Thiên Tàn Cốc','Thung lũng đáng sợ của Thiên Tàn tứ quái.',[4541,4543,4544]],
+    ['toc','Diệt Long kỵ sĩ quân đoàn','Quân đoàn kỵ sĩ chuyên diệt rồng.',[4579]],
+    ['bau','Nghiêu Đế thần tượng','Bên trong có một hình người bí ẩn.',[4573,4574]]
   ],
   toivuc:[
     ['tong','Tội huyết liên minh','Liên minh của hậu nhân tội huyết, minh chủ là "tội huyết chi hoàng" Lâm Phong.',[4586]],
@@ -148,7 +152,12 @@ const PLACES={
     ['toc','Si ma · Oán ma · Hận ma','Các ma đầu canh giữ bản nguyên Ma giới.',[6014]],
     ['bau','Trấn Ma Bia','Có thủ đoạn phi phàm, phát hiện được cả đội thuyền đang tàng hình.',[6060]],
     ['bau','Ngũ đại chí bảo','Năm chí bảo của Ma giới, tìm được nhờ lệnh bài ma chủ.',[4287]],
-    ['bau','Bản nguyên Ma giới','Khác thường, rất dễ bị dòm ngó.',[6014]]
+    ['bau','Bản nguyên Ma giới','Khác thường, rất dễ bị dòm ngó.',[6014]],
+    ['thanh','Thương Minh phủ','Phủ của Thương Minh Thiên. Hắn đền tội, ba đại cường giả thề thần phục Lâm Phong.',[6036,6037,6040,6041],'Ma Thiên vực'],
+    ['toc','Thiên Ma Bát Bộ','Đại quân Thiên Ma kéo tới, mở màn đại chiến.',[6060,6061]],
+    ['toc','Ôn dịch chi thần','Từng cầu xin tha thứ, sau lại hiển uy trong trận chiến.',[6022,6058]],
+    ['bau','Tám khối Vĩnh Trấn Bia','Phát hiện trọng đại ở Ma giới.',[6019]],
+    ['thanh','Tô Viên','Chỗ ở cũ của một vị đại nho.',[6042]]
   ],
   thiengioi:[
     ['vung','Ba mươi ba trọng thiên','Thiên Giới có 33 tầng trời và 33 vị thiên chủ.',[3475,6174]],
@@ -171,7 +180,12 @@ const PLACES={
     ['tong','Vĩnh Sinh tổ chức','Do vĩnh sinh chi chủ nắm giữ, người được cho là đi ra từ Vĩnh sinh chi môn.',[8040]],
     ['tong','Liên minh ác niệm kẻ khai hoang','Tàn sát bừa bãi, diệt cả một số thế lực đỉnh cấp.',[7106]],
     ['hiem','Mộ địa cường giả','Đại đế Quân Mạc Tiếu chết ở đây. Phế Thổ chứng kiến bao kỷ nguyên ra đời và hủy diệt.',[2883]],
-    ['toc','Hậu nhân tội huyết','Cũng có mặt ở Phế Thổ.',[6902]]
+    ['toc','Hậu nhân tội huyết','Cũng có mặt ở Phế Thổ.',[6902]],
+    ['tong','Long Đằng Các','Thế lực do Lâm Phong làm chi chủ.',[7107,7108]],
+    ['tong','Tiên Vũ Cung','Có Ngọc Tinh tiên tử.',[7109]],
+    ['dao','Quần Tinh Đảo','Nơi Lâm Phong từ biệt Ngọc Tinh tiên tử.',[7128]],
+    ['bau','Chấn Thiên Thạch Bi','Lâm Phong trấn áp rồi luyện hóa khối Chấn Thiên Thạch Bi thứ chín.',[7111,7179,7182]],
+    ['bau','Tứ Phương Thần ấn','Thần ấn Lâm Phong có được.',[7143]]
   ],
   cuuu:[
     ['hiem','Cửu U địa ngục','Bị phong ấn, chỉ linh hồn ra vào được. Thông đạo mỗi năm mở một canh giờ.',[1756]],
@@ -186,13 +200,30 @@ const PLACES={
     ['toc','Đồ Thần tộc','Vương tộc của thế giới đứng sau màn.',[6333],'Mạc Hậu Hắc Thủ thế giới'],
     ['hiem','Thông đạo thời không','Nhiều thông đạo nối tới các thời không khác nhau, có lúc truyền ra đạo âm. Vương tộc canh giữ những thông đạo khó trấn phong.',[8381]],
     ['bau','Thiên chi thần thân thể','Vừa sinh ra đã ở cấp Chúa Sáng Thế, có thể thành kẻ khai hoang thứ hai.',[8381]],
-    ['bau','Bảo vật chư thiên','Pháp bảo và thiên tài địa bảo khắp chư thiên bị hút về đây.',[8381]]
+    ['bau','Bảo vật chư thiên','Pháp bảo và thiên tài địa bảo khắp chư thiên bị hút về đây.',[8381]],
+    ['toc','Thiên Hư tộc','Một trong ba đại vương mạch dưới trướng Thái Tây tộc, bị hoàng tộc đứng sau màn tàn sát. Bộ Thường Nguyệt là hậu nhân.',[8372]],
+    ['tong','Thiên Ngục tổ chức','Tổ chức của Bạch Mặc Ly, đạt thỏa thuận hợp tác với Lâm Phong.',[8401,8402]],
+    ['hiem','Sương trắng yêu vực','Vùng sương trắng nơi yêu tà sinh sôi.',[8383]],
+    ['bau','Kiến Mộc chi thụ','Thần thụ bị hủy, ẩn chứa bí mật lớn.',[8376]],
+    ['bau','Côn Lôn Thiên Dương kiếm','Xếp thứ ba trong trăm đại cấm khí.',[8390,8404]],
+    ['bau','Đạo nguyên chi thảo','Dị thảo nghịch thiên, Lâm Phong thu được thành công.',[8418,8420]],
+    ['bau','Vườn thuốc đỉnh cấp','Một trong những vườn thuốc đỉnh cấp nhất.',[8405]],
+    ['toc','Trích tiên nhân','Thân phận bí ẩn, khiến Lâm Phong phải truy xét.',[8394,8396]]
   ],
   hoangchi:[
     ['hiem','Quân đoàn hoang chi âm binh','Cường giả cũng tránh đối đầu trực diện.',[8851]],
     ['bau','Máu bản nguyên kẻ khai hoang','Có thể nằm trong một bí địa ở đây.',[8851]],
     ['tong','Kỳ Liên sơn','Kỳ Liên sơn chủ đi cùng Lâm Phong tới Hoang chi địa.',[8840,8851]],
-    ['toc','Trời xanh con','Hóa thân của hắn rất mạnh, thề truy sát Lâm Phong vì bị phá việc lớn.',[8850,8851]]
+    ['toc','Trời xanh con','Hóa thân của hắn rất mạnh, thề truy sát Lâm Phong vì bị phá việc lớn.',[8850,8851]],
+    ['hiem','Khu vực sương đen','Sương đen lan ra, có nữ tu sống trong vùng này.',[8843,8897]],
+    ['tong','Thiên Khiển các','Thế lực của Bạch Ly.',[8863]],
+    ['tong','Vô Thượng Thần Đình','Thần Đình chi chủ tái xuất ở Hoang chi địa.',[8861]],
+    ['toc','Đế trụ','Cường giả bị Lâm Phong dụ mắc câu, sau dẫn đường tới bí địa.',[8844,8848,8851]],
+    ['quoc','Yêu chi quốc độ','Lâm Phong định hợp tác với quốc độ này.',[8888]],
+    ['toc','Bá chủ biển trong','Thế lực bá chủ dưới biển, có Hải hoàng và Giao hoàng.',[8881,8883,8884]],
+    ['bau','Khởi nguyên thần thạch','Tái hiện thân và bị Lâm Phong nghiền ép.',[8865,8866]],
+    ['bau','Quan tài chôn lửa','Nơi phong ấn một thiên hỏa mới xuất hiện.',[8892,8893,8894]],
+    ['hiem','Đền miếu','Nơi có phát hiện kinh người.',[8898,8899]]
   ],
   dongphuong:[
     ['vung','Côn Lôn vũ trụ','Vũ trụ gốc, lớn nhất trong tứ đại vũ trụ.',[4087,6420]],
