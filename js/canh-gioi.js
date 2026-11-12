@@ -114,3 +114,13 @@ Object.assign(REALMS[RIDX.chantien],{
 Object.assign(REALMS[RIDX.thanh],{lv:'Thánh cảnh cửu trọng: chín cảnh nhỏ như Đại Thánh, Tiên Thánh, Vạn Thánh…, mỗi cảnh có trọng thiên',tLv:'t',
   trait:'Từ Tiên Thánh bước vào Vạn Thánh là từ trung giai lên cao giai của Thánh cảnh; bốn cảnh cuối là giai cao nhất. Hải Vương của Nam Hải thế giới đột phá Thánh Chủ.',tTrait:'t',
   how:'Lâm Phong đột phá Đại Thánh ở Ma giới; khi tu thành đệ lục trọng Thái Cổ Long Tượng Quyết thì nhảy từ Tiên Thánh tứ trọng lên lục trọng; sau lên Tiên Thánh thập trọng, linh hồn đạt Vạn Thánh cửu trọng.',tHow:'t',ch:[6025,6315,6372,6570],lf:6025});
+
+/* Các bậc trên Siêu Việt tìm thêm được: Hợp Đạo, Hỗn Nguyên, vũ trụ đại lão */
+REALMS.splice(RIDX.chuasangthe,0,
+  R('hopdao','sieuviet','Hợp Đạo','合道','10 trọng thiên','Cảnh giới sau Siêu Việt.','Lâm Phong tu tới Hợp Đạo thập trọng thiên rồi bế quan xung kích Hỗn Nguyên.',{tLv:'t',tTrait:'t',tHow:'t',ch:[6834]}),
+  R('honnguyen','sieuviet','Hỗn Nguyên','混元','Có trọng thiên','Bậc ngay dưới chuẩn Chúa Sáng Thế. Phế Thổ chúa tể Thiên Tử Ức chưa vào chuẩn Chúa Sáng Thế nhưng chiến lực ngang bậc đó.','Lâm Phong trở lại Long Đằng Các bế quan, đột phá từ Hợp Đạo thập trọng lên Hỗn Nguyên nhất trọng. Sau đó xung kích chuẩn Chúa Sáng Thế.',{tLv:'t',tTrait:'t',tHow:'t',ch:[6834,7189,7190],lf:6834}));
+REALMS.splice(REALMS.findIndex(r=>r.id==='canhay'),0,
+  R('vutrudailao','sieuviet','Vũ trụ đại lão','宇宙大佬','Tính bằng tiên điện: 100 tòa','Chuẩn Kẻ Khai Hoang tối đa 99 tòa tiên điện; tòa thứ 100 là ranh giới để thành vũ trụ đại lão.','Phải độ kiếp. Năm cường giả từ 99 tiên điện cùng độ kiếp thành công. Bất Diệt kiếm chủ cũng xung kích bậc này. Linh hồn Lâm Phong đạt tầng vũ trụ đại lão, lợi ích toàn diện.',{tLv:'t',tTrait:'t',tHow:'t',ch:[9891,10085,10363]}));
+for(const k in RIDX)delete RIDX[k];REALMS.forEach((r,i)=>{RIDX[r.id]=i});
+Object.assign(REALMS[RIDX.chuasangthe],{how:'Phải độ Chúa Sáng Thế kiếp. Lôi kiếp càng mạnh, nuốt mảnh vỡ lôi kiếp càng được nhiều lợi. Lâm Phong chọn đột phá ở hải ngoại thế giới vì động tĩnh quá lớn. Có lần hai người cùng độ, một chết một thành.',ch:[6504,6611,7189,7729,7732],lf:7729});
+Object.assign(REALMS[RIDX.khaihoang],{lv:'Chuẩn Kẻ Khai Hoang tính bằng tiên điện, tối đa 99 tòa',tLv:'t',ch:[8381,8467,9706,10363,11034]});
