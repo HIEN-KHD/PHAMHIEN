@@ -253,4 +253,18 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .tile b{font:700 26px var(--body);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .tile span{font-size:12px;color:var(--muted)}
+/* Vũ trụ 3D */
+.v3d-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#05060f}
+.v3d-canvas canvas{display:block;width:100%!important;touch-action:none}
+.v3d-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:15px}
+.v3d-ctrl{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px}
+.v3d-ctrl .btn{padding:6px 12px;font-size:13px;background:rgba(10,11,34,.75);backdrop-filter:blur(6px)}
+.v3d-ctrl .btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.v3d-panel{position:absolute;top:12px;right:12px;width:min(300px,40%);max-height:calc(100% - 24px);overflow:auto;background:rgba(10,11,34,.82);backdrop-filter:blur(8px);gap:10px}
+.v3d-panel .pname{font-family:var(--display);font-size:28px;margin:0;color:var(--ink)}
+.v3d-panel .power{grid-template-columns:1fr}
+.v3d-legend{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.v3d-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.v3d-legend b{color:var(--muted);font-weight:600;margin-left:4px}
+@media (max-width:720px){.v3d-panel{position:static;width:auto;max-height:none;border-radius:0;border:0;border-top:1px solid var(--line)}.v3d-ctrl{position:static;padding:10px}}
 @media (prefers-reduced-motion:reduce){.tunnel .core{animation:none}.cover{transition:none}.place{transition:none}}

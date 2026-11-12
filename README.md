@@ -8,7 +8,8 @@
 2. **Bản đồ**: các thế giới và đường hầm không gian. Rê chuột để xem trước, bấm để vào.
 3. **Thế giới**: bản đồ vùng có quốc gia, vùng/vực, gia tộc, tông môn, chủng tộc, thành trì, hiểm địa và bảo vật (bấm để xem chi tiết, lọc theo loại); khung cảnh giới ở góc trên bên phải; hồ sơ thế giới theo lời truyện (có số chương); tháp cảnh giới và cách đột phá.
 
-4. **Hồ sơ truyện**: Nhân vật (theo nhóm quan hệ), Hành trình của Lâm Phong (mốc theo chương, kèm cảnh giới đạt được), Công pháp & bảo vật (công pháp, huyết mạch, thần thông, bảng thiên hỏa có xếp hạng, bảo vật).
+4. **Vũ trụ 3D**: các thế giới là đảo 3D xếp theo tầng (tầng cao nằm trên), xoay mọi góc, bấm để bay tới. Dùng Three.js r128 (tải từ CDN, dự phòng `js/vendor/`).
+5. **Hồ sơ truyện**: Nhân vật (theo nhóm quan hệ), Hành trình của Lâm Phong (mốc theo chương, kèm cảnh giới đạt được), Công pháp & bảo vật (công pháp, huyết mạch, thần thông, bảng thiên hỏa có xếp hạng, bảo vật).
 
 Không cần cài đặt gì: mở `index.html` bằng trình duyệt là chạy.
 
@@ -23,6 +24,9 @@ js/truyen/<slug>.dia-danh.js   Quốc gia, gia tộc, thế lực… của từn
 js/truyen/<slug>.chuong.js     Bảng liên kết chương, tạo tự động — không sửa tay
 js/truyen/<slug>.ho-so.js      Nhân vật, hành trình, công pháp/huyết mạch/thiên hỏa/bảo vật
 js/ho-so.js                    Vẽ các trang hồ sơ
+js/the-gioi-3d.js              Vũ trụ 3D (Three.js)
+js/vendor/                     Three.js r128 + OrbitControls (MIT), dùng khi không có mạng
+js/truyen/<slug>.quy-mo.js     Quy mô 1–5 của địa danh, tạo bằng tools/tinh_quy_mo.py
 js/ban-do-vung.js              Vẽ bản đồ vùng của một thế giới và sắp xếp địa danh không chồng nhau
 js/tien-ich.js                 Hàm tiện ích nhỏ
 js/hinh-ve.js                  Vẽ SVG: đảo bay, núi, mặt trời, sao, hiệu ứng mờ và phát sáng

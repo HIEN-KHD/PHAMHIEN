@@ -54,6 +54,22 @@
     <div id="infoBody" class="view"></div>
   </section>
 
+  <!-- Màn vũ trụ 3D -->
+  <section class="view" id="v3dView" hidden>
+    <header class="w-head"><span class="eyebrow">Vũ trụ 3D</span><h1>Các tầng thế giới</h1><p class="sub">Kéo để xoay mọi góc, cuộn hoặc chụm hai ngón để phóng to. Bấm một thế giới để bay tới.</p></header>
+    <div class="v3d-wrap">
+      <div id="v3d" class="v3d-canvas"></div>
+      <p class="v3d-msg meta" id="v3dMsg" hidden></p>
+      <div class="v3d-ctrl">
+        <button type="button" class="btn" data-v3d="rot" id="v3dRot" aria-pressed="true">Tự xoay</button>
+        <button type="button" class="btn" data-v3d="top">Nhìn từ trên</button>
+        <button type="button" class="btn" data-v3d="side">Nhìn ngang</button>
+        <button type="button" class="btn" data-v3d="reset">Góc ban đầu</button>
+      </div>
+      <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
+    </div>
+  </section>
+
   <!-- Màn 3: Thế giới -->
   <section class="view" id="vWorld" hidden>
     <header class="w-head"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></header>
@@ -101,6 +117,7 @@
 <script src="js/hinh-ve.js"></script>
 <script src="js/ban-do-vung.js"></script>
 <script src="js/ho-so.js"></script>
+<script src="js/the-gioi-3d.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
