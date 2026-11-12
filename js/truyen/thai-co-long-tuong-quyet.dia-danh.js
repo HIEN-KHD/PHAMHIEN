@@ -271,7 +271,12 @@ const PLACES={
     ['toc','Cửu Tiêu tộc','Có ba vị lão tổ. Chỉ lão tổ thứ ba đã mạnh khó tưởng.',[11002]],
     ['toc','Thiên Ảnh tộc','Có Thiên Tiểu Ngũ, cực mạnh nhưng khiêm tốn.',[10846]],
     ['quoc','Nam hải thế giới','Chưa từng được thống nhất, cho đến khi Lâm Phong làm được.',[10379]],
-    ['dao','Huyền Vũ đảo','Chọn đầu hàng Lâm Phong.',[10379],'Nam hải thế giới']
+    ['dao','Huyền Vũ đảo','Chọn đầu hàng Lâm Phong.',[10379],'Nam hải thế giới'],
+    ['vung','Vu chi thế giới','Có Tỏa Long phong.',[9998]],
+    ['toc','Thạch Ma tộc','Tộc ở tầng đất đáy.',[9944]],
+    ['tong','Hắc Ám Thiên điện','Lâm Phong cướp khí vận của điện chủ.',[10087,10123]],
+    ['dao','Tinh Lạc đảo','Thế lực đảo ở Nam hải thế giới, chống lại Lâm Phong rồi thất bại.',[10375,10379],'Nam hải thế giới'],
+    ['tong','Vĩnh Sinh hoàng tộc','Tám hoàng gia của Vĩnh sinh chi môn; con trai vĩnh sinh chi chủ là Cơ Tương Thiên.',[10612,10683]]
   ]
 };
 STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn])=>({t,n,d,ch,in:inn||null}))});
