@@ -257,6 +257,11 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .v3d-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#05060f}
 .v3d-canvas canvas{display:block;width:100%!important;touch-action:none}
 .v3d-msg{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:15px}
+.v3d-pivots{position:absolute;left:12px;top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:calc(100% - 340px)}
+.v3d-pivots span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.v3d-pivots .btn{padding:5px 10px;font-size:12px;background:rgba(10,11,34,.75);backdrop-filter:blur(6px)}
+.v3d-pivots .btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+@media (max-width:720px){.v3d-pivots{position:static;max-width:none;padding:10px 10px 0}}
 .v3d-tip{position:absolute;pointer-events:none;max-width:280px;background:rgba(10,11,34,.9);border:1px solid var(--gold);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted)}
 .v3d-tip b{font-size:14px;color:var(--ink)}
 .v3d-ctrl{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px}

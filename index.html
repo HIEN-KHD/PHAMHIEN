@@ -56,7 +56,7 @@
 
   <!-- Màn vũ trụ 3D -->
   <section class="view" id="v3dView" hidden>
-    <header class="w-head"><span class="eyebrow">Vũ trụ 3D</span><h1>Các tầng thế giới</h1><p class="sub">Kéo để xoay mọi góc, cuộn hoặc chụm hai ngón để phóng to. Bấm một thế giới để bay tới.</p></header>
+    <header class="w-head"><span class="eyebrow">Vũ trụ 3D</span><h1>Các tầng thế giới</h1><p class="sub">Kéo để xoay · cuộn hoặc chụm để phóng to · <b>nhấp đúp</b> vào chỗ bất kỳ để đặt tâm xoay ở đó · kéo chuột phải (hai ngón) để dời tâm · bấm một thế giới để bay tới.</p></header>
     <div class="v3d-wrap">
       <div id="v3d" class="v3d-canvas"></div>
       <p class="v3d-msg meta" id="v3dMsg" hidden></p>
@@ -66,6 +66,14 @@
         <button type="button" class="btn" data-v3d="top">Nhìn từ trên</button>
         <button type="button" class="btn" data-v3d="side">Nhìn ngang</button>
         <button type="button" class="btn" data-v3d="reset">Góc ban đầu</button>
+      </div>
+      <div class="v3d-pivots" role="group" aria-label="Tâm xoay">
+        <span>Tâm xoay</span>
+        <button type="button" class="btn" data-pivot="all" aria-pressed="true">Toàn vũ trụ</button>
+        <button type="button" class="btn" data-pivot="4" aria-pressed="false">Tầng 4</button>
+        <button type="button" class="btn" data-pivot="3" aria-pressed="false">Tầng 3</button>
+        <button type="button" class="btn" data-pivot="2" aria-pressed="false">Tầng 2</button>
+        <button type="button" class="btn" data-pivot="1" aria-pressed="false">Tầng 1</button>
       </div>
       <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
     </div>
