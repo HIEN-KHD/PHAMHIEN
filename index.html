@@ -77,6 +77,24 @@
       </div>
       <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
     </div>
+    <div class="v2d" id="v2d" hidden role="dialog" aria-modal="true" aria-labelledby="v2dName">
+      <div class="v2d-bar">
+        <button type="button" class="btn" data-v2d="close">← Về 3D</button>
+        <h2 id="v2dName"></h2>
+        <div class="v2d-zoom" role="group" aria-label="Phóng to thu nhỏ">
+          <button type="button" class="btn" data-v2d="out" aria-label="Thu nhỏ">−</button>
+          <button type="button" class="btn" data-v2d="fit">Vừa khung</button>
+          <button type="button" class="btn" data-v2d="in" aria-label="Phóng to">+</button>
+        </div>
+        <a class="btn primary" id="v2dFull" href="#">Trang thế giới →</a>
+      </div>
+      <div class="v2d-stage" id="v2dStage">
+        <svg id="scene2d" viewBox="0 0 1000 640" role="img"></svg>
+        <div class="realm-badge" id="v2dBadge"></div>
+        <aside class="panel v2d-card" id="v2dCard" hidden aria-live="polite"></aside>
+        <p class="v2d-hint meta">Lăn chuột hoặc chụm 2 ngón để phóng to · kéo để di chuyển · bấm thế lực để xem</p>
+      </div>
+    </div>
   </section>
 
   <!-- Màn 3: Thế giới -->

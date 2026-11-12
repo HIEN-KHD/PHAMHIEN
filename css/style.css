@@ -275,3 +275,21 @@ a:focus-visible,button:focus-visible,.world:focus-visible,.portal:focus-visible{
 .v3d-legend b{color:var(--muted);font-weight:600;margin-left:4px}
 @media (max-width:720px){.v3d-panel{position:static;width:auto;max-height:none;border-radius:0;border:0;border-top:1px solid var(--line)}.v3d-ctrl{position:static;padding:10px}}
 @media (prefers-reduced-motion:reduce){.tunnel .core{animation:none}.cover{transition:none}.place{transition:none}}
+
+/* Màn 2D phóng to của một thế giới (mở từ vũ trụ 3D) */
+.v2d{position:fixed;inset:0;z-index:60;background:#05060f;display:flex;flex-direction:column;animation:v2dIn .45s ease-out}
+@keyframes v2dIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.v2d{animation:none}}
+.v2d-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:rgba(8,9,30,.92)}
+.v2d-bar h2{margin:0;flex:1;min-width:0;font:600 clamp(18px,2.4vw,26px)/1.2 var(--display);color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v2d-zoom{display:flex;gap:6px}
+.v2d-stage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;cursor:grab}
+.v2d-stage.drag{cursor:grabbing}
+.v2d-stage svg{display:block;width:100%;height:100%}
+.v2d .realm-badge{max-height:calc(100% - 90px)}
+.v2d .realm-badge button{pointer-events:none}
+.v2d-card{position:absolute;left:16px;bottom:16px;width:min(360px,calc(100% - 32px));max-height:min(46vh,420px);overflow:auto}
+.v2d-card .x{position:absolute;top:8px;right:8px}
+.v2d-hint{position:absolute;right:16px;bottom:10px;margin:0;padding:4px 10px;border-radius:999px;background:rgba(8,9,30,.7);font-size:12px;pointer-events:none}
+.v2d #scene2d .place.sel .bg{stroke:#fff;stroke-width:3}
+@media (max-width:720px){.v2d-hint{display:none}.v2d .realm-badge{width:min(190px,48%);font-size:12px}}

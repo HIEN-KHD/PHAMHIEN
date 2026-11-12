@@ -134,14 +134,16 @@ function layoutPlaces(places,box,avoid){
 }
 
 let curPlace=null,placeFilter=null,placeIndex=[];
-function renderRegion(w){
-  const svg=document.getElementById('scene'),[top,bot,neb]=SKY[w.kind],mode=MODE[w.kind]||'land',base=GROUND[w.kind]||'#4f9a46';
+/* opt (màn 2D phóng to trong 3D): {svg, sfx: hậu tố id để không trùng gradient, onPick(i), onPortal(id)} */
+function renderRegion(w,opt){
+  opt=opt||{};const sfx=opt.sfx||'',pick=i=>opt.onPick?opt.onPick(i):selectPlace(i);
+  const svg=opt.svg||document.getElementById('scene'),[top,bot,neb]=SKY[w.kind],mode=MODE[w.kind]||'land',base=GROUND[w.kind]||'#4f9a46';
   svg.setAttribute('aria-label','Bản đồ vùng '+w.name);svg.innerHTML='';
-  el('defs',{},svg).innerHTML=`<linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>
-    <radialGradient id="landTop" cx="45%" cy="40%" r="70%"><stop offset="0" stop-color="${shade(base,.14)}"/><stop offset="1" stop-color="${shade(base,-.18)}"/></radialGradient>
-    <radialGradient id="seaTop" cx="50%" cy="45%" r="65%"><stop offset="0" stop-color="#3f8fd8"/><stop offset="1" stop-color="#123f7a"/></radialGradient>
-    <radialGradient id="sunTop" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#fff6d6"/><stop offset=".6" stop-color="#f6c45a"/><stop offset="1" stop-color="#c47a1e"/></radialGradient>`;
-  el('rect',{width:1000,height:640,fill:'url(#sceneSky)'},svg);
+  el('defs',{},svg).innerHTML=`<linearGradient id="sceneSky${sfx}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>
+    <radialGradient id="landTop${sfx}" cx="45%" cy="40%" r="70%"><stop offset="0" stop-color="${shade(base,.14)}"/><stop offset="1" stop-color="${shade(base,-.18)}"/></radialGradient>
+    <radialGradient id="seaTop${sfx}" cx="50%" cy="45%" r="65%"><stop offset="0" stop-color="#3f8fd8"/><stop offset="1" stop-color="#123f7a"/></radialGradient>
+    <radialGradient id="sunTop${sfx}" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#fff6d6"/><stop offset=".6" stop-color="#f6c45a"/><stop offset="1" stop-color="#c47a1e"/></radialGradient>`;
+  el('rect',{width:1000,height:640,fill:`url(#sceneSky${sfx})`},svg);
   const r=rng(w.id.length*97+w.x);
   for(let i=0;i<4;i++)el('ellipse',{cx:r()*1000,cy:r()*400,rx:140+r()*140,ry:80+r()*70,fill:neb,opacity:.22,filter:'url(#blur)'},svg);
   const st=stars(svg,200,1000,640,w.x*3+w.y);sparkle(st,40,300,5);sparkle(st,960,600,5);
@@ -155,10 +157,10 @@ function renderRegion(w){
       el('path',{d:`M${box.cx+box.rx*.02},${box.cy+box.ry} L${box.cx+box.rx*.04},${box.cy+box.ry+150} Q${box.cx+box.rx*.45},${box.cy+box.ry+80} ${box.cx+box.rx*.97},${box.cy+12}Z`,fill:'#000',opacity:.28},land);
     }else{el('ellipse',{cx:box.cx,cy:box.cy+70,rx:box.rx*1.05,ry:box.ry*.9,fill:'#c7d2ff',opacity:.3,filter:'url(#soft)'},land)}
     if(mode==='land')el('path',{d:shape,fill:'none',stroke:'#e6d29a','stroke-width':9,opacity:.75},land);
-    el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':'url(#landTop)',stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land);
+    el('path',{d:shape,fill:mode==='cloud'?'#e9eeff':`url(#landTop${sfx})`,stroke:shade(base,.35),'stroke-width':2,opacity:mode==='cloud'?.92:1},land);
   }else if(mode==='sea'){
     el('path',{d:blob(box.cx,box.cy+10,box.rx*1.04,box.ry*1.06,seed+1,.05),fill:'#071f44',opacity:.6,filter:'url(#soft)'},land);
-    el('path',{d:shape,fill:'url(#seaTop)',stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
+    el('path',{d:shape,fill:`url(#seaTop${sfx})`,stroke:'#7cc4ff','stroke-width':2,opacity:.95},land);
   }else if(mode==='void'){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.04,ry:box.ry*1.06,fill:'#ff6a1f',opacity:.35,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#2a120c',stroke:'#ff8a3a','stroke-width':3},land);
@@ -167,7 +169,7 @@ function renderRegion(w){
   }else if(mode==='sun'){
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.15,ry:box.ry*1.25,fill:'url(#sunHalo)'},land);
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;el('line',{x1:box.cx+Math.cos(a)*box.rx*1.03,y1:box.cy+Math.sin(a)*box.ry*1.03,x2:box.cx+Math.cos(a)*box.rx*(i%2?1.12:1.2),y2:box.cy+Math.sin(a)*box.ry*(i%2?1.12:1.2),stroke:'#f6d27e','stroke-width':4,'stroke-linecap':'round',opacity:.8},land)}
-    el('path',{d:shape,fill:'url(#sunTop)'},land);
+    el('path',{d:shape,fill:`url(#sunTop${sfx})`},land);
   }else{
     el('ellipse',{cx:box.cx,cy:box.cy,rx:box.rx*1.05,ry:box.ry*1.1,fill:'#5b6cff',opacity:.25,filter:'url(#blur)'},land);
     el('path',{d:shape,fill:'#14123f',opacity:.55,stroke:'#9b8cff','stroke-width':1.5,'stroke-dasharray':'6 6'},land);
@@ -177,7 +179,7 @@ function renderRegion(w){
   const[ra,rb]=rangeOf(w),avoid=[[775,0,1000,Math.min(330,60+(rb-ra+1)*22)],[0,0,215,165],[0,520,330,640],[670,520,1000,640]];
   const nP=w.places.length,shrink=nP>20?1.3:nP>15?.8:nP>11?.4:0;w.places.forEach(p=>{p.sv=Math.max(1,p.s-shrink)});
   const pos=layoutPlaces(w.places,box,avoid);
-  placeIndex=w.places;
+  if(!opt.svg)placeIndex=w.places;
   const roadG=el('g',{},svg),terrG=el('g',{},svg),markG=el('g',{},svg);
   if(mode==='land'||mode==='cloud'){const hubs=w.places.map(p=>pos.get(p)).filter((P,i)=>P&&['thanh','tong','quoc'].includes(w.places[i].t)&&!P.terr);
     const inT=[hubs[0]],rest=hubs.slice(1);while(rest.length&&inT[0]){let bi=0,bj=0,bd=1e9;rest.forEach((b,i)=>inT.forEach((a,j)=>{const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<bd){bd=d;bi=i;bj=j}}));
@@ -194,7 +196,7 @@ function renderRegion(w){
     el('path',{d,fill:'none',stroke:'#0a0b22','stroke-width':4.5,opacity:.35},g);
     el('path',{class:'edge',d,fill:'none',stroke:c,'stroke-width':1.6+p.s*.3,'stroke-dasharray':'8 4 2 4',opacity:.9},g);
     el('text',{class:'tlabel',x:P.x,y:P.y,fill:c,style:`font-size:${(12+p.s*1.6).toFixed(1)}px`},g).textContent=p.n.toUpperCase();
-    bindOpen(g,()=>selectPlace(i));
+    bindOpen(g,()=>pick(i));
   });
   w.places.forEach((p,i)=>{const P=pos.get(p);if(!P||P.terr)return;
     const c=PTYPE[p.t].c,g=el('g',{class:'place mk','data-pi':i,'data-t':p.t,tabindex:0,role:'button','aria-label':p.n,transform:`translate(${P.x.toFixed(1)},${P.y.toFixed(1)})`},markG);
@@ -204,7 +206,7 @@ function renderRegion(w){
     el('circle',{class:'bg',cx:0,cy:-2,r:z.r,fill:'#0a0b22',opacity:.7,stroke:c,'stroke-width':1.5+p.s*.25},g);
     ICON[p.t](el('g',{transform:`translate(0,-1) scale(${z.ic.toFixed(2)})`},g),c);
     el('text',{class:'plabel',x:0,y:z.r+z.fs+2,style:`font-size:${z.fs}px${p.s>=4?';font-weight:700':''}`},g).textContent=p.n;
-    bindOpen(g,()=>selectPlace(i));
+    bindOpen(g,()=>pick(i));
   });
 
   // Biểu tượng thế giới góc trên trái, cổng không gian ở các góc dưới
@@ -215,8 +217,9 @@ function renderRegion(w){
     el('ellipse',{cx:0,cy:0,rx:24,ry:9,fill:'#05060f',stroke:c,'stroke-width':3,filter:'url(#glow)'},g);
     el('ellipse',{cx:0,cy:-26,rx:14,ry:30,fill:c,opacity:.18,filter:'url(#soft)'},g);
     el('text',{x:right?-34:34,y:5,style:`text-anchor:${right?'end':'start'}`},g).textContent=(up?'⇡ ':'→ ')+short(byId[n].name);
-    bindOpen(g,()=>go(`${S.id}--${n}`));
+    bindOpen(g,()=>opt.onPortal?opt.onPortal(n):go(`${S.id}--${n}`));
   });
+  if(opt.svg)return;
   renderPlaceLists(w);applyFilter();
   const first=w.places.map((p,i)=>({p,i})).filter(x=>x.p.t!=='quoc'&&x.p.t!=='vung').sort((a,b)=>b.p.s-a.p.s)[0];
   selectPlace(first?first.i:null,true);
@@ -254,8 +257,8 @@ document.addEventListener('click',e=>{
 });
 
 /* Khung cảnh giới góc trên phải của bản đồ */
-function renderRealmBadge(w){
-  const[a,b]=rangeOf(w),box=document.getElementById('realmBadge');
+function renderRealmBadge(w,box){
+  const[a,b]=rangeOf(w);box=box||document.getElementById('realmBadge');
   const rows=REALMS.slice(a,b+1).map((r,k)=>({r,i:a+k})).reverse();
   box.innerHTML=`<span class="rb-h">Cảnh giới ở đây${w.rGuess?' <em>(ước lượng)</em>':''}</span>
     <span class="rb-range">${esc(REALMS[a].name)} → ${esc(REALMS[b].name)} · ${b-a+1} bậc</span>
