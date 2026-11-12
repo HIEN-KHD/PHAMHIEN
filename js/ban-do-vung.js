@@ -226,8 +226,9 @@ function renderPlaceLists(w){
   document.getElementById('placeCount').textContent=`${w.places.length} địa danh`;
   document.getElementById('placeLegend').innerHTML=PORDER.filter(t=>cnt[t]).map(t=>`<button type="button" class="lg" data-ft="${t}" aria-pressed="false"><svg viewBox="-16 -18 32 32" aria-hidden="true"></svg>${PTYPE[t].name} <b>${cnt[t]}</b></button>`).join('');
   document.querySelectorAll('#placeLegend .lg').forEach(b=>ICON[b.dataset.ft](b.querySelector('svg'),PTYPE[b.dataset.ft].c));
-  box.innerHTML=PORDER.filter(t=>cnt[t]).map(t=>`<div class="pg"><h3><i style="background:${PTYPE[t].c}"></i>${PTYPE[t].name}</h3><div class="chips">${
-    w.places.map((p,i)=>p.t===t?`<button type="button" class="chip pchip" data-pi="${i}">${esc(p.n)}</button>`:'').join('')}</div></div>`).join('')||'<p class="meta">Chưa có địa danh cho thế giới này.</p>';
+  const ranked=w.places.map((p,i)=>({p,i})).sort((a,b)=>b.p.s-a.p.s||a.p.n.localeCompare(b.p.n));
+  box.innerHTML=ranked.length?`<div class="power">${ranked.map(({p,i})=>`<button type="button" class="pw pchip" data-pi="${i}" data-t="${p.t}"><svg viewBox="-16 -18 32 32" aria-hidden="true"></svg><span class="pn">${esc(p.n)}</span><span class="pb"><i style="width:${p.s*20}%;background:${PTYPE[p.t].c}"></i></span></button>`).join('')}</div>`:'<p class="meta">Chưa có địa danh cho thế giới này.</p>';
+  box.querySelectorAll('.pw').forEach(b=>ICON[b.dataset.t](b.querySelector('svg'),PTYPE[b.dataset.t].c));
 }
 
 function selectPlace(i,quiet){

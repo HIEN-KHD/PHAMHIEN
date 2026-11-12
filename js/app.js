@@ -171,7 +171,7 @@ function renderWorld(wid){
   renderRegion(w);
   document.getElementById('dossier').innerHTML=
     `<figure class="quote" style="margin:0"><q>${esc(w.quote[0])}</q><figcaption class="meta">Nguyên văn bản convert, ${chLink(w.quote[1])}</figcaption></figure>`+
-    w.secs.map(([h,t,chs])=>`<section class="card${h.startsWith('Lâm Phong')?' lp':''}"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
+    w.secs.map(([h,t,chs])=>`<section class="card clamp${h.startsWith('Lâm Phong')?' lp':''}" tabindex="0"><h3>${esc(h)}</h3><p>${esc(t)}</p><div class="refs">${chs.map(chLink).join('')}</div></section>`).join('');
   const facts=[['Loại không gian',w.type],['Vị trí',(w.tier===4?'Ngoài':'Trong')+' Cửu Châu vũ trụ · '+S.tiers[w.tier].name],[w.rGuess?'Cảnh giới (ước lượng)':'Cảnh giới Lâm Phong khi ở đây',`${REALMS[lo].name} → ${REALMS[hi].name}`],['Đường hầm',`${adj[wid].length} lối (${adj[wid].filter(n=>linkType(wid,n)==='up').length} lối vàng)`],['Địa danh đã ghi',`${w.places.length} (quốc gia, gia tộc, thế lực…)`],['Biểu tượng trên bản đồ',w.sym]];
   document.getElementById('wFacts').innerHTML=facts.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
   const path=route(S.start,wid)||[wid],steps=path.length-1;
