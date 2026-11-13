@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Đế Bá** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/de-ba/  ·  Nguồn: https://metruyenchu.com.vn/de-ba
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+**Đã có dữ liệu** (đọc mẫu 550 chương): 16 thế giới · 155 địa danh · 32 cảnh giới · 28 nhân vật. Làm tiếp theo các bước dưới.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Đế Bá"*. Các lệnh chính (chạy trong thư mục `de-ba/`):
