@@ -9,15 +9,11 @@ from collections import Counter, defaultdict
 from chung import thu_muc_truyen
 
 # Phạm vi chương chính của mỗi thế giới; khoảng con đặt sau sẽ ghi đè khoảng rộng
-PHAM_VI = [("thienvo", 1, 800), ("tamthien", 801, 1400), ("phongtruc", 1401, 1600), ("cuuchau", 1601, 3000),
-           ("cuuu", 1740, 1800), ("cohoang", 1950, 2120), ("minhgioi", 2320, 2420), ("phetho", 2860, 2960),
-           ("battu", 3880, 5660), ("toivuc", 4500, 4620), ("longgioi", 5690, 5900), ("minhgioi", 5950, 5990),
-           ("magioi", 6000, 6090), ("thiengioi", 6170, 6640), ("phetho", 7150, 7200), ("dongphuong", 7700, 11220),
-           ("thienchi", 8360, 8420), ("hoangchi", 8830, 8890)]
+PHAM_VI = [("hoavuc", 1, 235), ("longvuc", 236, 488), ("thienha", 489, 522), ("chientruong", 523, 560), ("chanvu", 561, 614)]
 DUOI = ["gia tộc", "đế quốc", "học viện", "thánh địa", "sâm lâm", "tông", "gia", "thành", "quốc", "môn", "cốc", "phái", "điện",
         "các", "vực", "châu", "sơn", "đảo", "hải", "cung", "tộc", "viện", "phủ", "lâu", "trấn", "lĩnh", "uyên", "hồ", "tự", "đài",
         "giới", "minh", "triều", "thần triều", "vương triều", "đế triều", "liên minh", "sơn mạch", "bí cảnh", "cấm địa"]
-BO = {"lâm phong", "thiên võ", "cửu châu", "đông phương", "nguồn", "chương", "ta", "hắn", "nàng", "các ngươi", "chúng ta"}
+BO = {"giang thần", "giang", "ninh", "nguồn", "chương", "ta", "hắn", "nàng", "các ngươi", "chúng ta"}
 
 
 def the_gioi(n):
