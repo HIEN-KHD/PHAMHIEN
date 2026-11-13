@@ -3,3 +3,4 @@ du-lieu/*/chuong/
 __pycache__/
 *.pyc
 .DS_Store
+du-lieu/*/_trang/
