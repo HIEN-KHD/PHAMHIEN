@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Tu La Võ Thần** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/tu-la-vo-than/  ·  Nguồn: https://metruyenchu.com.vn/tu-la-vo-than-tu-la-vu-than-truyen-chu
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+Đã dựng bản đồ từ 230 chương mẫu rải đều: 12 thế giới, 106 địa danh, 17 cảnh giới, 23 nhân vật.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Tu La Võ Thần"*. Các lệnh chính (chạy trong thư mục `tu-la-vo-than/`):
