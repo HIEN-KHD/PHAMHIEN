@@ -34,7 +34,7 @@ def doc_danh_sach(slug):
     chi_muc = {}
     for i, (ten, duong_dan) in enumerate(hang):
         m = re.match(r".*?Chương\s*(\d+)", ten)
-        chi_muc.setdefault(m.group(1) if m else f"~{i + 1}", (ten, duong_dan))
+        chi_muc.setdefault(str(int(m.group(1))) if m else f"~{i + 1}", (ten, duong_dan))
     return hang, chi_muc
 
 
