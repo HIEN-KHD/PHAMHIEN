@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Kình Thiên Kiếm Đế** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/kinh-thien-kiem-de/  ·  Nguồn: https://metruyenchu.com.vn/kinh-thien-kiem-de
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+**Đã có dữ liệu**: 12 thế giới, 112 địa danh, 18 cảnh giới, 14 nhân vật, 33 mốc hành trình (đọc mẫu ~220 chương). Làm theo các bước dưới để bổ sung.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Kình Thiên Kiếm Đế"*. Các lệnh chính (chạy trong thư mục `kinh-thien-kiem-de/`):
