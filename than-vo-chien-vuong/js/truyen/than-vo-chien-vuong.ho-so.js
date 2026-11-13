@@ -12,9 +12,18 @@ const people=[
   ['hn','Bạch Linh','Cùng Giang Thần vạn dặm độc hành, sau vào Thánh Viện.',['hoavuc','longvuc'],[178,256,278]],
   ['hn','Ứng Vô Song','Người Anh Hùng Điện dẫn Giang Thần làm quen; bị cô lập.',['longvuc'],[253,274,295]],
   ['hn','Đường Thi Nhã','Đệ tử thân truyền Vân Lam Môn, con gái Đại trưởng lão Đường gia.',['chanvu'],[577,580]],
+    ['hn','Thủy Sanh','Nữ đệ tử Linh Lung Môn được Giang Thần cứu ở Vạn thú vực.',['hoavuc'],[142,144,227]],
   ['dh','Thiên Phong đạo nhân','Sư phụ của cha, đại năng Hỏa vực; đang chiến đấu ở Thiên Vực chiến trường.',['hoavuc','thanhvuc'],[1,41]],
   ['dh','Hàn Ty Minh','Người trên Thần Long bảng, cùng vào bí tàng; sau vào chiến xa quân.',['longvuc','chientruong'],[400,421,532]],
   ['dh','Đỗ Trấn Phi','Đại tướng quân quân đoàn thứ ba, tính phóng khoáng, tin dùng Giang Thần.',['thienha','chientruong','chanvu'],[511,532,589]],
+    ['dh','Phạm Đồ','Người hầu trung thành ở Đông viện Giang phủ từ chương đầu.',['hoavuc'],[3,4,8]],
+    ['dh','Mạnh Hạo','Thanh niên nắm kiếm điểm, quen trên đường tới Cửu Long thành.',['hoavuc'],[42,43,60]],
+    ['dh','Thanh Ma','Hồn trong bình ngọc, được tái tạo thân thể, thành "thiên bộ" của Bát bộ thiên long.',['hoavuc','longvuc','chanvu'],[113,114,125,349]],
+    ['dh','Nam Công','Người có địa vị ở Thánh Viện, dẫn nhóm Giang Thần tới Thánh Thành.',['longvuc'],[235,237,240]],
+    ['dh','Tô Tú Y','Chưởng giáo Thiên Đạo Môn, dáng thiếu niên tuấn dật.',['hoavuc'],[122,123,124]],
+    ['dh','Lệ Nam Tinh','Truyền thừa đệ tử Anh Hùng Điện, top 10 Thăng Long Bảng.',['longvuc','chientruong'],[404,430,524]],
+    ['dh','Âm Sương','Thủ tịch người bán đấu giá ở Thánh Thành.',['longvuc'],[303,304,306]],
+    ['dh','Khâu Ngôn','Doanh trưởng Xích Diễm Doanh, cấp trên của Giang Thần trong quân.',['chientruong','chanvu'],[520,522,523]],
   ['dt','Ninh Hạo Thiên','Con Đại phu nhân họ Ninh, được ghép Thần mạch cướp của Giang Thần; đối thủ suốt truyện.',['hoavuc','longvuc'],[1,120,322,326,481]],
   ['dt','Tô Thuyên','Đại phu nhân họ Ninh, mẹ Ninh Hạo Thiên; chủ mưu cướp Thần mạch.',['hoavuc'],[1,135,235,346]],
   ['dt','Tam Hoàng tử','Hoàng tử Đại Hạ ngang ngược; chết ở ch.224.',['hoavuc'],[131,134,211,224]],
@@ -22,7 +31,20 @@ const people=[
   ['dt','Mộ Dung Diên','Tiểu thư Mộ Dung gia kiêu ngạo.',['longvuc'],[295,304,307]],
   ['dt','Úy Trì Thiên','Người Úy Trì gia săn giết Giang Thần trong bí tàng; chết ở ch.423.',['longvuc'],[421,423]],
   ['dt','Quỷ Thương','Hạng 31 Thăng Long Bảng, Thông thiên tầng tám; bỏ mình ở ch.450.',['longvuc'],[425,427,450]],
-  ['cg','Mặc Kiếm Phi','Nhân tài hiếm có, đệ tử của một vị Đại tôn giả.',['longvuc'],[298,304]]
+    ['dt','Lý Thấm','Chị của Lý Tùng ở Thiên Vương phong, Thiên Đạo Môn; muốn giết mẹ Giang Thần để trả thù.',['hoavuc'],[83,84,86]],
+    ['dt','Cao Thần Dật','Đệ tử mười cường tông môn; cùng Sở Lạc ép Giang Thần giao bản đồ hoàng lăng.',['hoavuc'],[89,91,93]],
+    ['dt','Sở Lạc','Đệ tử chân truyền Phù Không đảo.',['hoavuc'],[90,92,93]],
+    ['dt','Mặc Ly','Tam thiếu Mặc gia, truy sát Giang Thần; bị chém ở Lang Thành.',['hoavuc'],[141,145,162]],
+    ['dt','Mộ Dung Long','Đệ tử Mộ Dung gia, đứng đầu tám thế gia truyền thừa.',['longvuc'],[430,431,478]],
+    ['dt','Tô Hình','Người của Tà Vân Điện trong Thần Long bí tàng.',['longvuc'],[430,432,433]],
+    ['dt','Liễu Sát Dương','Kẻ giấu tu vi, giết Đoàn Vô Hối ở Phong Nguyệt Thành.',['longvuc'],[380,381,413]],
+    ['dt','Lãnh Xuy Huyết','Kẻ khiêu khích trong Thần Long bí tàng, dùng Thiên Long Môn chặn đường.',['longvuc'],[411,413,414]],
+    ['dt','Trương Thiên Nhất','Kiếm khách ở Thân Binh Doanh quân đoàn thứ ba; đấu kiếm với Giang Thần.',['chientruong'],[511,513,517]],
+    ['dt','Triệu Phá Quân','Thiên tài đoàn Chân Vũ Giới, hoàng thân Cuồng Long hoàng triều.',['chanvu'],[593,594,595]],
+    ['dt','Nam Huyền','Sư huynh được người Thiên Hà Giới kính nể; thân pháp giống sát thủ Ảnh Tộc.',['chanvu'],[583,589,590]],
+  ['cg','Mặc Kiếm Phi','Nhân tài hiếm có, đệ tử của một vị Đại tôn giả.',['longvuc'],[298,304]],
+    ['cg','Viêm Vương Gia','Thiên Tôn, vương gia Cuồng Long hoàng triều; ra tay với Giang Thần vì con.',['chanvu'],[594,595,596]],
+    ['cg','Đô Nguyệt','Trưởng lão Thánh Viện, xử phạt Giang Thần vì chiến sủng.',['longvuc'],[276,277,281]]
 ];
 const journey=[
   [1,'hoavuc','Trọng sinh vào thân Ninh Thần ở Nam Phong Lĩnh; Thần mạch đã bị cướp, cha bị giam.','ngungkhi'],
@@ -68,12 +90,19 @@ const arts=[
   ['hm','Thiên Phượng huyết thống','Huyết thống của Cao gia; Giang Thần mang phượng huyết.',[229,259,268,376]],
   ['tt','Kiếm ý','Giang Thần lĩnh ngộ kiếm ý, sau đạt kiếm ý hoàn chỉnh.',[30,48,130]],
   ['tt','Phong tâm ý cảnh','Võ học ý cảnh, cùng Kim tâm ý cảnh bước vào nửa bước tiểu đạo.',[126,217]],
+    ['tt','Bát bộ thiên long','Chí bảo Phật môn; Giang Thần tạo ra, Thanh Ma là thiên bộ, Rồng Đen thành long bộ.',[113,125,349,497]],
+    ['tt','Thiên chi hoàn','Chín vòng trong Khí Hải, về sau cửu cửu quy nhất.',[279,435,477]],
+    ['tt','Chiến đạo','Cách dùng vũ khí tới cực hạn; Tô Hình cũng phải khen.',[432,459]],
   ['bv','Xích tiêu kiếm','Kiếm của Giang Thần, chủ nhân gọi là Xích tiêu kiếm chủ.',[33,187]],
   ['bv','Như ý toán bàn','Bảo vật xuất hiện trong lần đối đầu với Ninh Hạo Thiên ở Thiên Đạo Môn.',[122,123]],
   ['bv','Thiên Đạo Chiến Hạp','Chí bảo lâu đời của Thiên Đạo Môn, tổ hợp tùy ý công năng các linh khí.',[337]],
   ['bv','Kim Long thẻ','Thẻ quý ở phòng đấu giá Thánh Thành.',[287,313]],
   ['bv','Phượng Linh Thạch','Đá liên quan tới Thiên Phượng huyết thống của Cao gia.',[373]],
-  ['bv','Thần Long Châu','Báu vật các phe tranh trong Thần Long bí tàng.',[414]]
+  ['bv','Thần Long Châu','Báu vật các phe tranh trong Thần Long bí tàng.',[414]],
+    ['bv','Viêm Long Tinh Thạch','Đá quý giá nhất trong Thần Long bí tàng, có cả núi.',[419,420,427]],
+    ['bv','Quỷ Thần Giáp','Giáp tự chống đỡ thế công, khiến Giang Thần tốn sức.',[403,423]],
+    ['bv','Truy Tinh Cung','Linh khí của Ma Tinh trưởng lão Tà Vân Điện, khắc Quỷ Thần Giáp; về tay Giang Thần.',[423,425]],
+    ['bv','Thái Nguyên Quả','Quả quý trên Cực Ác Đảo mà Thập Tự Minh tranh nhau.',[609,611,612]]
 ];
 const st=STORIES.find(s=>s.id==='than-vo-chien-vuong');
 st.people=people.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));

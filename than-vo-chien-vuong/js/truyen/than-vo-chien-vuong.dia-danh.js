@@ -27,7 +27,18 @@ const PL={
     ['tong','Thiên Cơ các','Bán tình báo; từng cho biết nguồn ba loại linh đan và tin về Cao Nguyệt.',[119,136,229],null,2],
     ['thanh','Hùng Thành','Thành có cửa truyền tống; Giang Thần gây động tĩnh lớn ở đây.',[172,178],null,2],
     ['thanh','Hoàng Đô','Kinh đô Đại Hạ, có "Hoàng Đô tứ thiếu" như Hoàng Phủ Hoa.',[192,193],'Đại Hạ vương triều',3],
-    ['toc','Thương Mộc bộ lạc','Bộ lạc ở chỗ giao giới Hỏa vực và Mộc vực.',[184],null,2]
+    ['toc','Thương Mộc bộ lạc','Bộ lạc ở chỗ giao giới Hỏa vực và Mộc vực.',[184],null,2],
+    ['thanh','Thanh Sơn thành','Thành ngoài núi lớn, trạm liên lạc đầu tiên giữa Thập vạn đại sơn và bên ngoài.',[41,42],null,2],
+    ['gia','Hồng gia','Đại thế gia ở Cửu Long thành, nhà của Hồng Phi Vũ; Giang Thần từng nương náu ở Hồng phủ.',[47,48,60],'Cửu Long thành',2],
+    ['hiem','Huyền Cơ điện','Điện trong Thiên Đạo Môn; Giang Thần tát Trịnh Bình ở đây.',[62,63,68],'Thiên Đạo Môn',1],
+    ['tong','Đao Kiếm bang','Bang phái lập ở Chu Tước thành, rành đường hầm mỏ dẫn vào hoàng lăng.',[89,91,98],'Chu Tước thành',1],
+    ['hiem','Hộ Quốc điện','Điện trấn thủ hoàng lăng, có tượng đá Đại tướng quân cưỡi tuấn mã, nằm trước chí tôn cung điện.',[102,103,104],'Hoàng lăng Chu Tước quốc',1],
+    ['hiem','Vạn thú vực','Vùng hung thú các thế lực Hỏa vực cùng mở để chọn người tiến tu Thánh Viện; có linh dược Giang Thần cần.',[137,138,139,222],null,4],
+    ['gia','Mặc gia','Thế gia Hỏa vực giỏi con rối, cơ quan thú; tam thiếu Mặc Ly truy sát Giang Thần.',[139,141,164],null,3],
+    ['thanh','Lang Thành','Thành tị nạn dựng tạm trong Vạn thú vực; Giang Thần chém Mặc Ly ở đây.',[161,162,170],'Vạn thú vực',2],
+    ['tong','Linh Lung Môn','Môn phái của Thủy Sanh, có cửa truyền tống ở Hùng Thành.',[142,170,172,227],null,2],
+    ['gia','Bách Lý gia','Thế gia của Bách Lý Ly và Bách Lý Đồ.',[169,170,222],null,2],
+    ['gia','Mộc Vương phủ','Vương phủ có Tiểu vương gia Mộc Trấn Xuyên; người Mộc vực.',[138,170],null,2]
   ],
   longvuc:[
     ['quoc','Thần Long hoàng triều','Hoàng triều xưa của Long vực; hoàng thất tàn dư lập ra Tà Vân Điện.',[412,457],null,4],
@@ -44,7 +55,17 @@ const PL={
     ['gia','Úy Trì gia','Thế gia của Úy Trì Hoành và Úy Trì Thiên; Úy Trì Thiên bị giết ở ch.423.',[396,397,423],null,2],
     ['hiem','Thần Long bí tàng','Tiểu thế giới của Thần Long hoàng triều; các phe tranh Thần Long Châu.',[404,410,414],null,4],
     ['thanh','Võ Hoàng Thành','Thành có gác chuông cao nhất; báu vật tìm được đều rơi vào tay kẻ mạnh.',[429,430,433],null,3],
-    ['hiem','Vùng mỏ Viêm Long','Vùng mỏ tranh chấp, dưới đáy có Viêm Long bản nguyên.',[447,454,457],null,2]
+    ['hiem','Vùng mỏ Viêm Long','Vùng mỏ tranh chấp, dưới đáy có Viêm Long bản nguyên.',[447,454,457],null,2],
+    ['hiem','Tĩnh Tâm Hồ','Hồ rộng ở Anh Hùng Điện; thời gian tu luyện dưới nước được xếp hạng.',[283,284,285],'Anh Hùng Điện',2],
+    ['tong','Đao Long minh','Hội nhóm đệ tử Anh Hùng Điện, cạnh Kiếm Minh.',[274,276,283],'Anh Hùng Điện',2],
+    ['hiem','Chung Linh sơn','Núi của tiền trang Thánh Thành tặng "Xuất Vân đại sư"; nơi sản xuất huyền binh.',[311,313,407],'Thánh Thành',2],
+    ['thanh','Kim Long Thành','Trung tâm tộc địa Mộ Dung gia, "kim thành ngàn dặm", không thua Thánh Thành.',[368,478,479],null,4],
+    ['thanh','Phong Nguyệt Thành','Thành hỗn loạn ở nơi giao nam bắc Long vực, xa Thánh Thành; ngày nào cũng đổ máu.',[380,381,384],null,3],
+    ['gia','Triệu gia','Gia tộc cắm rễ ở Phong Nguyệt Thành.',[383,384],'Phong Nguyệt Thành',1],
+    ['thanh','Phi Long thành','Nơi phát hiện bí tàng Thần Long hoàng triều; Thánh Viện tập hợp đệ tử ở đây.',[404,405,408],null,2],
+    ['hiem','Thiên Long Môn','Cửa trong Thần Long bí tàng đúc từ dị thiết, không biết cách mở thì Tôn giả cũng không vào được.',[413,424],'Thần Long bí tàng',1],
+    ['gia','Ngô gia','Thế lực ủng hộ Anh Hùng Điện; thiếu gia Ngô Ngọc chết dưới tay Giang Thần.',[452,456,459],null,2],
+    ['vung','Vân Sơn','Núi mây mù, chỉ một vách cao nhất lộ ra làm khán đài; có Tam Quỷ Tuyệt Trận.',[465,466,467],null,3]
   ],
   thienha:[
     ['vung','Trung Châu','Vùng trung tâm; đeo chiến hoàn bạc là người tài, chiến hoàn vàng rất hiếm.',[493,496],null,4],
@@ -52,7 +73,9 @@ const PL={
     ['thanh','Độc Nguyệt Thành','Thành ở Trung Châu; có trưởng lão Vô Lượng Kiếm Phái cảnh Tôn giả.',[496,499],'Trung Châu',2],
     ['tong','Vô Lượng Kiếm Phái','Kiếm phái nắm Vô Lượng Kiếm đạo, có chiến hoàn màu vàng.',[496,502,583],null,4],
     ['quoc','Phi Long hoàng triều','Hoàng triều tàn bạo; Giang Thần bị ép gia nhập làm tướng.',[499,502,535],null,5],
-    ['tong','Nghịch Long quân','Quân từ Cửu Thiên Giới, giằng co với Phi Long hoàng triều.',[490,502,508],null,4]
+    ['tong','Nghịch Long quân','Quân từ Cửu Thiên Giới, giằng co với Phi Long hoàng triều.',[490,502,508],null,4],
+    ['thanh','Kiếm Thần Thành','Chủ thành Vô Lượng Kiếm Phái ở Trung Châu, nơi kiếm khách hằng mong tới.',[495,498,499],'Trung Châu',3],
+    ['gia','Phùng gia','Gia tộc tự cho có địa vị ở Kiếm Thần Thành.',[498,503],'Trung Châu',1]
   ],
   chientruong:[
     ['toc','Ma tộc','Tàn dư yêu ma bị cửu giới trục xuất tới đây; gia nhập khiến các chiến đoàn khổ chiến.',[523,532],null,4],
@@ -68,7 +91,16 @@ const PL={
     ['tong','Thiên Nhất Môn','Môn phái có đệ tử mở cửa tiệm ở Thủy Long Thành.',[571,574,589],null,3],
     ['gia','Thượng Quan gia','Thế gia đòi Thánh Võ Viện giao Giang Thần vì hắn giết người của họ.',[568,583],null,3],
     ['tong','Vân Lam Môn','Môn phái của Đường Thi Nhã.',[580,610],null,3],
-    ['gia','Đường gia','Gia tộc của Đường Thi Nhã; phụ thân nàng là Đại trưởng lão.',[580],null,2]
+    ['gia','Đường gia','Gia tộc của Đường Thi Nhã; phụ thân nàng là Đại trưởng lão.',[580],null,2],
+    ['thanh','Phi Vũ thành','Thành đón người từ thế giới dưới qua đường nối vị diện; bắt đăng ký, nộp phí. Giang Thần đại khai sát giới ở đây.',[566,567,584],null,2],
+    ['thanh','Thủy Nguyên Thành','Một trong các thành ở vùng hạt nhân.',[569],null,2],
+    ['quoc','Cuồng Long hoàng triều','Một trong ba đại hoàng triều Chân Vũ Giới; Viêm Vương Gia (Thiên Tôn) là cha Triệu Phá Quân.',[594,596,598],null,4],
+    ['toc','Ảnh Tộc','Tộc sát thủ có thân pháp như bóng; từng ám sát Giang Thần.',[589,590],null,2],
+    ['vung','Mộ Quang hải vực','Biển rộng có vạn đảo đạo tặc, giấu Hải Thần Bảo Điện.',[600,603],null,4],
+    ['dao','Cực Nhạc Đảo','Sào huyệt hải tặc Cực Nhạc Đạo, cất bảo vật cướp nhiều năm.',[602,603,609],'Mộ Quang hải vực',2],
+    ['hiem','Hải Thần Bảo Điện','Bảo điện giấu sâu dưới biển mà vạn đảo đạo tặc muốn tìm.',[603,604],'Mộ Quang hải vực',2],
+    ['tong','Thập Tự Minh','Liên minh các môn phái trên thuyền Trấn Hải Hào, chia theo chữ (Thiên Tự Minh của Thiên Nhất Môn, Vân Tự Minh của Vân Lam Môn).',[605,606,609],null,3],
+    ['dao','Cực Ác Đảo','Đảo cực kỳ nguy hiểm có Thái Nguyên Quả; Thập Tự Minh kéo gần nghìn thuyền tới.',[609,610,611],'Mộ Quang hải vực',3]
   ],
   linhvuc:[
     ['toc','Băng Linh tộc','Tộc của sư tỷ Lý Tuyết Nhi, tu Băng tâm quyết.',[232,364],null,5],
