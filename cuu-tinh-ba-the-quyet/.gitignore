@@ -1,0 +1,6 @@
+# Nội dung chương tải về chỉ dùng để tra cứu trên máy, không đưa lên git
+du-lieu/*/chuong/
+du-lieu/*/_trang/
+__pycache__/
+*.pyc
+.DS_Store

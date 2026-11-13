@@ -1,126 +1,18 @@
-# Thư viện truyện
+# Dự án truyện
 
-Ứng dụng web xem chi tiết các truyện tôi đọc. **Mỗi truyện là một dự án riêng** (thư mục + trang riêng, chỉ nạp dữ liệu của truyện đó):
+Mỗi truyện là **một dự án độc lập** trong thư mục riêng — có đủ bộ máy (`css/`, `js/`), công cụ tải/tra cứu (`tools/`), dữ liệu (`du-lieu/`) và trang web riêng `https://hien-khd.github.io/PHAMHIEN/<thư-mục>/`.
 
-| Dự án | Trang |
+| Dự án | Trạng thái |
 |---|---|
-| Thái Cổ Long Tượng Quyết | https://hien-khd.github.io/PHAMHIEN/thai-co-long-tuong-quyet/ |
-| Thần Võ Chiến Vương | https://hien-khd.github.io/PHAMHIEN/than-vo-chien-vuong/ |
-| Bất Diệt Võ Tôn | https://hien-khd.github.io/PHAMHIEN/bat-diet-vo-ton/ |
+| [thai-co-long-tuong-quyet](thai-co-long-tuong-quyet/) | Có bản đồ |
+| [than-vo-chien-vuong](than-vo-chien-vuong/) | Có bản đồ |
+| [bat-diet-vo-ton](bat-diet-vo-ton/) | Có bản đồ |
+| [kinh-thien-kiem-de](kinh-thien-kiem-de/) | Mới — đã có danh sách chương |
+| [de-ba](de-ba/) | Mới |
+| [bao-luc-dan-ton](bao-luc-dan-ton/) | Mới |
+| [tu-la-vo-than](tu-la-vo-than/) | Mới |
+| [cuu-tinh-ba-the-quyet](cuu-tinh-ba-the-quyet/) | Mới |
+| [sieu-duy-thuat-si](sieu-duy-thuat-si/) | Mới |
+| [long-de-bat-diet](long-de-bat-diet/) | Mới — cần link nguồn |
 
-Trang gốc `index.html` là thư viện gộp mọi truyện. Thêm truyện mới: viết `js/truyen/<slug>*.js`, thêm vào `index.html`, rồi chạy `python tools/tao_trang_truyen.py <slug>` để tạo `<slug>/index.html`; `python tools/build.py --tat-ca` tạo file đơn `dist/<slug>.html` cho từng dự án.
-
-Ứng dụng có ba màn chính và một khu hồ sơ:
-
-1. **Thư viện**: bìa các truyện.
-2. **Bản đồ**: các thế giới và đường hầm không gian. Rê chuột để xem trước, bấm để vào.
-3. **Thế giới**: bản đồ vùng có quốc gia, vùng/vực, gia tộc, tông môn, chủng tộc, thành trì, hiểm địa và bảo vật (bấm để xem chi tiết, lọc theo loại); khung cảnh giới ở góc trên bên phải; hồ sơ thế giới theo lời truyện (có số chương); tháp cảnh giới và cách đột phá.
-
-4. **Vũ trụ 3D**: các thế giới là đảo 3D xếp theo tầng (tầng cao nằm trên), xoay mọi góc, bấm để bay tới. Dùng Three.js r128 (tải từ CDN, dự phòng `js/vendor/`).
-5. **Hồ sơ truyện**: Nhân vật (theo nhóm quan hệ), Hành trình của Lâm Phong (mốc theo chương, kèm cảnh giới đạt được), Công pháp & bảo vật (công pháp, huyết mạch, thần thông, bảng thiên hỏa có xếp hạng, bảo vật).
-
-Không cần cài đặt gì: mở `index.html` bằng trình duyệt là chạy.
-
-## Cấu trúc
-
-```
-index.html                     Khung trang (3 màn) — thư viện gộp mọi truyện
-<slug>/index.html              Dự án riêng của một truyện (tạo bằng tools/tao_trang_truyen.py)
-js/chung.js                    Phần dùng chung: STORIES, liên kết chương, màu trời, nhóm hồ sơ
-css/style.css                  Giao diện
-js/canh-gioi.js                Hệ thống cảnh giới: tên, phân tầng, đặc điểm, cách đột phá, kiếp, chương
-js/truyen/<slug>.js            Dữ liệu một truyện: thế giới, đường hầm, hồ sơ
-js/truyen/<slug>.dia-danh.js   Quốc gia, gia tộc, thế lực… của từng thế giới (kèm số chương)
-js/truyen/<slug>.chuong.js     Bảng liên kết chương, tạo tự động — không sửa tay
-js/truyen/<slug>.ho-so.js      Nhân vật, hành trình, công pháp/huyết mạch/thiên hỏa/bảo vật
-js/ho-so.js                    Vẽ các trang hồ sơ
-js/the-gioi-3d.js              Vũ trụ 3D (Three.js)
-js/vendor/                     Three.js r128 + OrbitControls (MIT), dùng khi không có mạng
-js/truyen/<slug>.quy-mo.js     Quy mô 1–5 của địa danh, tạo bằng tools/tinh_quy_mo.py
-js/ban-do-vung.js              Vẽ bản đồ vùng của một thế giới và sắp xếp địa danh không chồng nhau
-js/tien-ich.js                 Hàm tiện ích nhỏ
-js/hinh-ve.js                  Vẽ SVG: đảo bay, núi, mặt trời, sao, hiệu ứng mờ và phát sáng
-js/app.js                      Logic 3 màn và điều hướng theo #hash
-tools/                         Công cụ thu thập dữ liệu và build (Python 3, không cần thư viện ngoài)
-du-lieu/<slug>/                Danh sách chương đã tải; thư mục chuong/ không đưa lên git
-dist/thu-vien-truyen.html      Bản gộp 1 file, tạo bằng tools/build.py
-```
-
-Thứ tự nạp script trong `index.html` quan trọng: dữ liệu → tiện ích → hình vẽ → ứng dụng.
-
-## Công cụ
-
-Chạy từ thư mục gốc dự án:
-
-```bash
-python tools/tai_danh_sach_chuong.py thai-co-long-tuong-quyet
-```
-
-Tải danh sách tên chương (11.341 dòng) vào `du-lieu/thai-co-long-tuong-quyet/danh-sach-chuong.tsv`.
-
-```bash
-python tools/tim_chuong.py thai-co-long-tuong-quyet "đột phá|kiếp"
-```
-
-Tìm chương theo tên. Chương không ghi số trong tên được đánh số tạm theo vị trí, dạng `~1543`.
-
-```bash
-python tools/tai_chuong.py thai-co-long-tuong-quyet 839 2883 ~1543
-```
-
-Tải nội dung các chương đó vào `du-lieu/<slug>/chuong/`.
-
-```bash
-python tools/trich_doan.py thai-co-long-tuong-quyet "Minh giới|Địa phủ" 20
-```
-
-Trích các đoạn chứa từ khóa trong những chương đã tải.
-
-```bash
-python tools/tao_lien_ket_chuong.py thai-co-long-tuong-quyet
-```
-
-Quét dữ liệu, tìm mọi số chương được trích dẫn và tạo lại `js/truyen/<slug>.chuong.js`. Chạy sau mỗi lần thêm số chương mới.
-
-```bash
-python tools/build.py
-```
-
-Gộp HTML, CSS và JS thành `dist/thu-vien-truyen.html` để gửi người khác hoặc đăng làm artifact.
-
-## Thêm địa danh
-
-Mở `js/truyen/<slug>.dia-danh.js`, thêm một dòng vào thế giới tương ứng:
-
-```js
-['gia','Tên gia tộc','Mô tả ngắn theo truyện.',[1234,'~1441'],'Tên vùng chứa nó']
-```
-
-Loại: `quoc` quốc gia, `vung` vùng/vực, `thanh` thành trì, `gia` gia tộc, `tong` tông môn/thế lực, `toc` chủng tộc, `dao` đảo, `hiem` hiểm địa/bí cảnh, `bau` bảo vật. Phần tử cuối (không bắt buộc) là tên một `quoc`/`vung` trong cùng thế giới; địa danh sẽ được vẽ trong vùng đó. Bản đồ tự sắp xếp, không cần toạ độ. Sau đó chạy `tools/tao_lien_ket_chuong.py`.
-
-## Thêm truyện mới
-
-1. Tạo `js/truyen/<slug>.js` theo mẫu của Thái Cổ Long Tượng Quyết, rồi thêm truyện vào mảng `STORIES` (hiện `STORIES` được khai báo trong file truyện đầu tiên; khi có truyện thứ hai nên chuyển sang `STORIES.push(...)`).
-2. Thêm thẻ `<script src="js/truyen/<slug>.js">` vào `index.html`, sau `canh-gioi.js`.
-3. Mỗi thế giới cần: `id`, `name`, `tier` (1–4), toạ độ `x`, `y` trên bản đồ 820×960, `kind` (kiểu hình vẽ trong `js/hinh-ve.js`), `r` (khoảng cảnh giới), `about`, `quote`, `secs`.
-4. Hệ thống cảnh giới hiện dùng chung cho mọi truyện. Truyện có hệ thống khác thì cần tách `REALMS` theo truyện.
-
-## Nguồn và độ tin cậy
-
-- Lời truyện: bản convert trên [metruyenchu.com.vn](https://metruyenchu.com.vn/thai-co-long-tuong-quyet). Mỗi thông tin trong hồ sơ thế giới đều ghi số chương.
-- Nhãn trong ứng dụng: **theo truyện** (tóm tắt từ chương), **bách khoa** (từ bách khoa trên web), **diễn giải** (suy ra từ tên gọi), **ước lượng** (chưa có chương xác nhận).
-- Đã đọc khoảng 490 chương: mẫu cứ 40 chương một lần để dựng mạch truyện, cộng các chương giới thiệu từng thế lực, nhân vật, cảnh giới; cộng tên toàn bộ 11.341 chương. Còn thiếu cách đột phá chi tiết của Hư Thần; cảnh giới ở Thiên Giới vẫn là ước lượng; thứ tự giữa Kẻ Khai Hoang và vũ trụ đại lão suy từ số tiên điện.
-- Ghi chú người dùng lưu trong `localStorage` của trình duyệt, không đồng bộ giữa các máy.
-
-## Tìm địa danh mới trong các chương đã tải
-
-```bash
-python tools/tim_dia_danh.py thai-co-long-tuong-quyet 25
-```
-
-In ra theo từng thế giới các tên tông môn, gia tộc, thành, vực… xuất hiện nhiều mà chưa có trong `dia-danh.js`, kèm chương và câu ví dụ, để đọc lại rồi thêm vào dữ liệu.
-
-## Bản đồ vùng phóng to tới 10×
-
-Lăn chuột, chụm hai ngón hoặc bấm nút +/−. Khi phóng to, địa hình của vùng đang xem được vẽ lại chi tiết hơn (`js/dia-hinh.js`, `js/thu-phong.js`). Bản đồ dày chỉ hiện thế lực lớn ở 1×; địa danh nhỏ hiện từ khoảng 2,4×.
-
+Làm một truyện: mở phiên Claude Code, dùng skill `ung-dung-the-gioi-truyen` trong thư mục dự án đó (xem README của dự án). Skill nằm ở `skill/ung-dung-the-gioi-truyen/`.
