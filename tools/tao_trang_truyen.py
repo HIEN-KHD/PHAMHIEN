@@ -22,6 +22,9 @@ def tao(slug, mau):
     s = s.replace('<script src="js/chung.js"></script>\n',
                   '<script src="js/chung.js"></script>\n' + "\n".join(the) + "\n", 1)
     s = re.sub(r'(href|src)="(css|js)/', r'\1="../\2/', s)
+    m = re.search(r"title:'([^']+)'", open(os.path.join(TRUYEN, slug + ".js"), encoding="utf-8").read())
+    if m:
+        s = re.sub(r"<title>[^<]*</title>", f"<title>{m.group(1)}</title>", s, count=1)
     s = s.replace("<head>", "<head>\n<script>window.GOC='../'</script>", 1)
     d = os.path.join(GOC, slug)
     os.makedirs(d, exist_ok=True)
