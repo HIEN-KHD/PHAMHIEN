@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Bạo Lực Đan Tôn** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/bao-luc-dan-ton/  ·  Nguồn: https://metruyenchu.com.vn/bao-luc-dan-ton
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+Đã dựng: 13 thế giới, 114 địa danh, 27 cảnh giới, 24 nhân vật — từ ~260 chương mẫu, mục nào cũng có số chương.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Bạo Lực Đan Tôn"*. Các lệnh chính (chạy trong thư mục `bao-luc-dan-ton/`):
