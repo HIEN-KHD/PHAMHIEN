@@ -1,6 +1,14 @@
 # Thư viện truyện
 
-Ứng dụng web xem chi tiết các truyện tôi đọc. Hiện có truyện đầu tiên: **Thái Cổ Long Tượng Quyết** (Vượng Tử Lão Man Đầu).
+Ứng dụng web xem chi tiết các truyện tôi đọc. **Mỗi truyện là một dự án riêng** (thư mục + trang riêng, chỉ nạp dữ liệu của truyện đó):
+
+| Dự án | Trang |
+|---|---|
+| Thái Cổ Long Tượng Quyết | https://hien-khd.github.io/PHAMHIEN/thai-co-long-tuong-quyet/ |
+| Thần Võ Chiến Vương | https://hien-khd.github.io/PHAMHIEN/than-vo-chien-vuong/ |
+| Bất Diệt Võ Tôn | https://hien-khd.github.io/PHAMHIEN/bat-diet-vo-ton/ |
+
+Trang gốc `index.html` là thư viện gộp mọi truyện. Thêm truyện mới: viết `js/truyen/<slug>*.js`, thêm vào `index.html`, rồi chạy `python tools/tao_trang_truyen.py <slug>` để tạo `<slug>/index.html`; `python tools/build.py --tat-ca` tạo file đơn `dist/<slug>.html` cho từng dự án.
 
 Ứng dụng có ba màn chính và một khu hồ sơ:
 
@@ -16,7 +24,9 @@ Không cần cài đặt gì: mở `index.html` bằng trình duyệt là chạy
 ## Cấu trúc
 
 ```
-index.html                     Khung trang (3 màn)
+index.html                     Khung trang (3 màn) — thư viện gộp mọi truyện
+<slug>/index.html              Dự án riêng của một truyện (tạo bằng tools/tao_trang_truyen.py)
+js/chung.js                    Phần dùng chung: STORIES, liên kết chương, màu trời, nhóm hồ sơ
 css/style.css                  Giao diện
 js/canh-gioi.js                Hệ thống cảnh giới: tên, phân tầng, đặc điểm, cách đột phá, kiếp, chương
 js/truyen/<slug>.js            Dữ liệu một truyện: thế giới, đường hầm, hồ sơ

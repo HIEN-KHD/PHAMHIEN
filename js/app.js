@@ -17,7 +17,11 @@ const rangeOf=w=>[RIDX[w.r[0]],RIDX[w.r[1]]];
 function bindOpen(g,fn){g.addEventListener('click',fn);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fn()}})}
 
 /* ===== Thanh điều hướng ===== */
+// Dự án một truyện: không có màn thư viện, thanh điều hướng bắt đầu từ tên truyện
+const ONE=STORIES.length===1;
+if(ONE){const b=document.querySelector('.brand');if(b){b.href='#'+STORIES[0].id;b.lastChild.textContent=STORIES[0].title}document.title=STORIES[0].title+' — bản đồ thế giới'}
 function setBar(crumbs,nav){
+  if(ONE&&crumbs.length>1&&crumbs[0][0]==='Thư viện')crumbs=crumbs.slice(1);
   document.getElementById('crumbs').innerHTML=crumbs.map((c,i)=>(i?'<span class="sep">/</span>':'')+(c[1]?`<a href="${c[1]}">${esc(c[0])}</a>`:`<b>${esc(c[0])}</b>`)).join('');
   document.getElementById('barNav').innerHTML=(nav||[]).map(([t,h])=>`<a href="${h}">${esc(t)}</a>`).join('');
 }
@@ -202,6 +206,7 @@ document.getElementById('toggleAll').addEventListener('click',()=>{showAll=!show
 function show(v){['vHome','vMap','vWorld','vInfo','v3dView'].forEach(id=>document.getElementById(id).hidden=id!==v);if(v!=='v3dView'&&typeof stop3D==='function')stop3D()}
 function router(){
   const [sid,wid]=decodeURIComponent(location.hash.slice(1)).split('--');
+  if(ONE&&!(sid&&STORIES.some(x=>x.id===sid))){location.replace('#'+STORIES[0].id);return}
   if(sid&&useStory(sid)){
     if(wid==='3d'){show('v3dView');render3D()}
     else if(INFO_TABS.some(x=>x[0]===wid)){show('vInfo');renderInfo(wid)}

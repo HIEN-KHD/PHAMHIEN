@@ -3,8 +3,8 @@
 const V3D={ready:false,run:false};
 /* G: hệ số phóng to mỗi đảo (mô hình dựng theo đơn vị nhỏ rồi nhân G). TIER_R tính lại theo cỡ đảo để các đảo không chồng nhau. */
 const G=5.4,RM={},TIER_Y={1:0,2:60,3:129,4:198},TIER_R={1:36,2:108,3:69,4:78},SHELL={r:177,y:60,k:.62};
-const LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','js/vendor/three.min.js'],
-  ['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js','js/vendor/OrbitControls.js']];
+const LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',(window.GOC||'')+'js/vendor/three.min.js'],
+  ['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',(window.GOC||'')+'js/vendor/OrbitControls.js']];
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s)});
 async function ensureThree(){
   if(window.THREE&&THREE.OrbitControls)return;

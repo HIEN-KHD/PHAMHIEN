@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<script>window.GOC='../'</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Thư viện truyện</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" id="sharedDefs"></svg>
+
+<header class="appbar gut">
+  <div class="inner">
+    <a class="brand" href="#thu-vien"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#f2c76e" stroke-width="1.5" stroke-dasharray="3 2"/><path d="M12 4l1.8 6.2L20 12l-6.2 1.8L12 20l-1.8-6.2L4 12l6.2-1.8z" fill="#f2c76e"/></svg>Thư viện truyện</a>
+    <nav class="crumbs" id="crumbs" aria-label="Vị trí"></nav>
+    <div class="bar-nav" id="barNav"></div>
+  </div>
+</header>
+
+<main class="inner gut">
+  <!-- Màn 1: Thư viện -->
+  <section class="view" id="vHome">
+    <div class="feature" id="feature"></div>
+    <div class="shelf-head"><h2 class="h-sec">Kệ truyện</h2><span class="meta" id="libCount"></span></div>
+    <div class="shelf" id="shelf"></div>
+  </section>
+
+  <!-- Màn 2: Bản đồ -->
+  <section class="view" id="vMap" hidden>
+    <div class="map-layout">
+      <figure class="map-box" style="margin:0">
+        <svg id="map" viewBox="0 0 820 960" role="img" aria-label="Bản đồ các thế giới và đường hầm không gian"></svg>
+        <figcaption class="legend">
+          <span><i style="background:var(--tunnel)"></i>Đường hầm giữa các giới</span>
+          <span><i style="background:var(--gold)"></i>Đường hầm lên cấp cao hơn</span>
+        </figcaption>
+      </figure>
+      <aside class="side">
+        <div><span class="eyebrow">Bản đồ thế giới</span><h1 id="storyTitle"></h1></div>
+        <div class="stats" id="stats"></div>
+        <div class="panel preview" id="preview"></div>
+        <div class="panel"><div class="sec"><h3>Tất cả thế giới theo tầng</h3></div><div id="tierList" class="ladder"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Màn hồ sơ: nhân vật / hành trình / công pháp -->
+  <section class="view" id="vInfo" hidden>
+    <header class="w-head"><span class="eyebrow">Hồ sơ truyện</span><h1 id="infoTitle"></h1><p class="sub" id="infoSub"></p></header>
+    <nav class="tabs" id="infoTabs" aria-label="Hồ sơ"></nav>
+    <div id="infoBody" class="view"></div>
+  </section>
+
+  <!-- Màn vũ trụ 3D -->
+  <section class="view" id="v3dView" hidden>
+    <div class="v3d-wrap">
+      <div id="v3d" class="v3d-canvas"></div>
+      <p class="v3d-msg meta" id="v3dMsg" hidden></p>
+      <div class="v3d-tip" id="v3dTip" hidden></div>
+      <div class="v3d-ctrl">
+        <button type="button" class="btn" data-v3d="rot" id="v3dRot" aria-pressed="true">Tự xoay</button>
+        <button type="button" class="btn" data-v3d="top">Nhìn từ trên</button>
+        <button type="button" class="btn" data-v3d="side">Nhìn ngang</button>
+        <button type="button" class="btn" data-v3d="reset">Góc ban đầu</button>
+        <button type="button" class="btn" data-v3d="full">Toàn màn hình</button>
+      </div>
+      <div class="v3d-orbit" role="group" aria-label="Xoay góc nhìn">
+        <button type="button" class="btn" data-orb="up" title="Nghiêng lên (↑)" aria-label="Nghiêng lên">↑</button>
+        <button type="button" class="btn" data-orb="left" title="Xoay trái 45° (←)" aria-label="Xoay trái">⟲</button>
+        <button type="button" class="btn" data-orb="right" title="Xoay phải 45° (→)" aria-label="Xoay phải">⟳</button>
+        <button type="button" class="btn" data-orb="down" title="Nghiêng xuống (↓)" aria-label="Nghiêng xuống">↓</button>
+        <button type="button" class="btn wide" data-orb="below" title="Nhìn từ dưới lên">Từ dưới</button>
+        <button type="button" class="btn" data-orb="N" title="Nhìn từ phía Bắc">B</button>
+        <button type="button" class="btn" data-orb="E" title="Nhìn từ phía Đông">Đ</button>
+        <button type="button" class="btn" data-orb="S" title="Nhìn từ phía Nam">N</button>
+        <button type="button" class="btn" data-orb="W" title="Nhìn từ phía Tây">T</button>
+      </div>
+      <div class="v3d-pivots" role="group" aria-label="Tâm xoay">
+        <span>Tâm xoay</span>
+        <button type="button" class="btn" data-pivot="all" aria-pressed="true">Toàn vũ trụ</button>
+        <button type="button" class="btn" data-pivot="4" aria-pressed="false">Tầng 4</button>
+        <button type="button" class="btn" data-pivot="3" aria-pressed="false">Tầng 3</button>
+        <button type="button" class="btn" data-pivot="2" aria-pressed="false">Tầng 2</button>
+        <button type="button" class="btn" data-pivot="1" aria-pressed="false">Tầng 1</button>
+      </div>
+      <button type="button" class="btn primary v3d-open2d" id="v3dOpen2d" data-v2d="open" hidden><span aria-hidden="true">⛰</span><span>Xem toàn cảnh<br><b></b></span></button>
+      <aside class="panel v3d-panel" id="v3dPanel" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- Màn 3: Thế giới -->
+  <section class="view" id="vWorld" hidden>
+    <header class="w-head"><span class="eyebrow" id="wTier"></span><h1 id="wName"></h1><p class="sub" id="wAbout"></p></header>
+    <figure class="w-map">
+      <div class="w-stage" id="wStage"><svg id="scene" viewBox="0 0 1000 640" role="img"></svg></div>
+      <div class="map-zoom" role="group" aria-label="Phóng to thu nhỏ bản đồ">
+        <button type="button" class="btn" data-mz="in" aria-label="Phóng to">+</button>
+        <button type="button" class="btn" data-mz="out" aria-label="Thu nhỏ">−</button>
+        <button type="button" class="btn" data-mz="fit" title="Vừa khung">⤢</button>
+        <button type="button" class="btn" data-mz="full" title="Toàn màn hình" aria-label="Toàn màn hình">⛶</button>
+        <span class="mz-lv" id="mzLv">1×</span>
+      </div>
+      <div class="realm-badge" id="realmBadge"></div>
+      <figcaption class="place-legend" id="placeLegend"></figcaption>
+    </figure>
+    <div class="places">
+      <aside class="panel place-detail" id="placeDetail" aria-live="polite"></aside>
+      <div class="place-groups">
+        <div class="dossier-head"><h2 class="h-sec">Sức mạnh các thế lực</h2><span class="meta" id="placeCount"></span></div>
+        <div id="placeGroups" class="pgs"></div>
+      </div>
+    </div>
+    <div class="dossier-head"><h2 class="h-sec">Thế giới này như thế nào</h2><span class="meta">Theo lời truyện · bấm số chương để đọc nguyên văn</span></div>
+    <div class="dossier" id="dossier"></div>
+    <div class="w-grid">
+      <div class="a-info view" style="gap:20px">
+        <div class="sec"><h3>Tổng quan</h3><div id="wFacts"></div></div>
+        <div class="sec"><h3 id="routeHead"></h3><div class="chips" id="wRoute"></div><p class="meta" id="wRouteMeta"></p></div>
+        <div class="sec"><h3>Thế giới kề bên</h3><div class="chips" id="wNear"></div></div>
+        <div class="sec"><h3>Nhân vật ở đây</h3><div class="chips" id="wPeople"></div></div>
+        <div class="sec"><h3>Sự kiện ở đây</h3><ul class="evs" id="wEvents"></ul></div>
+      </div>
+      <div class="a-tower sec">
+        <h3>Tháp cảnh giới <span id="towerBadge"></span></h3>
+        <p class="meta" id="realmRange"></p>
+        <div class="ladder" id="ladder"></div>
+        <button class="toggle" id="toggleAll" type="button"></button>
+      </div>
+      <aside class="a-detail panel" id="realmPanel" aria-live="polite"></aside>
+    </div>
+  </section>
+</main>
+
+<!-- Thứ tự nạp quan trọng: dữ liệu → tiện ích → hình vẽ → ứng dụng -->
+<!-- Màn 2D phóng to (mở từ vũ trụ 3D) -->
+  <div class="v2d" id="v2d" hidden role="dialog" aria-modal="true" aria-labelledby="v2dName">
+    <div class="v2d-bar">
+      <button type="button" class="btn" data-v2d="close">← Về 3D</button>
+      <h2 id="v2dName"></h2>
+      <div class="v2d-zoom" role="group" aria-label="Phóng to thu nhỏ">
+        <button type="button" class="btn" data-v2d="out" aria-label="Thu nhỏ">−</button>
+        <button type="button" class="btn" data-v2d="fit">Vừa khung</button>
+        <button type="button" class="btn" data-v2d="in" aria-label="Phóng to">+</button>
+      </div>
+      <a class="btn primary" id="v2dFull" href="#">Trang thế giới →</a>
+    </div>
+    <div class="v2d-stage" id="v2dStage">
+      <svg id="scene2d" viewBox="0 0 1000 640" role="img"></svg>
+      <div class="realm-badge" id="v2dBadge"></div>
+      <aside class="panel v2d-card" id="v2dCard" hidden aria-live="polite"></aside>
+      <p class="v2d-hint meta">Lăn chuột hoặc chụm 2 ngón để phóng to · kéo để di chuyển · bấm thế lực để xem</p>
+    </div>
+  </div>
+<script src="../js/canh-gioi.js"></script>
+<script src="../js/chung.js"></script>
+<script src="../js/truyen/thai-co-long-tuong-quyet.quy-mo.js"></script>
+<script src="../js/truyen/thai-co-long-tuong-quyet.js"></script>
+<script src="../js/truyen/thai-co-long-tuong-quyet.chuong.js"></script>
+<script src="../js/truyen/thai-co-long-tuong-quyet.dia-danh.js"></script>
+<script src="../js/truyen/thai-co-long-tuong-quyet.ho-so.js"></script>
+<script src="../js/tien-ich.js"></script>
+<script src="../js/hinh-ve.js"></script>
+<script src="../js/dia-hinh.js"></script>
+<script src="../js/ban-do-vung.js"></script>
+<script src="../js/thu-phong.js"></script>
+<script src="../js/ho-so.js"></script>
+<script src="../js/the-gioi-3d.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>

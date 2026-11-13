@@ -653,9 +653,20 @@ Object.assign(REALMS[RIDX.chuasangthe],{how:'Phải độ Chúa Sáng Thế ki�
 Object.assign(REALMS[RIDX.khaihoang],{lv:'Chuẩn Kẻ Khai Hoang tính bằng tiên điện, tối đa 99 tòa',tLv:'t',ch:[8381,8467,9706,10363,11034]});
 </script>
 <script>
+/* ===== Phần dùng chung cho mọi truyện: danh sách truyện, liên kết chương, màu trời, nhóm hồ sơ ===== */
+const STORIES=[];
+// Liên kết tới chương gốc; bảng CH nằm trong <slug>.chuong.js (tạo bằng tools/tao_lien_ket_chuong.py)
+const chLink=n=>{const st=(typeof S!=='undefined'&&S)||STORIES[0],C=(window.CHAP&&CHAP[st.id])||{},k=String(n),u=C[k]||C['~'+k],nhan=k.replace('~','');
+  return u?`<a class="chref" href="${st.source.replace(/\/[^/]*$/,'')}${u}" target="_blank" rel="noopener">ch.${nhan}</a>`:`<span class="chref">ch.${nhan}</span>`};
+/* Màu trời cho cảnh quan từng thế giới: [trên, dưới, tinh vân] */
+const SKY={galaxy:['#0b0d3a','#1b2a6b','#5b6cff'],sun:['#2a1a3d','#7a4a2a','#f2b54a'],ruins:['#1a1c2c','#4a4e64','#c9cce0'],dragon:['#0a2a2e','#145a4e','#2bd3a0'],heaven:['#2a3570','#8fa3e6','#ffffff'],tree:['#16304a','#6aa6a0','#e6fff4'],nine:['#0d2a22','#1e5a3a','#6cc85a'],gate:['#1c1d33','#4a4d6a','#f2c76e'],demon:['#1a0508','#4a0d16','#ff3b3b'],nether:['#120a2a','#2e1f5e','#9b7bff'],sea:['#071a3a','#0f4a8a','#3fa2f0'],waste:['#2a1a0e','#6e4a26','#d9a66a'],sin:['#1e060c','#55101e','#e0435c'],abyss:['#0a0404','#3a1208','#ff6a1f'],start:['#0f2440','#3a7a8a','#9be37b'],isles:['#06243a','#0f6a8a','#5fcf6a']};
+const PEOPLE_GROUPS={gd:'Gia đình',hn:'Hồng nhan',dh:'Đồng hành & đồng minh',dt:'Đối thủ',cg:'Cường giả khác'};
+const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
+</script>
+<script>
 /* ===== Truyện =====
    r = cảnh giới của Lâm Phong trong khoảng chương ở thế giới đó (suy từ mốc chương), rGuess = chưa xác định được. */
-const STORIES=[{
+STORIES.push({
   id:'thai-co-long-tuong-quyet',
   hero:'Lâm Phong',chapters:11220,
   title:'Thái Cổ Long Tượng Quyết',
@@ -791,14 +802,9 @@ const STORIES=[{
     ['phetho','thienvo'],['thienvo','tamthien'],['tamthien','toivuc']
   ],
   ring:{cx:410,cy:590,rx:392,ry:338,label:'CỬU CHÂU VŨ TRỤ',lx:262,ly:280}
-}];
-// Liên kết tới chương gốc; bảng CH nằm trong <slug>.chuong.js (tạo bằng tools/tao_lien_ket_chuong.py)
-const chLink=n=>{const st=(typeof S!=='undefined'&&S)||STORIES[0],C=(window.CHAP&&CHAP[st.id])||{},k=String(n),u=C[k]||C['~'+k],nhan=k.replace('~','');
-  return u?`<a class="chref" href="${st.source.replace(/\/[^/]*$/,'')}${u}" target="_blank" rel="noopener">ch.${nhan}</a>`:`<span class="chref">ch.${nhan}</span>`};
+});
 
-/* Màu trời cho cảnh quan từng thế giới: [trên, dưới, tinh vân] */
-const SKY={galaxy:['#0b0d3a','#1b2a6b','#5b6cff'],sun:['#2a1a3d','#7a4a2a','#f2b54a'],ruins:['#1a1c2c','#4a4e64','#c9cce0'],dragon:['#0a2a2e','#145a4e','#2bd3a0'],heaven:['#2a3570','#8fa3e6','#ffffff'],tree:['#16304a','#6aa6a0','#e6fff4'],nine:['#0d2a22','#1e5a3a','#6cc85a'],gate:['#1c1d33','#4a4d6a','#f2c76e'],demon:['#1a0508','#4a0d16','#ff3b3b'],nether:['#120a2a','#2e1f5e','#9b7bff'],sea:['#071a3a','#0f4a8a','#3fa2f0'],waste:['#2a1a0e','#6e4a26','#d9a66a'],sin:['#1e060c','#55101e','#e0435c'],abyss:['#0a0404','#3a1208','#ff6a1f'],start:['#0f2440','#3a7a8a','#9be37b'],isles:['#06243a','#0f6a8a','#5fcf6a']};
-STORIES[0].realmSet={groups:GROUPS.slice(),realms:REALMS.slice()};
+STORIES.find(s=>s.id==='thai-co-long-tuong-quyet').realmSet={groups:GROUPS.slice(),realms:REALMS.slice()};
 </script>
 <script>
 /* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */
@@ -1536,7 +1542,7 @@ const PLACES={
     ['gia','Trầm gia','Gia tộc đối đầu Lâm Phong trên Tam Nguyên Thượng Thanh đảo.',[11120],null,2]
   ]
 };
-STORIES[0].worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||((window.SIZES&&SIZES['thai-co-long-tuong-quyet'])||{})[w.id+'|'+n]||2}))});
+STORIES.find(s=>s.id==='thai-co-long-tuong-quyet').worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||((window.SIZES&&SIZES['thai-co-long-tuong-quyet'])||{})[w.id+'|'+n]||2}))});
 </script>
 <script>
 /* ===== Hồ sơ truyện: nhân vật, hành trình, công pháp & bảo vật =====
@@ -1577,7 +1583,6 @@ const PEOPLE_RAW=[
   ['cg','Đế Vô Đạo','Cường giả ở Bất Tử giới, mẹ xuất thân từ một nhánh Thiên chủ.',['battu'],[2721,4657,5581]],
   ['cg','Thiên Tiểu Ngũ','Thiên kiêu ẩn mình mạnh nhất của Thiên Ảnh tộc, cực mạnh nhưng khiêm tốn.',['dongphuong'],[10813,10846,10890]]
 ];
-const PEOPLE_GROUPS={gd:'Gia đình',hn:'Hồng nhan',dh:'Đồng hành & đồng minh',dt:'Đối thủ',cg:'Cường giả khác'};
 const PEOPLE=PEOPLE_RAW.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));
 
 /* Hành trình: [chương, thế giới, sự kiện, cảnh giới đạt được (nếu có)] */
@@ -1688,9 +1693,8 @@ const ARTS_RAW=[
   ['bv','Cửu Thiên Lôi Mẫu châu','Vũ khí khủng bố do luyện kim thuật sĩ Bùi Anh Tuấn chế tạo.',[5134,5167]],
   ['bv','Luân hồi thánh dịch & Chư Thiên Thạch','Giúp đột phá chuẩn Chúa Sáng Thế.',[6504]]
 ];
-const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
 const ARTS=ARTS_RAW.map(([g,n,d,ch,rank])=>({g,n,d,ch,rank:rank||null}));
-STORIES[0].people=PEOPLE;STORIES[0].journey=JOURNEY;STORIES[0].arts=ARTS;
+{const st=STORIES.find(s=>s.id==='thai-co-long-tuong-quyet');st.people=PEOPLE;st.journey=JOURNEY;st.arts=ARTS}
 </script>
 <script>
 /* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */
@@ -3193,8 +3197,8 @@ document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const c=e.targ
 const V3D={ready:false,run:false};
 /* G: hệ số phóng to mỗi đảo (mô hình dựng theo đơn vị nhỏ rồi nhân G). TIER_R tính lại theo cỡ đảo để các đảo không chồng nhau. */
 const G=5.4,RM={},TIER_Y={1:0,2:60,3:129,4:198},TIER_R={1:36,2:108,3:69,4:78},SHELL={r:177,y:60,k:.62};
-const LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','js/vendor/three.min.js'],
-  ['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js','js/vendor/OrbitControls.js']];
+const LIBS=[['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',(window.GOC||'')+'js/vendor/three.min.js'],
+  ['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',(window.GOC||'')+'js/vendor/OrbitControls.js']];
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error(src));document.head.appendChild(s)});
 async function ensureThree(){
   if(window.THREE&&THREE.OrbitControls)return;
@@ -3742,7 +3746,11 @@ const rangeOf=w=>[RIDX[w.r[0]],RIDX[w.r[1]]];
 function bindOpen(g,fn){g.addEventListener('click',fn);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fn()}})}
 
 /* ===== Thanh điều hướng ===== */
+// Dự án một truyện: không có màn thư viện, thanh điều hướng bắt đầu từ tên truyện
+const ONE=STORIES.length===1;
+if(ONE){const b=document.querySelector('.brand');if(b){b.href='#'+STORIES[0].id;b.lastChild.textContent=STORIES[0].title}document.title=STORIES[0].title+' — bản đồ thế giới'}
 function setBar(crumbs,nav){
+  if(ONE&&crumbs.length>1&&crumbs[0][0]==='Thư viện')crumbs=crumbs.slice(1);
   document.getElementById('crumbs').innerHTML=crumbs.map((c,i)=>(i?'<span class="sep">/</span>':'')+(c[1]?`<a href="${c[1]}">${esc(c[0])}</a>`:`<b>${esc(c[0])}</b>`)).join('');
   document.getElementById('barNav').innerHTML=(nav||[]).map(([t,h])=>`<a href="${h}">${esc(t)}</a>`).join('');
 }
@@ -3927,6 +3935,7 @@ document.getElementById('toggleAll').addEventListener('click',()=>{showAll=!show
 function show(v){['vHome','vMap','vWorld','vInfo','v3dView'].forEach(id=>document.getElementById(id).hidden=id!==v);if(v!=='v3dView'&&typeof stop3D==='function')stop3D()}
 function router(){
   const [sid,wid]=decodeURIComponent(location.hash.slice(1)).split('--');
+  if(ONE&&!(sid&&STORIES.some(x=>x.id===sid))){location.replace('#'+STORIES[0].id);return}
   if(sid&&useStory(sid)){
     if(wid==='3d'){show('v3dView');render3D()}
     else if(INFO_TABS.some(x=>x[0]===wid)){show('vInfo');renderInfo(wid)}

@@ -36,7 +36,6 @@ const PEOPLE_RAW=[
   ['cg','Đế Vô Đạo','Cường giả ở Bất Tử giới, mẹ xuất thân từ một nhánh Thiên chủ.',['battu'],[2721,4657,5581]],
   ['cg','Thiên Tiểu Ngũ','Thiên kiêu ẩn mình mạnh nhất của Thiên Ảnh tộc, cực mạnh nhưng khiêm tốn.',['dongphuong'],[10813,10846,10890]]
 ];
-const PEOPLE_GROUPS={gd:'Gia đình',hn:'Hồng nhan',dh:'Đồng hành & đồng minh',dt:'Đối thủ',cg:'Cường giả khác'};
 const PEOPLE=PEOPLE_RAW.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));
 
 /* Hành trình: [chương, thế giới, sự kiện, cảnh giới đạt được (nếu có)] */
@@ -147,6 +146,5 @@ const ARTS_RAW=[
   ['bv','Cửu Thiên Lôi Mẫu châu','Vũ khí khủng bố do luyện kim thuật sĩ Bùi Anh Tuấn chế tạo.',[5134,5167]],
   ['bv','Luân hồi thánh dịch & Chư Thiên Thạch','Giúp đột phá chuẩn Chúa Sáng Thế.',[6504]]
 ];
-const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
 const ARTS=ARTS_RAW.map(([g,n,d,ch,rank])=>({g,n,d,ch,rank:rank||null}));
-STORIES[0].people=PEOPLE;STORIES[0].journey=JOURNEY;STORIES[0].arts=ARTS;
+{const st=STORIES.find(s=>s.id==='thai-co-long-tuong-quyet');st.people=PEOPLE;st.journey=JOURNEY;st.arts=ARTS}
