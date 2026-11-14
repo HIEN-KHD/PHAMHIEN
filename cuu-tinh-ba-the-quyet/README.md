@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Cửu Tinh Bá Thể Quyết** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/cuu-tinh-ba-the-quyet/  ·  Nguồn: https://metruyenchu.com.vn/cuu-tinh-ba-the-quyet
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+**Đã có bản đồ** (16 thế giới, 112 địa danh, 9 cảnh giới, 31 nhân vật) dựng từ ~200 chương mẫu trong khoảng 3276–7204 — trang nguồn không còn chương 1–3275.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Cửu Tinh Bá Thể Quyết"*. Các lệnh chính (chạy trong thư mục `cuu-tinh-ba-the-quyet/`):
