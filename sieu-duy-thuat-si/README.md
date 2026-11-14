@@ -3,7 +3,7 @@
 Dự án riêng của truyện **Siêu Duy Thuật Sĩ** — ứng dụng xem thế giới truyện (bản đồ 2D tổng quát → vùng đất → cảnh giới → hồ sơ → 3D).
 Trang web: https://hien-khd.github.io/PHAMHIEN/sieu-duy-thuat-si/  ·  Nguồn: https://metruyenchu.com.vn/sieu-duy-thuat-si
 
-**Chưa có dữ liệu** — trang hiện khung trống. Làm theo các bước dưới để tải truyện và dựng bản đồ.
+**Đã có bản đồ** — 10 thế giới, 60 địa danh, 9 cấp bậc Phù thuỷ, 25 nhân vật; dựng từ ~240 chương mẫu, mỗi mục có số chương.
 
 ## Làm tiếp bằng skill `ung-dung-the-gioi-truyen`
 Mở một phiên Claude Code trong thư mục này và nói: *"dùng skill ung-dung-the-gioi-truyen làm bản đồ truyện Siêu Duy Thuật Sĩ"*. Các lệnh chính (chạy trong thư mục `sieu-duy-thuat-si/`):

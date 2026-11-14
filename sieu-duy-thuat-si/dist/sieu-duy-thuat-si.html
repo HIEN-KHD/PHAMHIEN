@@ -664,24 +664,389 @@ const PEOPLE_GROUPS={gd:'Gia đình',hn:'Hồng nhan',dh:'Đồng hành & đồn
 const ARTS_GROUPS={cp:'Công pháp',hm:'Huyết mạch',tt:'Thần thông',th:'Thiên hỏa',bv:'Bảo vật'};
 </script>
 <script>
-/* ===== Truyện: Siêu Duy Thuật Sĩ — KHUNG TRỐNG =====
-   Chưa có dữ liệu. Dùng skill ung-dung-the-gioi-truyen để tải truyện và viết lại file này
-   (thế giới, đường hầm, cảnh giới), thêm sieu-duy-thuat-si.dia-danh.js, .ho-so.js, .chuong.js, .quy-mo.js. */
+/* Tạo tự động bởi tools/tinh_quy_mo.py — quy mô 1–5 của từng địa danh */
+var SIZES=window.SIZES||(window.SIZES={});SIZES["sieu-duy-thuat-si"]={
+"cuutho|Kim Tước đế quốc": 5,
+"cuutho|Heilan vương triều": 4,
+"cuutho|Jamey hành tỉnh": 3,
+"cuutho|Gru trấn": 2,
+"cuutho|Pat gia tộc": 2,
+"cuutho|Bl·essed gia tộc": 4,
+"cuutho|Grace gia tộc": 2,
+"cuutho|Shannon vương tộc": 3,
+"cuutho|Hải Nguyệt thành": 3,
+"cuutho|Watford ngục giam": 1,
+"cuutho|Cửa Triều Tịch giới": 2,
+"namvuc|Phồn đại lục": 5,
+"namvuc|Dã Man hang động": 5,
+"namvuc|Học Đồ trấn": 2,
+"namvuc|Hắc Ma quốc": 3,
+"namvuc|Dạ Ma thành": 2,
+"namvuc|Huyễn Ma đảo": 4,
+"namvuc|Thiên Không Cơ Giới thành": 5,
+"namvuc|Sương Nguyệt liên minh": 5,
+"namvuc|Đồng Thoại trấn": 4,
+"namvuc|Vĩnh Dạ quốc": 4,
+"namvuc|Không Ngủ thành": 3,
+"namvuc|Hối Dạ chi phong": 2,
+"namvuc|Cổ Mạn vương quốc": 3,
+"namvuc|Hoàng Nữ trấn": 1,
+"namvuc|Bạch san hô phù đảo học viện": 3,
+"namvuc|Hoàng Hôn phòng đấu giá": 2,
+"namvuc|Barbie phòng ăn": 1,
+"namvuc|Lâu Đài Đen": 3,
+"namvuc|Kulaku tộc địa": 2,
+"namvuc|Đồng Thoại thế giới": 3,
+"namvuc|Nữ Vu trấn": 1,
+"namvuc|Ngỗng Trắng trấn": 1,
+"namvuc|Phong Ngữ thung lũng": 1,
+"namvuc|Biển Râu Cá Voi": 3,
+"votanhai|Biển sâu chi ca": 4,
+"votanhai|Bánh Răng hải uyên": 3,
+"votanhai|Vùng biển Ma Quỷ": 3,
+"votanhai|Đại lục Gợi Ý": 3,
+"trieutich|Sinh vật nguyên tố": 4,
+"trieutich|Bạch Bạch Vân Hương": 3,
+"trieutich|Nhu Phong điện hạ": 3,
+"trieutich|Ma hỏa Midier": 2,
+"hante|Niệm sư": 3,
+"hante|Đường Hoàng vị diện": 3,
+"bangkinh|Phù thuỷ chiếm cứ": 3,
+"bangkinh|Vùng đóng băng vĩnh cửu": 3,
+"vucsau|Băng cốc": 4,
+"vucsau|Ác Ma thành": 3,
+"vucsau|Hàn cổ di chỉ": 2,
+"vucsau|Ngưng Uyên ma nhãn": 5,
+"vucsau|Ác ma": 3,
+"monggioi|Nơi hoang tàn của giấc mộng": 5,
+"monggioi|Sơ Tâm thành": 4,
+"monggioi|Yêu Tinh nhất tộc": 2,
+"monggioi|Mỹ Mộng sơn": 2,
+"kinhvuc|Mộng chi tinh": 3,
+"yemgioi|Naraku thành": 5,
+"yemgioi|Huyền Ngục chi thê": 3,
+"yemgioi|Sinh vật Yểm giới": 4
+};
+</script>
+<script>
+/* ===== Truyện: Siêu Duy Thuật Sĩ (Mục Hồ) =====
+   Nguồn: metruyenchu.com.vn/sieu-duy-thuat-si — 3357 chương ở nguồn này.
+   Dữ liệu dựng từ ~240 chương mẫu rải đều. Bản dịch đổi "Vu sư" thành "Phù thuỷ" từ khoảng ch.700 — hai từ là một.
+   Tầng trên bản đồ là cách xếp của ứng dụng (càng lên càng xa, càng bí ẩn), không phải thứ bậc chính thức trong truyện. */
 (function(){
-const groups=[{id:'chua',name:'Chưa có dữ liệu',han:'',c:'#8fd6ff'}];
-const realms=[R('chua','chua','Chưa ghi','','—','Cảnh giới sẽ lấy từ lời truyện.','Chưa ghi.',{ch:[1]})];
+/* Cấp bậc Phù thuỷ (R() khai báo trong js/canh-gioi.js) */
+const groups=[
+  {id:'pham',name:'Phàm nhân',han:'凡人',c:'#9fb4c8'},
+  {id:'hocdo',name:'Phù thuỷ học đồ',han:'巫师学徒',c:'#8fd6ff'},
+  {id:'chinhthuc',name:'Phù thuỷ chính thức',han:'正式巫师',c:'#7be0a8'},
+  {id:'chantri',name:'Chân Tri',han:'真知',c:'#f2c76e'},
+  {id:'truyenky',name:'Truyền Kỳ',han:'传奇',c:'#f4f1ff'}
+];
+const realms=[
+  R('thienphu','pham','Người thiên phú','天赋者','Đo bằng tinh thần lực trị số',
+    'Người thường có tinh thần lực đủ cao được Phù thuỷ chọn làm học đồ. Tinh thần lực 15 điểm chỉ được xem là trung đẳng.',
+    'Qua khảo hạch thiên phú của tổ chức Phù thuỷ (Dã Man hang động thả người thiên phú ra dã ngoại để quan sát), rồi minh tưởng theo một bản minh tưởng pháp.',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[10,88,122],lf:1}),
+  R('hocdo1','hocdo','Học đồ cấp 1','一级学徒','Cấp 1 · sơ cấp',
+    'Trong cơ thể sinh ra Ma nguyên, vượt qua giới hạn siêu phàm. Dùng được ảo thuật cấp 1.',
+    'Minh tưởng cho tới khi Ma nguyên thành hình. Anghel thành học đồ ở ch.153 ("Ma nguyên sơ thành"), sau các bạn cùng khóa (ch.145).',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[145,153,244],lf:153}),
+  R('hocdo2','hocdo','Học đồ cấp 2','二级学徒','Cấp 2',
+    'Học đồ cấp 2 đã dùng được những ảo thuật như Bài trừ mê chướng.',
+    'Vách ngăn nhỏ, người thường chịu khó vài năm cũng qua. Anghel chỉ mất ba ngày (ch.330).',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[10,330,458],lf:330}),
+  R('hocdo3','hocdo','Học đồ cấp 3','三级学徒','Cấp 3 · cao cấp',
+    'Bậc cao nhất của học đồ. Moro gần tám mươi tuổi vẫn dừng ở đây. Nơi hoang tàn của giấc mộng chỉ chịu được năng lượng tới mức này.',
+    'Từ đỉnh cấp 2 lên cấp 3 là vách ngăn "khủng bố" hơn nhiều so với cấp 1 lên cấp 2.',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[10,330,1274,2298]}),
+  R('pt1','chinhthuc','Phù thuỷ cấp 1','一级巫师','Cấp 1',
+    'Thoát phàm, thành Phù thuỷ bất hủ. Học được thuật pháp không gian, tự đi đường hẻm giữa các vị diện mà không cần thông đạo chính quy.',
+    'Vách ngăn lớn: cùng lúc đánh bốn "chiến trường" — mở rộng biển tinh thần, biến Ma nguyên thành ma tuyền (Ma nguyên hóa tuyền)… Anghel đột phá ở ch.1423, nhờ Linh động dược tề.',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[330,362,364,1422,1423,1434],lf:1423}),
+  R('pt2','chinhthuc','Phù thuỷ cấp 2','二级巫师','Cấp 2',
+    'Sanders đã lên cấp 2 mấy chục năm. Khoảng cách giữa cấp 1 và cấp 2 còn sâu hơn giữa học đồ và Phù thuỷ chính thức.',
+    'Chưa ghi.',
+    {tLv:'t',tTrait:'t',ch:[42,74]}),
+  R('pt3','chinhthuc','Phù thuỷ cấp 3','三级巫师','Cấp 3',
+    'Niệm sư Tam tinh mạnh nhất Hante thế giới chỉ ngang Phù thuỷ cấp 3.',
+    'Chưa ghi.',
+    {tLv:'t',tTrait:'t',ch:[75]}),
+  R('chantri','chantri','Chân Tri','真知','Đạp lên "Chân Tri con đường"',
+    'Phù thuỷ Chân Tri gần như không bị thế giới khác áp chế thực lực.',
+    'Thường cần một pháp sáng tạo đủ sức gợi điềm lạ: Greya bước vào Chân Tri bằng sáng sinh thuật, khiến thế giới ý thức giáng lâm; Samantha nhờ thuật pháp lưu ly thiên đường. Lúc đột phá chính thức, Anghel đã nhìn thấy cửa Chân Tri (ch.1434, 1738).',
+    {tLv:'t',tTrait:'t',tHow:'t',ch:[75,1333,1434,1738,2592]}),
+  R('truyenky','truyenky','Truyền Kỳ','传奇','Chưa rõ',
+    'Bậc của Barzel, người soạn « vị diện chinh phạt lợi và hại ». Kẻ đánh nát Huyền Ngục chi thê từ rất xa có lẽ đã đạt Truyền Kỳ. Yểm giới có Ma vật cấp Truyền Kỳ ngay ở vùng ngoài cùng.',
+    'Chưa ghi.',
+    {tLv:'t',tTrait:'t',ch:[10,62,112,882,1740]})
+];
+
 STORIES.push({
-  id:'sieu-duy-thuat-si',hero:'Nhân vật chính',chapters:1,
-  title:'Siêu Duy Thuật Sĩ',author:'',genre:'Chưa có dữ liệu',
+  id:'sieu-duy-thuat-si',
+  title:'Siêu Duy Thuật Sĩ',
+  author:'Mục Hồ',
+  genre:'Fantasy phương Tây · 3357 chương (nguồn)',
   source:'https://metruyenchu.com.vn/sieu-duy-thuat-si',
-  sub:'Dự án mới — chưa tải truyện. Dùng skill ung-dung-the-gioi-truyen để dựng bản đồ.',
-  worlds:[{id:'khung',name:'Thế giới chưa xác định',tier:1,x:410,y:600,kind:'start',type:'Đại lục',r:['chua'],
-    sym:'Chưa có dữ liệu.',about:'Chưa tải truyện. Bản đồ sẽ được dựng từ lời truyện, có số chương.',quote:['Chưa có trích dẫn',1],secs:[],places:[]}],
-  tiers:{1:{name:'Chưa xác định'},2:{name:'—'},3:{name:'—'},4:{name:'—'}},
-  links:[],people:[],journey:[],arts:[],
-  ring:{cx:410,cy:600,rx:300,ry:200,label:'SIÊU DUY THUẬT SĨ',lx:300,ly:420},
+  hero:'Anghel',chapters:3357,
+  sub:'Thiếu niên quý tộc Anghel ở trấn nhỏ Gru được đạo sư John — một người tới từ Địa Cầu — dạy học. Anh gặp học đồ Moro, rồi rời Cựu Thổ đại lục vào giới Phù thuỷ ở Nam vực, tới Yểm giới, Mộng giới và nhiều vị diện khác.',
+  start:'cuutho',
+  tiers:{
+    4:{name:'Mộng · Yểm · Kính',hint:'Ba cõi đặc biệt (ch.3290); Yểm giới còn đáng sợ hơn Ma Thần vực sâu.'},
+    3:{name:'Vị diện khác',hint:'Các thế giới Phù thuỷ đi tới qua thông đạo hoặc cửa.'},
+    2:{name:'Vu sư giới · Nam vực',hint:'Trung tâm giới Phù thuỷ phía nam.'},
+    1:{name:'Biên giới đảo',hint:'Cựu Thổ đại lục, nơi Anghel lớn lên.'}
+  },
+  worlds:[
+    {id:'cuutho',name:'Cựu Thổ đại lục',tier:1,x:410,y:820,kind:'start',type:'Đại lục (Biên giới đảo)',r:['thienphu','hocdo3'],
+      sym:'Lục địa xanh nghèo nguyên tố — quê nhà của Anghel.',
+      about:'Đại lục người phàm mênh mông, nhưng với Phù thuỷ chỉ là một hòn đảo "không nhỏ". Nguyên tố trong không khí thưa thớt, nên Phù thuỷ gọi nó là Biên giới đảo và đã rút khỏi đây.',
+      quote:['Cựu Thổ đại lục trong cái xưng hô này, đối với Phồn đại lục Vu sư đến nói, cơ bản cũng là chuyện tiếu lâm.',9],
+      secs:[['Phàm thế','Kim Tước đế quốc đang ở thế chiến tranh với nước láng giềng Heilan; gia tộc Bl·essed nắm quân sự đế quốc.',[1]],
+        ['Bí ẩn nguyên tố','Anghel đoán nguyên tố của Cựu Thổ biến mất có liên quan tới Triều Tịch giới sau cánh cửa Mirafer vẽ.',[854]],
+        ['Anghel tại đây','Lớn lên ở Gru trấn, theo đạo sư John; gặp học đồ Moro rồi rời đi (ch.9–10). Sau này trở lại vùng Shannon, Hải Nguyệt thành.',[1,9,10,826,854,874]]]},
+    {id:'namvuc',name:'Nam vực Phù thuỷ giới',tier:2,x:330,y:590,kind:'gate',type:'Phương nam giới Phù thuỷ',r:['hocdo1','truyenky'],
+      sym:'Đại lục Phồn với các tổ chức Phù thuỷ, đảo nổi và thành máy móc trên trời.',
+      about:'Một trong bốn phương của giới Phù thuỷ; truyền tống trận từ Nam vực sang ba phương kia đã hư hỏng. Dã Man hang động là một trong những tổ chức hàng đầu ở đây.',
+      quote:['Dã Man hang động là tại Nam vực đều xếp hạng hàng đầu tổ chức lớn, Hắc vu sư chiếm cứ đa số',47],
+      secs:[['Thế lực','Dã Man hang động, Thiên Không Cơ Giới thành, Sương Nguyệt liên minh, liên minh Đồng Thoại trấn, Vĩnh Dạ quốc.',[47,154,62,442]],
+        ['Bốn phương','Tây lục và Nam vực cách nhau xa không đo được; không có cách đặc biệt thì gần như không liên lạc được.',[2381]],
+        ['Anghel tại đây','Theo Sanders về Dã Man hang động, thành học đồ, dựng Huyễn Ma đảo, đột phá Phù thuỷ chính thức.',[112,153,154,1423,1434]]]},
+    {id:'votanhai',name:'Vô Tận Hải',tier:2,x:600,y:610,kind:'sea',type:'Biển của Vu sư giới',r:['hocdo2','pt3'],rGuess:true,
+      sym:'Biển sâu có hải uyên bánh răng và đảo lạ.',
+      about:'Biển lớn của giới Phù thuỷ; tổ chức Biển sâu chi ca sống dưới đáy biển và vốn không dự vào việc khai hoang vị diện.',
+      quote:['Bọn hắn không hảo hảo đợi tại Vô Tận Hải dưới, đến chộn rộn đại lục sự tình',442],
+      secs:[['Đường biển','Đường thuyền men khung biển White Dwarf nối với Bánh Răng hải uyên; vùng biển Ma Quỷ có đảo nhỏ khép kín.',[714,794]],
+        ['Anghel tại đây','Đi thuyền Man Thú số, tới Đại lục Gợi Ý.',[794,808]]]},
+    {id:'trieutich',name:'Triều Tịch giới',tier:3,x:150,y:370,kind:'isles',type:'Vị diện nguyên tố',r:['pt1','chantri'],rGuess:true,
+      sym:'Quần đảo của sinh vật nguyên tố — gió, lửa, nước.',
+      about:'Thế giới đầy sinh vật nguyên tố. Mirafer tìm ra nó và vẽ một cánh cửa ở lối vào; vương thất Shannon giữ « Triều Tịch giới bản đồ ».',
+      quote:['Triều Tịch giới là tràn ngập nguyên tố sinh vật',854],
+      secs:[['Sinh vật','Phong hệ có Bạch Bạch Vân Hương và Nhu Phong điện hạ; ma hỏa Midier cũng có thái độ riêng với loài người.',[2186,2202,2218]],
+        ['Giá trị','Có thể là nguyên nhân nguyên tố ở Cựu Thổ biến mất; giá trị của giới này còn tăng nhiều lần.',[854,2170]],
+        ['Anghel tại đây','Tìm ra cửa (ch.854), về sau cùng Rhine và Sanders bàn chuyện Triều Tịch giới.',[854,2170,2298,2490]]]},
+    {id:'hante',name:'Hante thế giới',tier:3,x:330,y:345,kind:'ruins',type:'Vị diện ma lực thấp',r:['pt1','pt3'],
+      sym:'Đất hoang đá cổ, năng lực là niệm lực.',
+      about:'Vị diện ma lực thấp, siêu năng lực là niệm lực; mạnh nhất là Niệm sư Tam tinh, ngang Phù thuỷ cấp 3. Rời Hante thì niệm lực giảm mạnh.',
+      quote:['Hante thế giới xem như một cái đê ma vị diện, người mạnh nhất vì Tam tinh Niệm sư.',75],
+      secs:[['Láng giềng','Đường Hoàng vị diện nằm sát bên; Felicia mời Đại Vu sư tiên đoán tới đó tìm Greya.',[282]],
+        ['Anghel tại đây','Chỉ nghe kể, rồi hỏi thăm bí ẩn của Hante.',[74,75,3098]]]},
+    {id:'bangkinh',name:'Băng Kính thế giới',tier:3,x:500,y:345,kind:'waste',type:'Vị diện băng',r:['pt1','chantri'],rGuess:true,
+      sym:'Đất băng và gương lạnh.',
+      about:'Thế giới tồn tại từ rất xa xưa; từ lâu đã có một nhóm Phù thuỷ vào chiếm giữ. Có liên hệ với vùng đóng băng vĩnh cửu nay thuộc Sương Nguyệt liên minh.',
+      quote:['Băng Kính thế giới thời gian tồn tại tương đương xa xưa',2592],
+      secs:[['Anghel tại đây','Nghe Hắc bá tước kể về giới này; lo phương pháp của Monchy các hạ nên chưa dám đi.',[2592]]]},
+    {id:'vucsau',name:'Vực sâu',tier:3,x:680,y:380,kind:'demon',type:'Vị diện ác ma',r:['hocdo3','truyenky'],rGuess:true,
+      sym:'Đất đỏ đen, sông dung nham — cõi của Ma Thần và ác ma.',
+      about:'Cõi của ác ma và các Ma Thần (Ngưng Uyên ma nhãn, Vô Diễm Chi Chủ, tàn khốc học giả…). Từng có Ma Thần xâm lấn, đủ sức phá cả Nam vực.',
+      quote:['Vực sâu Ma Thần đã có thể phá vỡ toàn bộ Nam Vực',882],
+      secs:[['Ma Thần','Phần lớn Ma Thần thuộc phe "trật tự tà ác".',[1098,1242]],
+        ['Anghel tại đây','Cùng Madeline qua cứ điểm, Hàn cổ di chỉ, Ác Ma thành và Băng cốc đầy nguyền rủa; chứng kiến Ma Thần đánh cờ.',[962,970,986,1034,1114,1130]]]},
+    {id:'monggioi',name:'Mộng giới',tier:4,x:220,y:150,kind:'heaven',type:'Cõi mộng',r:['thienphu','hocdo3'],
+      sym:'Biển mây — nơi hoang tàn của giấc mộng.',
+      about:'Thế giới trong mộng. Nơi hoang tàn của giấc mộng lớn hơn vô số lần Không Ngủ thành; năng lượng ở đây cao nhất chỉ tới mức học đồ cấp 3.',
+      quote:['Mộng chi tinh nguyên bản thân liền là Mộng giới, Yểm giới, Kính vực ba cái ở giữa khe hở',3290],
+      secs:[['Sơ Tâm thành','Thành trong nơi hoang tàn của giấc mộng; Anghel chọn làm điểm đến qua cánh cửa mộng cảnh, đưa Toby đi dạo.',[906,938,1562]],
+        ['Sinh vật','Sinh ra Yêu Tinh nhất tộc; có Mỹ Mộng sơn và kẻ đuổi mộng Alan.',[2890,2906,3290]],
+        ['Anghel tại đây','Ghé lần đầu ở ch.906; về sau nắm quyền năng của mộng cảnh.',[906,2298,3290]]]},
+    {id:'kinhvuc',name:'Kính vực',tier:4,x:410,y:95,kind:'galaxy',type:'Cõi gương',r:['pt1','truyenky'],rGuess:true,
+      sym:'Thiên hà gương — cõi thứ ba cạnh Mộng và Yểm.',
+      about:'Một trong ba cõi (cùng Mộng giới, Yểm giới) mà Mộng chi tinh nằm giữa khe hở. Ít người nghiên cứu được ở đây.',
+      quote:['Mộng giới, Yểm giới, Kính vực ba cái ở giữa khe hở',3290],
+      secs:[['Anghel tại đây','Nhận chìa khóa từ trí giả chúa tể; muốn vào kính vực nghiên cứu.',[2858,3290]]]},
+    {id:'yemgioi',name:'Yểm giới',tier:4,x:600,y:150,kind:'nether',type:'Vị diện bất ổn',r:['hocdo1','truyenky'],
+      sym:'Lục địa tím của ác mộng — Naraku thành ở vòng ngoài.',
+      about:'Vị diện không ổn định, mới được « vô ngần vị diện chinh hoang lục » ghi nhận 200 năm trước; chưa có thông đạo ổn định nối với giới Phù thuỷ. Anghel vào bằng linh hồn.',
+      quote:['Yểm giới là một vị trí không ổn định vị diện',42],
+      secs:[['Naraku thành','"Vườn Hoa mê cung" ở vùng ngoài cùng, có Huyền Ngục chi thê; vẫn còn mấy Ma vật cấp Truyền Kỳ.',[112,554,882]],
+        ['Hiểm họa','Đáng sợ hơn nhiều so với Ma Thần vực sâu; sinh vật Yểm giới từng ký sinh khắp Dạ Ma thành.',[709,882]],
+        ['Anghel tại đây','Cùng Sanders vào Yểm giới lấy dẫn dắt pháp (ch.88–112); sinh vật Yểm giới tưởng anh là Maria.',[88,90,106,112,882,2009]]]}
+  ],
+  links:[['cuutho','namvuc'],['namvuc','votanhai'],['cuutho','trieutich'],['namvuc','hante'],['namvuc','bangkinh'],['namvuc','vucsau'],
+    ['namvuc','monggioi','up'],['namvuc','yemgioi','up'],['monggioi','kinhvuc'],['kinhvuc','yemgioi']],
+  ring:{cx:410,cy:500,rx:395,ry:430,label:'VU SƯ GIỚI & VẠN VỊ DIỆN',lx:250,ly:470},
   realmSet:{groups,realms}
 });
+})();
+</script>
+<script>
+/* Tạo tự động bởi tools/tao_lien_ket_chuong.py — không sửa tay */
+var CHAP=window.CHAP||(window.CHAP={});CHAP["sieu-duy-thuat-si"]={"1": "/sieu-duy-thuat-si/chuong-1-ZnOiCScj4th3", "2": "/sieu-duy-thuat-si/chuong-2-61PfMwiBO0hV", "3": "/sieu-duy-thuat-si/chuong-3-FYpY6f3gd_bK", "5": "/sieu-duy-thuat-si/chuong-5-ZjBlhyX2UPk7", "6": "/sieu-duy-thuat-si/chuong-6-kgJXQbGZRXld", "9": "/sieu-duy-thuat-si/chuong-9-Z5785YDqpwbv", "10": "/sieu-duy-thuat-si/chuong-10-QvOCKytSI8rb", "26": "/sieu-duy-thuat-si/chuong-26-z9BdkMOGzc_a", "42": "/sieu-duy-thuat-si/chuong-42-7GJkg5Yd34Dn", "47": "/sieu-duy-thuat-si/chuong-47-aGux_je0eBV8", "49": "/sieu-duy-thuat-si/chuong-49-5nusoheCXWpZ", "58": "/sieu-duy-thuat-si/chuong-58-NAh2R0AdEKqY", "60": "/sieu-duy-thuat-si/chuong-60-VGAhFkH4UYeE", "62": "/sieu-duy-thuat-si/chuong-62-SYQvdF4uLggU", "74": "/sieu-duy-thuat-si/chuong-74-nqlJLl7nFsCU", "75": "/sieu-duy-thuat-si/chuong-75-9oaMcXfHw66k", "88": "/sieu-duy-thuat-si/chuong-88-hZLD35V42GQV", "90": "/sieu-duy-thuat-si/chuong-90-PYhrdZ_LnY9l", "106": "/sieu-duy-thuat-si/chuong-106-AxdAxx3GOb6p", "112": "/sieu-duy-thuat-si/chuong-112-0TXppaMKTqcr", "122": "/sieu-duy-thuat-si/chuong-122-AkLvwtPc3Gw1", "123": "/sieu-duy-thuat-si/chuong-123-PEipvdmVi_Bu", "138": "/sieu-duy-thuat-si/chuong-138-ccv_lIQ7tMH_", "145": "/sieu-duy-thuat-si/chuong-145-wT_C_NeXY7LC", "153": "/sieu-duy-thuat-si/chuong-153-PmtUpuJQHFAU", "154": "/sieu-duy-thuat-si/chuong-154-FrQsqs6PrHIk", "170": "/sieu-duy-thuat-si/chuong-170-xgk_yH1I1vDk", "172": "/sieu-duy-thuat-si/chuong-172-n0zTAhvwhorn", "218": "/sieu-duy-thuat-si/chuong-218-KNeRR_w8SsKE", "244": "/sieu-duy-thuat-si/chuong-244-Bd_yMC6T6VNM", "250": "/sieu-duy-thuat-si/chuong-250-JPviFk_IkK8p", "282": "/sieu-duy-thuat-si/chuong-282-J0a6pQR7hy9L", "314": "/sieu-duy-thuat-si/chuong-314-oG!ZJsqwBVbw", "330": "/sieu-duy-thuat-si/chuong-330-uYXLX9u7em4W", "352": "/sieu-duy-thuat-si/chuong-352-H0o_lhVyj6pF", "362": "/sieu-duy-thuat-si/chuong-362-6hsfLN7EQlgF", "363": "/sieu-duy-thuat-si/chuong-363-41lb8_WtuHes", "364": "/sieu-duy-thuat-si/chuong-364-Gtc7OHTgkiCB", "371": "/sieu-duy-thuat-si/chuong-371-6w_gDZFu9kT7", "378": "/sieu-duy-thuat-si/chuong-378-_zgO13nOEd_t", "394": "/sieu-duy-thuat-si/chuong-394-q!HJLCGh1NFr", "410": "/sieu-duy-thuat-si/chuong-410-MhZSnzFzFhPZ", "426": "/sieu-duy-thuat-si/chuong-426-6SK0_xZD!u_V", "428": "/sieu-duy-thuat-si/chuong-428-S_drsPx9Ph4a", "442": "/sieu-duy-thuat-si/chuong-442-!NC6!F2qrWtO", "458": "/sieu-duy-thuat-si/chuong-458-bRGC3CE13c9g", "490": "/sieu-duy-thuat-si/chuong-490-EtycFZBwjSWf", "554": "/sieu-duy-thuat-si/chuong-554-rWBSG0M8b5fv", "568": "/sieu-duy-thuat-si/chuong-568-gxhaltMJFoBR", "572": "/sieu-duy-thuat-si/chuong-572-AowxZfJwRoTi", "577": "/sieu-duy-thuat-si/chuong-577-6jB3oK6nZvmQ", "634": "/sieu-duy-thuat-si/chuong-634-QMNAG7KSVtTY", "666": "/sieu-duy-thuat-si/chuong-666-d7U_Nk_XuQDT", "695": "/sieu-duy-thuat-si/chuong-695-KkgUd_CLYn1y", "698": "/sieu-duy-thuat-si/chuong-698-DJgRx09C2zYg", "709": "/sieu-duy-thuat-si/chuong-709-1ky53ch_J4N8", "714": "/sieu-duy-thuat-si/chuong-714-0X8PL916JNCI", "794": "/sieu-duy-thuat-si/chuong-794-jbyaRCT0OrGC", "808": "/sieu-duy-thuat-si/chuong-808-fRZTpMTd_Txe", "826": "/sieu-duy-thuat-si/chuong-826-dljK_JDbBA2L", "839": "/sieu-duy-thuat-si/chuong-839-6jAFFjYgi40L", "842": "/sieu-duy-thuat-si/chuong-842-YIo5eD3Wmjfw", "854": "/sieu-duy-thuat-si/chuong-854-vCgFNbGZVxgw", "874": "/sieu-duy-thuat-si/chuong-874-BYRZy2m7qAKy", "882": "/sieu-duy-thuat-si/chuong-882-QnTBFboDei7c", "890": "/sieu-duy-thuat-si/chuong-890-u0EL7JiS57S3", "906": "/sieu-duy-thuat-si/chuong-906-sg6huwWFWP!T", "938": "/sieu-duy-thuat-si/chuong-938-g2wR4pGzWCRa", "954": "/sieu-duy-thuat-si/chuong-954-Tp_zuORmiBGa", "962": "/sieu-duy-thuat-si/chuong-962-jO2LA!5rq4uR", "970": "/sieu-duy-thuat-si/chuong-970-j_AxwmeTdQJ4", "975": "/sieu-duy-thuat-si/chuong-975-O2bhurapoC9n", "976": "/sieu-duy-thuat-si/chuong-976-Q2E3piLa84HK", "986": "/sieu-duy-thuat-si/chuong-986-3TB7Co_c2CO5", "1034": "/sieu-duy-thuat-si/chuong-1034-cmSvQ4RHijRg", "1050": "/sieu-duy-thuat-si/chuong-1050-BNpIFV2Ew5YT", "1066": "/sieu-duy-thuat-si/chuong-1066-pUpwMcS1APft", "1098": "/sieu-duy-thuat-si/chuong-1098-z_S99ZFvwZEJ", "1114": "/sieu-duy-thuat-si/chuong-1114-afcoHmNbOK2_", "1130": "/sieu-duy-thuat-si/chuong-1130-ZoGADJnyU5C0", "1242": "/sieu-duy-thuat-si/chuong-1242-c5b4oSCd2EsA", "1267": "/sieu-duy-thuat-si/chuong-1267-UcBAVQspxF9H", "1268": "/sieu-duy-thuat-si/chuong-1268-xhta2wqJKUga", "1274": "/sieu-duy-thuat-si/chuong-1274-DfTdwc5XIYaK", "1322": "/sieu-duy-thuat-si/chuong-1322-V8t71oiTWn_X", "1333": "/sieu-duy-thuat-si/chuong-1333-6se4ebfZp4Y8", "1354": "/sieu-duy-thuat-si/chuong-1354-I8Dg1E7!EL4m", "1377": "/sieu-duy-thuat-si/chuong-1377-!1U765h4wQu0", "1402": "/sieu-duy-thuat-si/chuong-1402-7S9eYumgsU_m", "1412": "/sieu-duy-thuat-si/chuong-1412-6YhM3XZEfsWV", "1422": "/sieu-duy-thuat-si/chuong-1422-WLAc53wsdXSO", "1423": "/sieu-duy-thuat-si/chuong-1423-gjYaduOVBrM0", "1434": "/sieu-duy-thuat-si/chuong-1434-qK6i_hAriPj7", "1530": "/sieu-duy-thuat-si/chuong-1530-Kg_ov9RrGtOz", "1562": "/sieu-duy-thuat-si/chuong-1562-TXf!w7cJOZ11", "1577": "/sieu-duy-thuat-si/chuong-1577-fwsIj_JmqhN4", "1578": "/sieu-duy-thuat-si/chuong-1578-G0In1hKyWsvk", "1590": "/sieu-duy-thuat-si/chuong-1590-kh3!pQaFS8Vf", "1610": "/sieu-duy-thuat-si/chuong-1610-4Lzdn_88QNik", "1728": "/sieu-duy-thuat-si/chuong-1728-58GK__a_vu1O", "1729": "/sieu-duy-thuat-si/chuong-1729-Ar2K6nAZUDq3", "1738": "/sieu-duy-thuat-si/chuong-1738-hnkAJpWlgFJa", "1740": "/sieu-duy-thuat-si/chuong-1740-4IgLSvTYmVwa", "1754": "/sieu-duy-thuat-si/chuong-1754-REG51_Je!NZ8", "1866": "/sieu-duy-thuat-si/chuong-1866-PEryX_1FUDC7", "1978": "/sieu-duy-thuat-si/chuong-1978-jJfKDNV1rL!d", "1998": "/sieu-duy-thuat-si/chuong-1998-GYBBAFN6hZiX", "2000": "/sieu-duy-thuat-si/chuong-2000-b9iiWfq_Mu09", "2009": "/sieu-duy-thuat-si/chuong-2009-J4QAEFLkB!lV", "2079": "/sieu-duy-thuat-si/chuong-2079-f6LpIYVScpr2", "2154": "/sieu-duy-thuat-si/chuong-2154-DeVVww1!qW_r", "2170": "/sieu-duy-thuat-si/chuong-2170-l29oStKiboD9", "2186": "/sieu-duy-thuat-si/chuong-2186-5ixHk0DfkqAl", "2202": "/sieu-duy-thuat-si/chuong-2202-vrJb14WhK8i7", "2218": "/sieu-duy-thuat-si/chuong-2218-wQdFVdxEI_fS", "2234": "/sieu-duy-thuat-si/chuong-2234-jAS!QF46IJfh", "2266": "/sieu-duy-thuat-si/chuong-2266-70PNDGmIrRRG", "2282": "/sieu-duy-thuat-si/chuong-2282-AHCNaQxKXN1H", "2298": "/sieu-duy-thuat-si/chuong-2298-XyIgU_op2rGr", "2314": "/sieu-duy-thuat-si/chuong-2314-qwwaAjGdJUoi", "2346": "/sieu-duy-thuat-si/chuong-2346-fBlBJVvjh14r", "2381": "/sieu-duy-thuat-si/chuong-2381-v5Z!xhhWQMuC", "2435": "/sieu-duy-thuat-si/chuong-2435-VIj5zYSJkpa7", "2436": "/sieu-duy-thuat-si/chuong-2436-5fj5Ye8dubIz", "2490": "/sieu-duy-thuat-si/chuong-2490-CL_MMsFcWjLX", "2506": "/sieu-duy-thuat-si/chuong-2506-MaX__m0GjV1Z", "2554": "/sieu-duy-thuat-si/chuong-2554-cGJXL8H_PFXz", "2592": "/sieu-duy-thuat-si/chuong-2592-p82JfdBjiJ5Y", "2698": "/sieu-duy-thuat-si/chuong-2698-6zun1BAdXDup", "2713": "/sieu-duy-thuat-si/chuong-2713-0J_8J24RfZwi", "2715": "/sieu-duy-thuat-si/chuong-2715-8tWPdq8H_2!6", "2719": "/sieu-duy-thuat-si/chuong-2719-SQ5jy3t_LJzz", "2745": "/sieu-duy-thuat-si/chuong-2745-Bs93zlVWaG_8", "2842": "/sieu-duy-thuat-si/chuong-2842-xJYqU_lhKz9_", "2858": "/sieu-duy-thuat-si/chuong-2858-jTCYe4YmCa1M", "2890": "/sieu-duy-thuat-si/chuong-2890-OoaxH125759W", "2898": "/sieu-duy-thuat-si/chuong-2898-12YTWhFYZEFr", "2906": "/sieu-duy-thuat-si/chuong-2906-6O0VyrPwnZn0", "2952": "/sieu-duy-thuat-si/chuong-2952-HdgfLj2GBeZ2", "2965": "/sieu-duy-thuat-si/chuong-2965-DgrKk4dzcXWZ", "2968": "/sieu-duy-thuat-si/chuong-2968-TJIDnv4p1KH3", "3098": "/sieu-duy-thuat-si/chuong-3098-IMztxCplkiPt", "3207": "/sieu-duy-thuat-si/chuong-3207-8!B!3!nESjxV", "3247": "/sieu-duy-thuat-si/chuong-3247-XGaMRLTzR_cB", "3248": "/sieu-duy-thuat-si/chuong-3248-x!xTh2RonbX2", "3290": "/sieu-duy-thuat-si/chuong-3290-RftIWf!daYqY"};
+</script>
+<script>
+/* ===== Siêu Duy Thuật Sĩ — địa danh của từng thế giới =====
+   Mỗi mục: [loại, tên, mô tả, [chương], thuộc, quy mô 1–5]. Lấy từ ~240 chương mẫu; gán thế giới theo ngữ cảnh. */
+(function(){
+const PL={
+  cuutho:[
+    ['quoc','Kim Tước đế quốc','Đế quốc nơi Anghel lớn lên; đang ở thế chiến tranh với nước láng giềng Heilan.',[1,826],null,5],
+    ['quoc','Heilan vương triều','Nước láng giềng của Kim Tước; biên giới cách Gru trấn không xa. Hải Nguyệt thành phải đón đánh "Hải Lan".',[1,854],null,4],
+    ['vung','Jamey hành tỉnh','Tỉnh ở góc xa trung tâm Kim Tước đế quốc, có Gru trấn.',[1],'Kim Tước đế quốc',3],
+    ['thanh','Gru trấn','Trấn nhỏ nơi Anghel sống và học với đạo sư John; có nhà sàn của John.',[1,2,10],'Kim Tước đế quốc',2],
+    ['gia','Pat gia tộc','Gia tộc tử tước giàu nhất Gru trấn; Moro cảm ơn Pat tử tước đã giúp mình đột phá.',[1,9],'Kim Tước đế quốc',2],
+    ['gia','Bl·essed gia tộc','"Cột sống của Kim Tước đế quốc": mấy trăm năm ra ít nhất sáu đại tướng, nắm mạch quân sự.',[1],'Kim Tước đế quốc',4],
+    ['gia','Grace gia tộc','Gia tộc quý tộc liên quan tới Nhã Mai hành tỉnh; nghe nói phía sau có bóng Phù thuỷ.',[826],'Kim Tước đế quốc',2],
+    ['gia','Shannon vương tộc','Vương thất giữ « Triều Tịch giới bản đồ », cần máu vương tộc để mở.',[854,1050],null,3],
+    ['thanh','Hải Nguyệt thành','Thành nơi con gái Rosello trở về đón đánh Hải Lan; Anghel từng tới đây.',[854,874],null,3],
+    ['hiem','Watford ngục giam','Ngục Anghel đã vào xem trước khi tới Hải Nguyệt thành.',[874],null,1],
+    ['hiem','Cửa Triều Tịch giới','Cánh cửa Mirafer vẽ ở cuối một lỗ thủng, phong ấn lối vào Triều Tịch giới.',[854],null,2]
+  ],
+  namvuc:[
+    ['vung','Phồn đại lục','Đại lục chính của giới Phù thuỷ phía nam; Phù thuỷ ở đây cười cái tên "Cựu Thổ".',[9,10,58],null,5],
+    ['tong','Dã Man hang động','Một trong những tổ chức hàng đầu Nam vực, phần lớn là Hắc vu sư; của Sanders, Flora, Nice, Wallace.',[47,122,123,250],'Phồn đại lục',5],
+    ['thanh','Học Đồ trấn','Trấn của học đồ cạnh Dã Man hang động.',[138,145,2346],'Phồn đại lục',2],
+    ['quoc','Hắc Ma quốc','Nước phàm nhân; mấy trăm thành trấn quanh Dã Man hang động bề ngoài thuộc Hắc Ma quốc.',[123,250],'Phồn đại lục',3],
+    ['thanh','Dạ Ma thành','Thành của Hắc Ma quốc trong phạm vi Dã Man hang động; từng bị vật ký sinh Yểm giới phủ kín.',[314,410,709],'Phồn đại lục',2],
+    ['dao','Huyễn Ma đảo','Đảo có đại trận của Sanders, nơi dựng vườn hoa vu thuật; sau thành thế lực của Anghel.',[154,314,371,1434],null,4],
+    ['thanh','Thiên Không Cơ Giới thành','Thành máy móc trên trời có pháp tắc "Tịnh hóa"; trung tâm luyện kim Nam vực, có đấu giá lớn.',[154,282,442,666],null,5],
+    ['tong','Sương Nguyệt liên minh','Liên minh xuất bản « vô ngần vị diện chinh hoang lục »; liên tục chinh phục vị diện mới.',[62,218,842,2592],null,5],
+    ['tong','Đồng Thoại trấn','Liên minh tổ chức Phù thuỷ "kỳ lạ", chỉ là một khái niệm; căn nhà bánh kẹo nắm hơn năm thành Phù thuỷ mỹ thực Nam vực.',[47,282,364],null,4],
+    ['quoc','Vĩnh Dạ quốc','Có Không Ngủ thành và Hối Dạ chi phong; vực Bóng Tối đang lan, thêm ba Mái Vòm Bóng Tối.',[442,698,709],null,4],
+    ['thanh','Không Ngủ thành','Tổ chức Phù thuỷ gần Dã Man hang động nhất; không gian tường kép nhân tạo.',[442,666,709,890],'Vĩnh Dạ quốc',3],
+    ['hiem','Hối Dạ chi phong','Đỉnh núi có truyền tống trận sang Cổ Mạn vương quốc.',[698],'Vĩnh Dạ quốc',2],
+    ['quoc','Cổ Mạn vương quốc','Vương quốc có Hoàng Nữ trấn; nơi tìm thấy một thiếu niên bị thương.',[698,2506],null,3],
+    ['thanh','Hoàng Nữ trấn','Trấn thuộc Cổ Mạn vương quốc.',[2506],'Cổ Mạn vương quốc',1],
+    ['tong','Bạch san hô phù đảo học viện','Học viện trên đảo nổi; Moro đưa Ellen và Eileen về đây.',[9],'Phồn đại lục',3],
+    ['thanh','Hoàng Hôn phòng đấu giá','Nơi đấu giá; mười năm qua đây là vụ lớn nhất, hơn chục Phù thuỷ chính thức có mặt.',[282],null,2],
+    ['tong','Barbie phòng ăn','Quán của nữ Phù thuỷ duy nhất ở giới Phù thuỷ tổng hợp được Bóp Méo ba nguyên trùng.',[42,47],null,1],
+    ['tong','Lâu Đài Đen','Thế lực dẫn đầu ký hữu nghị với Huyễn Ma đảo sau khi Anghel thành Phù thuỷ.',[1354,1377,1434],null,3],
+    ['hiem','Kulaku tộc địa','Đất của Kulaku tộc trong yểm cảnh Đồng Thoại thế giới; tộc huấn cấm dẫn người vào.',[371,378,426],null,2],
+    ['hiem','Đồng Thoại thế giới','Yểm cảnh nhiều tầng (ngoài, giữa, trong); quanh đó chỉ có tổ chức Yên tĩnh lĩnh.',[364,371,428],null,3],
+    ['thanh','Nữ Vu trấn','Sanders vơ vét được nhiều vật phẩm từ đây.',[554],null,1],
+    ['thanh','Ngỗng Trắng trấn','Trấn Blaze sống nhiều năm.',[2314],null,1],
+    ['hiem','Phong Ngữ thung lũng','Nơi Anghel để lại tin nhắn "muốn đi Băng cốc".',[1114],null,1],
+    ['vung','Biển Râu Cá Voi','Vùng biển xảy ra dị tượng mà thầy của Jetway ở xa vẫn cảm nhận được.',[1333],null,2]
+  ],
+  votanhai:[
+    ['tong','Biển sâu chi ca','Tổ chức sống dưới Vô Tận Hải, không dự vào khai hoang vị diện.',[442],null,4],
+    ['hiem','Bánh Răng hải uyên','Hải uyên trên tuyến thuyền men khung biển White Dwarf.',[714,794],null,3],
+    ['vung','Vùng biển Ma Quỷ','Vùng biển có hòn đảo khép kín mà Man Thú số đi qua.',[794],null,2],
+    ['vung','Đại lục Gợi Ý','Đích đến của chuyến đi biển.',[808],null,3]
+  ],
+  trieutich:[
+    ['toc','Sinh vật nguyên tố','Triều Tịch giới đầy sinh vật nguyên tố, cần nhiều năng lượng nguyên tố để sống.',[854],null,4],
+    ['vung','Bạch Bạch Vân Hương','Nơi các sinh vật Phong hệ.',[2218],null,3],
+    ['tong','Nhu Phong điện hạ','Chủ Phong hệ được giao áp giải tinh linh Phong hệ tới.',[2202,2218],'Bạch Bạch Vân Hương',3],
+    ['toc','Ma hỏa Midier','Sinh vật lửa; Anghel muốn biết thái độ của nó với loài người.',[2186],null,2]
+  ],
+  hante:[
+    ['toc','Niệm sư','Người dùng niệm lực, chia theo sao; Tam tinh là mạnh nhất.',[74,75],null,3],
+    ['quoc','Đường Hoàng vị diện','Vị diện sát vách Hante thế giới.',[282],null,3]
+  ],
+  bangkinh:[
+    ['tong','Phù thuỷ chiếm cứ','Từ rất sớm đã có một nhóm Phù thuỷ vào chiếm giữ Băng Kính thế giới.',[2592],null,3],
+    ['vung','Vùng đóng băng vĩnh cửu','Nay do Sương Nguyệt liên minh chiếm, có liên hệ với Băng Kính thế giới.',[2592],null,3]
+  ],
+  vucsau:[
+    ['hiem','Băng cốc','Nơi đầy nguyền rủa, Phù thuỷ lăn lộn ở vực sâu ai cũng biết tên.',[970,1034,1114],null,4],
+    ['thanh','Ác Ma thành','Thành của ác ma.',[986,1034,1066],null,3],
+    ['hiem','Hàn cổ di chỉ','Di tích Anghel và Madeline tới; cứ điểm ở vực sâu rất khó dời.',[970],null,2],
+    ['toc','Ngưng Uyên ma nhãn','Đại Ma Thần viễn cổ, có ước định với tàn khốc học giả.',[1098,1130],null,5],
+    ['toc','Ác ma','Phần lớn ác ma ghét bỏ ác ma nửa dòng máu.',[1098],null,3]
+  ],
+  monggioi:[
+    ['vung','Nơi hoang tàn của giấc mộng','Vùng mộng rộng lớn hơn vô số lần Không Ngủ thành.',[890,906,1866],null,5],
+    ['thanh','Sơ Tâm thành','Thành Anghel chọn làm điểm đến qua cánh cửa mộng cảnh; có cư dân như Lisa, Lyon.',[906,938,1322,1562,1578,2234],'Nơi hoang tàn của giấc mộng',4],
+    ['toc','Yêu Tinh nhất tộc','Tộc sinh ra từ Mộng giới.',[2890],null,2],
+    ['hiem','Mỹ Mộng sơn','Núi trong Mộng giới.',[2906],null,2]
+  ],
+  kinhvuc:[
+    ['hiem','Mộng chi tinh','Khe hở giữa Mộng giới, Yểm giới và Kính vực.',[3290],null,3]
+  ],
+  yemgioi:[
+    ['thanh','Naraku thành','"Vườn Hoa mê cung" ở vùng ngoài cùng Yểm giới, vẫn còn Ma vật cấp Truyền Kỳ.',[112,554,882,2554],null,5],
+    ['hiem','Huyền Ngục chi thê','Bậc thang ở Naraku thành; trên bàn đặt « kỳ điểm », dẫn đạo pháp mạnh nhất Nam vực theo Sanders.',[112,554],'Naraku thành',3],
+    ['toc','Sinh vật Yểm giới','Ca ngợi Anghel, tưởng anh là "Maria"; từng gây tổn thương lớn cho Nam vực.',[882,2009],null,4]
+  ]
+};
+const st=STORIES.find(s=>s.id==='sieu-duy-thuat-si'),SZ=(window.SIZES&&SIZES['sieu-duy-thuat-si'])||{};
+st.worlds.forEach(w=>{w.places=(PL[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||SZ[w.id+'|'+n]||2}))});
+})();
+</script>
+<script>
+/* ===== Siêu Duy Thuật Sĩ — nhân vật, hành trình, công pháp & bảo vật =====
+   Định dạng như truyện mẫu; nhóm nhân vật/công pháp dùng chung PEOPLE_GROUPS, ARTS_GROUPS. */
+(function(){
+const people=[
+  ['gd','Anghel','Nhân vật chính. Thiếu gia quý tộc ở Gru trấn, theo học đạo sư John; được Moro phát hiện, theo Sanders vào giới Phù thuỷ. Có thiên phú đặc biệt liên quan tới Yểm giới.',['cuutho','namvuc','yemgioi','monggioi','vucsau','trieutich'],[1,10,62,153,1423]],
+  ['gd','Lyon','Anh trai Anghel; giận vì Anghel tin phục, bái John làm đạo sư.',['cuutho'],[1,2]],
+  ['gd','John','Đạo sư của Anghel, người "thời không khách" tới từ Địa Cầu; nghiên cứu nhiều năm số liệu vật lý không khớp với thế giới này.',['cuutho'],[2,3,5,6,10]],
+  ['dh','Moro','Học đồ cấp 3 gần tám mươi tuổi; người cho Anghel biết về Phù thuỷ ở Gru trấn.',['cuutho','namvuc'],[9,10,26]],
+  ['cg','Sanders','Thầy của Anghel, Phù thuỷ cấp 2 của Dã Man hang động; thuật pháp liên hệ nhiều với Yểm giới, đưa Anghel vào Yểm giới.',['namvuc','yemgioi','trieutich'],[42,47,62,88,112,2490]],
+  ['dh','Flora','Học trò của Sanders, đồng hành từ Cựu Thổ về Dã Man hang động.',['namvuc','yemgioi'],[47,88,112,154]],
+  ['cg','Nice','Phù thuỷ Dã Man hang động, chấm khảo hạch người thiên phú; giải thích thế giới dưới mặt kính.',['namvuc'],[122,123,2154]],
+  ['cg','Wallace','Phù thuỷ Dã Man hang động, Flora gọi là "già mà không đứng đắn".',['namvuc'],[88,122,1978]],
+  ['dh','Toby','Con chim đi theo Anghel, mặc đồ "tao bao"; được tính như có thực lực Phù thuỷ chính thức.',['namvuc','monggioi'],[42,58,938,1754]],
+  ['dh','Nausicaa','Người thiên phú cùng khóa; thành học đồ cấp 1 trước Anghel.',['namvuc'],[122,145,442]],
+  ['dh','Sarum','Bạn cùng khóa, sinh ra Ma nguyên trước Anghel.',['namvuc'],[122,145,1530]],
+  ['dh','Qi Li','Học đồ cấp 2 hệ Hỏa, cùng tuổi Anghel nhưng vào giới Phù thuỷ sớm hơn bảy năm.',['namvuc','votanhai'],[458,490,1530]],
+  ['dh','Ám Ảnh','Ma ngẫu cấp Phù thuỷ có tư duy, ký khế ước với Anghel; dẫn vào Đồng Thoại thế giới.',['namvuc'],[364,371,428]],
+  ['dh','Babaya','Người thiên phú Anghel giám định được; được mong là thiên phú huyết mạch để giải quyết huyết mạch Kura Kuka tộc.',['namvuc'],[634,695,1274]],
+  ['cg','Felicia','Phù thuỷ mỹ thực; từng đi Quang Diệu giới, mời Đại Vu sư tiên đoán sang Đường Hoàng vị diện tìm Greya.',['namvuc','hante'],[282,394,428]],
+  ['cg','Greya','Phù thuỷ bước vào Chân Tri nhờ sáng sinh thuật; Sanders từng vào Yểm giới tìm nhục thân của Greya.',['namvuc','yemgioi'],[42,282,1333,1610]],
+  ['cg','Frost','Nhận xét Anghel nhìn thấy con đường Chân Tri ngay lúc đột phá.',['namvuc'],[1412,1434]],
+  ['dh','Madeline','Cùng Anghel đi vực sâu, qua cứ điểm và Hàn cổ di chỉ.',['vucsau'],[954,962,970]],
+  ['dh','Shannon','Người của vương tộc Shannon, mặc giáp ra trận ở Hải Nguyệt thành chống Hải Lan.',['cuutho'],[826,854,874]],
+  ['cg','Mirafer','Phù thuỷ ma họa đã tìm ra Triều Tịch giới, vẽ cánh cửa và « Triều Tịch giới bản đồ ».',['cuutho','trieutich'],[854,1050]],
+  ['cg','Rhine','Các hạ cùng Anghel bàn chuyện Triều Tịch giới, quan sát quyền năng giao phó.',['trieutich'],[2298]],
+  ['cg','Trí giả chúa tể','Trao chìa khóa cho Anghel trước khi đi.',['kinhvuc'],[2698,2858]],
+  ['cg','Barzel','Truyền kỳ Vu sư "vặn vẹo", soạn « vị diện chinh phạt lợi và hại ».',['namvuc'],[10,62]],
+  ['dt','Ngưng Uyên ma nhãn','Đại Ma Thần viễn cổ của vực sâu; tàn khốc học giả vì ước định với nó mà cản Anghel.',['vucsau'],[1098,1130]],
+  ['dt','Julington','Học đồ cấp 3 từng mang mỹ nữ tới làm quen Anghel; tâm địa hẹp hòi.',['namvuc'],[2346]]
+];
+const journey=[
+  [1,'cuutho','Thiếu gia Anghel ở Gru trấn, học với đạo sư John.','thienphu'],
+  [9,'cuutho','Gặp học đồ Moro, biết về Cựu Thổ đại lục và giới Phù thuỷ.'],
+  [26,'cuutho','Gặp Tiên Huyết nữ vu; cưỡi Vân kình rời đi.'],
+  [47,'namvuc','Gặp Sanders và Flora của Dã Man hang động.'],
+  [90,'yemgioi','Cùng Sanders vào Yểm giới bằng linh hồn tìm dẫn dắt pháp.'],
+  [112,'namvuc','Trở về giới Phù thuỷ, mang ra Lẫm Dạ dược tề và đoản trượng đen.'],
+  [122,'namvuc','Khảo hạch người thiên phú ở Dã Man hang động; Sanders nhận làm học trò.'],
+  [153,'namvuc','Ma nguyên thành hình — thành học đồ cấp 1.','hocdo1'],
+  [154,'namvuc','Bước vào vòng trong Huyễn Ma đảo.'],
+  [172,'namvuc','Thành học đồ luyện kim sơ cấp.'],
+  [330,'namvuc','Ba ngày lên học đồ cấp 2.','hocdo2'],
+  [364,'namvuc','Cùng Ám Ảnh vào yểm cảnh Đồng Thoại thế giới, tới tộc địa Kulaku.'],
+  [572,'namvuc','Dự đấu giá hàng đầu Nam vực, bán huyết mạn.'],
+  [709,'namvuc','Giải quyết vật ký sinh Yểm giới ở Dạ Ma thành.'],
+  [808,'votanhai','Vượt biển tới Đại lục Gợi Ý.'],
+  [854,'cuutho','Tìm ra cánh cửa Triều Tịch giới Mirafer vẽ.'],
+  [906,'monggioi','Lần đầu vào Mộng giới, chọn Sơ Tâm thành.'],
+  [970,'vucsau','Cùng Madeline vào vực sâu, tới Hàn cổ di chỉ và Băng cốc.'],
+  [1130,'vucsau','Chứng kiến Ma Thần đánh cờ.'],
+  [1423,'namvuc','Ma nguyên hóa tuyền — đột phá Phù thuỷ chính thức, nhìn thấy cửa Chân Tri.','pt1'],
+  [1434,'namvuc','Huyễn Ma đảo mạnh thêm, Lâu Đài Đen ký hữu nghị.'],
+  [2170,'trieutich','Ở Triều Tịch giới, đối đầu Dangros.'],
+  [2554,'yemgioi','Tìm hiểu bí văn Noah nhất tộc, nghi liên quan tới Augustine ở Naraku thành.'],
+  [2592,'bangkinh','Nghe về Băng Kính thế giới.'],
+  [2858,'kinhvuc','Nhận chìa khóa của trí giả chúa tể.'],
+  [3290,'monggioi','Dùng quyền năng mộng cảnh gọi kẻ đuổi mộng Alan.']
+];
+const arts=[
+  ['cp','Kỳ Điểm Tán Xạ minh tưởng pháp','Minh tưởng pháp Anghel tu ("điểm đơn tản ra"), có khác biệt riêng.',[112,1423]],
+  ['cp','Montos tám mặt dẫn dắt pháp','Dẫn dắt pháp Sanders định cho Anghel xin khi không mang được bản ở Yểm giới ra.',[112]],
+  ['cp','« Kỳ điểm »','Dẫn đạo pháp Sanders cho là mạnh nhất Nam vực, đặt trên Huyền Ngục chi thê ở Naraku thành.',[554]],
+  ['cp','Tinh sương minh tưởng pháp','Một bản minh tưởng pháp.',[1267]],
+  ['tt','Ảo thuật (huyễn thuật)','Con đường chính của Anghel: ảo thuật cấp 1, huyễn cảnh, cả trong yểm cảnh.',[244,364,808]],
+  ['tt','Ma Lực chi thủ','Thuật pháp có hai bản nâng cấp.',[170]],
+  ['tt','Bài trừ mê chướng','Ảo thuật phụ trợ khám phá huyễn thuật, cần học đồ cấp 2.',[10]],
+  ['tt','Con mắt của Nalda','Thuật giám định; Anghel nắm sơ bộ rất nhanh, Muse mất một tháng.',[666,698]],
+  ['tt','Luyện kim','Anghel thành học đồ luyện kim sơ cấp, về sau giám định, luyện chế.',[172,2952]],
+  ['hm','Thiên phú Linh Hồn hệ','Sanders nghi Anghel có thiên phú thứ hai thuộc hệ Linh Hồn; vào Yểm giới bằng linh hồn.',[106,218]],
+  ['hm','Thân phận "Maria"','Sinh vật Yểm giới nhận nhầm Anghel là Maria và đều không thù địch.',[882,2079]],
+  ['bv','Lưu Ly châu','Viên kết tinh hình bầu dục, John cho là đồ của Địa Cầu.',[6]],
+  ['bv','Lẫm Dạ dược tề','Hai bình mang ra từ Yểm giới.',[112]],
+  ['bv','Đoản trượng đen','Vật đặc biệt mang ra từ Yểm giới.',[112]],
+  ['bv','Thẻ vàng Barbie phòng ăn','Kết tình nghĩa với chủ quán, có lợi khi thành Phù thuỷ chính thức.',[47]],
+  ['bv','Hồn Châu','Viên linh hồn bổ sung linh hồn chi lực; có loại làm từ linh hồn bị đại trận hấp thu.',[394,554,634]],
+  ['bv','Yểm thạch','Đá tạo huyễn cảnh không cần ma văn, liên quan tới vị diện khác.',[26]],
+  ['bv','Linh động dược tề','Dược tề hỗ trợ biển tinh thần khi đột phá.',[1422,1423]],
+  ['bv','Kael chi thư','Sách viết vận mệnh thiên chương bao gồm vực sâu, giới Phù thuỷ, Triều Tịch giới.',[2266,2282,2842]],
+  ['bv','Ma tinh','Tiền tệ của Phù thuỷ; Moro góp chưa tới 100 viên.',[10,572]]
+];
+const st=STORIES.find(s=>s.id==='sieu-duy-thuat-si');
+st.people=people.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));
+st.journey=journey.map(([ch,w,d,r])=>({ch,w,d,r:r||null}));
+st.arts=arts.map(([g,n,d,ch,rank])=>({g,n,d,ch,rank:rank||null}));
 })();
 </script>
 <script>
@@ -1204,7 +1569,7 @@ function renderRegion(w,opt){
 
   // Biểu tượng thế giới góc trên trái, cổng không gian ở các góc dưới
   ART[w.kind](el('g',{transform:`translate(110,${w.kind==='sun'||w.kind==='galaxy'?112:100}) scale(.62)`,opacity:.95},svg));
-  const slots=[[70,592],[930,592],[70,480],[930,480]];
+  const slots=[[70,592],[930,592],[70,480],[930,480],[190,640],[810,640],[310,640],[690,640]];
   adj[w.id].forEach((n,i)=>{const[x,y]=slots[i],up=linkType(w.id,n)==='up',c=up?'#f2c76e':'#8fd6ff',right=x>500;
     const g=el('g',{class:'portal',tabindex:0,role:'link','aria-label':'Sang '+byId[n].name,transform:`translate(${x},${y})`},svg);
     el('ellipse',{cx:0,cy:0,rx:24,ry:9,fill:'#05060f',stroke:c,'stroke-width':3,filter:'url(#glow)'},g);

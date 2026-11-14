@@ -244,7 +244,7 @@ function renderRegion(w,opt){
 
   // Biểu tượng thế giới góc trên trái, cổng không gian ở các góc dưới
   ART[w.kind](el('g',{transform:`translate(110,${w.kind==='sun'||w.kind==='galaxy'?112:100}) scale(.62)`,opacity:.95},svg));
-  const slots=[[70,592],[930,592],[70,480],[930,480]];
+  const slots=[[70,592],[930,592],[70,480],[930,480],[190,640],[810,640],[310,640],[690,640]];
   adj[w.id].forEach((n,i)=>{const[x,y]=slots[i],up=linkType(w.id,n)==='up',c=up?'#f2c76e':'#8fd6ff',right=x>500;
     const g=el('g',{class:'portal',tabindex:0,role:'link','aria-label':'Sang '+byId[n].name,transform:`translate(${x},${y})`},svg);
     el('ellipse',{cx:0,cy:0,rx:24,ry:9,fill:'#05060f',stroke:c,'stroke-width':3,filter:'url(#glow)'},g);
