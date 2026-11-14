@@ -15,6 +15,9 @@ const people=[
   ['dh','Điếu Ngư Ông','Ông câu cá Lâm Bạch gặp ở Võ Ý sơn, thật ra là khí linh Tạo Hóa Thần Cung; trao Tạo Hóa Lệnh, nhận Lâm Bạch làm chủ.',['thantich'],[1186,1199]],
   ['cg','Diệp Vô Hoan','Một trong ba chưởng giáo Thần Tích lĩnh, chủ Thánh Dạ vương triều.',['thantich','thanvo'],[501,1081,1258]],
   ['dt','Từ Giang Thắng','Định tố cáo bí mật võ hồn của Lâm Bạch với Diệp Vô Hoan và bị giết; bí mật Thôn Phệ Kiếm Hồn được giữ.',['thantich'],[1081]],
+  ['dh','Lý Cố Nhàn','Thần Nữ thứ chín thần điện Cửu U Ma Cung; mời Lâm Bạch xông Thánh Quân cổ đạo làm Đế Tử, giúp hắn rời Cửu U thành.',['cuuu'],[6980,7001,7041,7061]],
+  ['dh','Thẩm Uyên trưởng lão','Trưởng lão Ma cung bên Đế Tử Lâm Bạch, tiếp lão tổ Quách gia.',['cuuu'],[7701,7721,7885]],
+  ['dt','Tề Hạo','Đạo Tử thứ chín thần điện.',['cuuu'],[6980]],
   ['dt','Tô Thương','Vị hôn phu của Diệp Túc Tâm; bắt nàng để ép Lâm Bạch.',['thanvo','thantich'],[154,1271]]
 ];
 const journey=[
@@ -50,7 +53,13 @@ const journey=[
   [6223,'liepgioi','Vào Liệp giới.'],
   [6628,'mabac','Xuất quan ở Thái Ất thượng phẩm.'],
   [6902,'cuuu','Con đường tấn thăng ở Cửu U Ma Cung.'],
-  [7057,'cuuu','Đột phá Đại La Đạo Quả.','daila']
+  [6980,'cuuu','Cửu U Ma Cung chia thiên kiêu: công tử, Linh Tử, Thánh Tử, Đạo Tử, Thần Tử, Đế Tử.'],
+  [7001,'cuuu','Nhận xông Thánh Quân cổ đạo để thành Đế Tử.'],
+  [7041,'cuuu','Thành Đế Tử, ở lại Đế Cung chuẩn bị đột phá.'],
+  [7057,'cuuu','Luyện hóa 650.000 tiên ngọc, đột phá Đại La Đạo Quả.','daila'],
+  [7641,'madong','Khánh điển đổi tên Ma cung; Bắc Vực xâm lấn, Đông Vực đại loạn.'],
+  [7701,'cuuu','Ma cung trùng kiến sơn môn; Quách gia cầu sinh lộ.'],
+  [7841,'cuuu','Thi triển Thôn Thiên Đạo Vực.']
 ];
 const arts=[
   ['hm','Thôn Phệ Kiếm Hồn','Võ hồn bị coi là phế, nuốt được sức mạnh để tu luyện; "không nhìn thiên mệnh", ý thiên địa không tha.',[2,529,1161,2839]],
@@ -61,7 +70,10 @@ const arts=[
   ['bv','Tạo Hóa Thần Cung','Di tích Xích Tiên tông ở Thần Tích lĩnh; ai có Tạo Hóa Lệnh là chưởng giáo đương đại.',[1186,1199]],
   ['bv','Tạo Hóa Lệnh','Lệnh bài Điếu Ngư Ông trao; luyện hóa thì hai khí linh nhận chủ.',[1199]],
   ['hm','Phong Lôi Kiếm Hồn','Kiếm hồn xuất hiện ở ch.1074.',[1074]],
-  ['hm','Cực Đạo Băng Kiếm Hồn','"Siêu thoát thiên mệnh".',[1142]]
+  ['hm','Cực Đạo Băng Kiếm Hồn','"Siêu thoát thiên mệnh".',[1142]],
+  ['cp','Ngũ Hành Kinh','Công pháp Lâm Bạch vận chuyển khi đột phá Đại La Đạo Quả.',[7057]],
+  ['hm','Thôn Thiên Đạo Quả','Đạo quả trong đan điền; sau Đại La lớn gấp đôi, sinh nhiều đạo quả tinh hoa.',[7057]],
+  ['tt','Thôn Thiên Đạo Vực','Đạo vực rút khí huyết đối thủ mỗi khi họ xuất thủ.',[7841]]
 ];
 const st=STORIES.find(s=>s.id==='kinh-thien-kiem-de');
 st.people=people.map(([g,n,d,w,ch])=>({g,n,d,w,ch}));

@@ -80,7 +80,9 @@ const PL={
   ],
   linhgioi:[
     ['tong','Cổ Tiên tông','Tông ở thượng giới nối với Hàng Thế sơn; có người hạ giới xuống Man Cổ.',[4021],null,5],
-    ['tong','Ly Hận Thiên','Đứng đầu Linh giới thập đại ma tông.',[6917],null,4]
+    ['tong','Ly Hận Thiên','Đứng đầu Linh giới thập đại ma tông.',[6917],null,4],
+    ['tong','Dược Tiên cốc','Một trong Linh giới thập đại chính đạo môn phái, giỏi luyện đan.',[7881],null,4],
+    ['vung','Thiên Chi Thất Giới','"Chư Thiên Vạn Giới trung tâm"; võ giả qua lại Ma giới và Linh giới đều phải đi qua; có cổ đạo của Cửu U Ma Cung.',[7041],null,5]
   ],
   yeugioi:[
     ['toc','Yêu tộc','Không tát ao bắt cá nên Yêu giới còn nhiều linh dược.',[7081],null,4]
@@ -136,7 +138,19 @@ const PL={
     ['tong','Phiên Thiên tông','Chiến trường chính có thể ở cương vực Phiên Thiên và Bái Thiên tông.',[6961,7141,7441],null,3],
     ['tong','Bái Thiên tông','Như trên.',[6961,7141,7441],null,3],
     ['vung','Vạn Thánh sơn','Cương vực có phân đà Cửu U Ma Cung.',[6901,6961],null,3],
-    ['tong','Tiên Thiên Đạo Môn','Đạo môn của Ma giới.',[7253,7621],null,3]
+    ['tong','Tiên Thiên Đạo Môn','Đạo môn của Ma giới.',[7253,7621],null,3],
+    ['hiem','Thánh Quân cổ đạo','Đường thử luyện nguy hiểm tới lăng tẩm; ai đi qua mới thành Đế Tử.',[7001],'Cửu U Ma Cung',2],
+    ['tong','Đệ Nhất Thần Điện','Mạnh nhất chín đại thần điện, có chín vị Đạo Tử.',[6980,7886],'Cửu U thành',3],
+    ['vung','Hoàng Long Thiên Châu','Mở cửa đón võ giả khi Ma cung làm khánh điển đổi tên.',[7561],'Cửu U Ma Cung',3],
+    ['tong','Tề Thiên tông','Gửi sứ đoàn giúp Thất Dạ Thần Tông rồi rút về; biên cương bị Nam, Tây Vực quấy nhiễu.',[7061,7641],null,3],
+    ['tong','Thanh Liên tông','Không chống Thuần Dương tông, Phượng Hoàng cốc; ngầm đỡ liên minh các gia tộc trung, tiểu ở Đông Vực.',[7121,7661,7885],null,3],
+    ['vung','Vân Hà Thiên Châu','Nơi Quách gia làm giàu khởi thế vạn năm trước.',[7701],null,3],
+    ['gia','Quách gia','Lão tổ Quách gia nhất định đòi gặp Đế Tử Lâm Bạch để cầu sinh lộ.',[7701],'Vân Hà Thiên Châu',2],
+    ['vung','Ninh Hải Thiên Châu','Do Trấn Hải tông thống ngự.',[7781,7885],null,3],
+    ['tong','Trấn Hải tông','Thống ngự Ninh Hải Thiên Châu; tông chủ, trưởng lão tới Linh Hồ.',[7781,7885],'Ninh Hải Thiên Châu',3],
+    ['hiem','Linh Hồ','Có Linh Hồ Long Vương; động phủ trong hồ để Cửu U Ma Cung khai quật.',[7781,7885],'Ninh Hải Thiên Châu',2],
+    ['thanh','Ngọc Hải thành','Thành Lâm Bạch dò xét.',[7761],null,2],
+    ['tong','Tinh Cung','Gấp muốn hòa đàm với Lâm Bạch sau khi hắn gặp Đoan Mộc gia tộc.',[7721,7741],null,3]
   ]
 };
 const st=STORIES.find(s=>s.id==='kinh-thien-kiem-de'),SZ=(window.SIZES&&SIZES['kinh-thien-kiem-de'])||{};

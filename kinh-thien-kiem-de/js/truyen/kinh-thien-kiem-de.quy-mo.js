@@ -68,6 +68,8 @@ var SIZES=window.SIZES||(window.SIZES={});SIZES["kinh-thien-kiem-de"]={
 "tuchau|Hàng Thế sơn": 3,
 "linhgioi|Cổ Tiên tông": 5,
 "linhgioi|Ly Hận Thiên": 4,
+"linhgioi|Dược Tiên cốc": 4,
+"linhgioi|Thiên Chi Thất Giới": 5,
 "yeugioi|Yêu tộc": 4,
 "thuykinh|Khu giao dịch": 3,
 "thuykinh|Thủy Kính Hải": 3,
@@ -111,5 +113,17 @@ var SIZES=window.SIZES||(window.SIZES={});SIZES["kinh-thien-kiem-de"]={
 "cuuu|Phiên Thiên tông": 3,
 "cuuu|Bái Thiên tông": 3,
 "cuuu|Vạn Thánh sơn": 3,
-"cuuu|Tiên Thiên Đạo Môn": 3
+"cuuu|Tiên Thiên Đạo Môn": 3,
+"cuuu|Thánh Quân cổ đạo": 2,
+"cuuu|Đệ Nhất Thần Điện": 3,
+"cuuu|Hoàng Long Thiên Châu": 3,
+"cuuu|Tề Thiên tông": 3,
+"cuuu|Thanh Liên tông": 3,
+"cuuu|Vân Hà Thiên Châu": 3,
+"cuuu|Quách gia": 2,
+"cuuu|Ninh Hải Thiên Châu": 3,
+"cuuu|Trấn Hải tông": 3,
+"cuuu|Linh Hồ": 2,
+"cuuu|Ngọc Hải thành": 2,
+"cuuu|Tinh Cung": 3
 };
