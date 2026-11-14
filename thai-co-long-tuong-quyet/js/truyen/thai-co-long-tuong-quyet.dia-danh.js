@@ -49,7 +49,8 @@ const PLACES={
     ['hiem','Vĩnh Sinh Thần Điện','Thần điện có một tôn Ma Thần bị đóng đinh chết bên trong.',[309, 313],null,3],
     ['tong','Vọng Thiên Tông','Tông môn có người xuất hiện giúp Lâm Phong thoát khỏi Phong Ma truy đuổi.',[386, 562],null,2],
     ['tong','Thiên Phong Học Viện','Học viện có đệ tử giỏi đao, cùng dự khảo hạch với Lâm Phong.',[113],null,2],
-    ['tong','Tế Vũ lâu','Một trong năm thế lực lớn của thiên tài doanh, chỉ nhận nữ học viên.',[166],null,2]
+    ['tong','Tế Vũ lâu','Một trong năm thế lực lớn của thiên tài doanh, chỉ nhận nữ học viên.',[166],null,2],
+    ['tong','Long Vân tông','Tông môn có các đệ tử hạch tâm Tống Thiên Vũ, Lý Mộc Ca kết giao với Lâm Phong.',[452]]
   ],
   tamthien:[
     ['vung','Đông quận Thần Châu','Vùng có trăm quốc và thập đại cố đô. Chân Võ quốc cũng nằm trong vùng này.',[239,437]],
@@ -146,7 +147,9 @@ const PLACES={
     ['hiem','Huyễn Cảnh Hải','Cửa thử thứ hai của khảo hạch: biển ảo cảnh, phải tự thoát ra.',[1762],null,1],
     ['hiem','Tâm Ma Hải','Cửa thử thứ ba của khảo hạch: biển tâm ma, thử ý chí.',[1762],null,1],
     ['toc','Thôn Thiên Mãng tộc','Tộc mãng xà tinh không, có đại đế tham chiến.',[2912],null,2],
-    ['toc','Cửu Đầu Trùng tộc','Tộc của Tà Hình Đại Đế, kẻ từng muốn giết Hồng Trần Tiên Tôn.',[2912, 2932],null,2]
+    ['toc','Cửu Đầu Trùng tộc','Tộc của Tà Hình Đại Đế, kẻ từng muốn giết Hồng Trần Tiên Tôn.',[2912, 2932],null,2],
+    ['tong','Thái Hư Cung','Tông môn Đạo giáo lừng lẫy, một trong những phái Đạo giáo mạnh nhất Cửu Châu.',[1932]],
+    ['gia','Lôi gia','Gia tộc có lão tổ Lôi Vạn Lý, Thiên Thần cảnh đỉnh phong; hộ vệ do Độc nương tử dẫn đầu.',[1858]]
   ],
   cohoang:[
     ['vung','Quy Khư hải vực','Hải vực giáp Cổ Hoang, nơi Lâm Phong từng gây sóng gió.',[1942,1964]],
@@ -376,7 +379,9 @@ const PLACES={
     ['hiem','Hỏa Diễm Sơn','Núi lửa gần Vạn tiên quốc gia.',[6490],null,2],
     ['thanh','Hỗn Độn Thành','Thành cổ lừng danh của Hỗn Độn vực, có truyền tống trận.',[6506],'Hỗn Độn vực',3],
     ['thanh','Sát Ma thành','Thành đen dưới lòng đất, có thông đạo lên mặt đất.',[6482],null,2],
-    ['vung','Chúc Thần vực','Vực của Chúc Nhất Kiếm, kẻ bị Lâm Phong giết.',[6474],null,2]
+    ['vung','Chúc Thần vực','Vực của Chúc Nhất Kiếm, kẻ bị Lâm Phong giết.',[6474],null,2],
+    ['gia','Mục gia','Gia tộc của Mục Tiêm Vũ, người lấn át mọi huynh đệ để thành người trẻ dẫn đầu.',[6237]],
+    ['hiem','Bạch Liên Cốc','Thung lũng có đóa Bạch Liên Hoa còn sống; Tào Trùng chạy vào sâu bên trong khi bị Mục gia truy đuổi.',[6237]]
   ],
   phetho:[
     ['tong','Phế thổ liên minh','Liên minh của Phế thổ thế giới. Nhiều thế lực theo dõi xem nó sẽ phát triển ra sao.',[7165,7178]],
@@ -472,7 +477,13 @@ const PLACES={
     ['dao','Phong Thần đảo','Đảo có đảo chủ quản lý Ác ma vực sâu.',[9800],null,2],
     ['hiem','Táng Thiên cốc','Cốc vô cùng đáng sợ; Lâm Phong cùng vong linh quân đoàn tấn công.',[8240],null,3],
     ['dao','Tam Nguyên Thượng Thanh đảo','Đảo nơi Trầm gia đối đầu Lâm Phong.',[11120],null,2],
-    ['gia','Trầm gia','Gia tộc đối đầu Lâm Phong trên Tam Nguyên Thượng Thanh đảo.',[11120],null,2]
+    ['gia','Trầm gia','Gia tộc đối đầu Lâm Phong trên Tam Nguyên Thượng Thanh đảo.',[11120],null,2],
+    ['hiem','Chư Thần Cốc','Vùng bị quy tắc tiên giới phong tỏa; những tồn tại bị đổi hồn không thể tới gần.',[10983]],
+    ['hiem','Quy Sơn mộ','Mộ cổ sắp xuất thế, các đại lão quanh thần sơn kéo tới tranh đoạt.',[10252]],
+    ['thanh','Vô Song Thành','Thành mà Lâm Phong phải tìm cách rời khỏi để thoát một tồn tại khủng bố.',[9215]],
+    ['tong','Minh Hải Thần cung','Thế lực cổ; xác tu sĩ của nó và kẻ tấn công nó hóa cương thi.',[11133]],
+    ['hiem','Vạn Trượng Sơn','Nơi ở của Vạn Trượng lão Quy, kẻ biết về sư tôn của Lâm Phong.',[7872]],
+    ['hiem','Thanh Khâu Sơn','Nơi Bình Thiên thượng quân tìm tới khi phát hiện điều bất thường.',[8317]]
   ]
 };
 STORIES.find(s=>s.id==='thai-co-long-tuong-quyet').worlds.forEach(w=>{w.places=(PLACES[w.id]||[]).map(([t,n,d,ch,inn,s])=>({t,n,d,ch,in:inn||null,s:s||((window.SIZES&&SIZES['thai-co-long-tuong-quyet'])||{})[w.id+'|'+n]||2}))});
