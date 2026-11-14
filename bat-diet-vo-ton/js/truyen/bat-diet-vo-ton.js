@@ -70,7 +70,7 @@ STORIES.push({
       about:'Thế giới tu tiên có Nguyên Anh, Hóa Thần; xa hơn là Tiên Vương, Tiên Quân. Nhân tộc giữ Trấn Bắc Quan chặn hải yêu Bắc Hải.',
       quote:['Nhân tộc thế giới tu tiên',6238],
       secs:[['Thế lực','Nhạc Tinh Tông tuyển đệ tử bằng linh căn; Thiên Nguyên vực có Trần Gia ba Tiên Quân; Thiên tộc chặn Bắc Hải.',[6241,6401,6641]],
-        ['Cổ Phi tại đây','Đối đầu Triệu Minh (Tiên Vương), một mình chiến ba lão tổ Trần Gia, giữ Trấn Bắc Thành.',[6301,6401,6701]]]},
+        ['Cổ Phi tại đây','Đối đầu Triệu Minh (Tiên Vương), chiến ba lão tổ Trần Gia, giữ Trấn Bắc Thành, vào Tạo hóa chi địa, phá hang U Minh Ma tộc.',[6401,6701,6733,6888]]]},
     {id:'hoanggioi',name:'Hoang giới',tier:3,x:130,y:345,kind:'waste',type:'Giới',r:['thanhton','chiton'],rGuess:true,
       sym:'Đất hoang u tối.',
       about:'Dị giới có sinh linh vượt giới xâm phạm; có Huyền Ma Sơn, Huyền Đô Thành và Hắc Ma Hải.',

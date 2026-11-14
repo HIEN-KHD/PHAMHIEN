@@ -12,6 +12,10 @@ const people=[
   ['hn','Tần Dao','Đế nữ Tần Tộc.',['thienthan','thaithuy'],[4201,4441]],
   ['hn','Ma Tiên Nhi','Có Tiên Ma chi thể; độ Hóa Hình Lôi Kiếp ở Tiên Võ giới.',['tienvo'],[4021]],
   ['hn','Sở Uyển','Vừa đột phá Tiên Vương.',['tutien'],[6301]],
+  ['hn','Ma Linh Nhi','Tân Ma Chủ của Ma tộc, dưới trướng tam đại ma tôn; muốn cùng Cổ Phi xông Tạo hóa chi địa.',['tutien'],[6704,6710,6718]],
+  ['cg','Yêu Tổ','Hóa thân của vô thượng Nữ Đế trên đỉnh Đế Cực Ma Sơn; giáng lâm Bắc Hải, lái Phi Chu luyện từ Hồng Mông Thụ.',['tutien','dima'],[6702,6732,6737]],
+  ['dh','Hỗn Độn Ma Hầu','Sinh từ Hỗn Độn, một gậy đánh ra vực sâu; bị một hóa thân Yêu Tổ nghiền ép, sau cùng đi chiến Ma Long.',['tutien'],[6711,6732,6876]],
+  ['dt','Thanh Sư Yêu Chủ','Yêu Chủ duy nhất của Bắc Hải Yêu tộc buộc đối thủ phải nghiêm túc; bại trận.',['tutien'],[6721,6723,6724]],
   ['dt','Nguyên Cổ Tiên Đế','Chủ Thiên Đế Thành ở Thiên giới; có ba nửa bước đại năng dưới trướng.',['thiengioi'],[1061,1081]],
   ['dt','Cơ Phàm','Mang Vô Cực Thánh thể, tu vi ngang Cổ Phi; đối thủ cạnh tranh lớn nhất.',['nhangian'],[2261]],
   ['dt','Vương Dương','Đại thiếu Vương gia ở Thiên Thần giới, Cửu Dương Thần Thể; bị Cổ Phi một cước giẫm chết.',['thienthan'],[4081]],
@@ -53,7 +57,10 @@ const journey=[
   [5861,'dima','Tới Dị Ma giới, thấy Nhân tộc thê thảm.'],
   [6238,'tutien','Tới thế giới tu tiên của Nhân tộc.'],
   [6401,'tutien','Một mình chiến ba lão tổ Tiên Quân Trần Gia.'],
-  [6701,'tutien','Giữ Trấn Bắc Thành trước hải yêu Bắc Hải.']
+  [6701,'tutien','Giữ Trấn Bắc Thành trước hải yêu Bắc Hải.'],
+  [6714,'tutien','Trấn Bắc Thành bị Ma tộc phá; đập bay Hỗn Độn Ma Hầu.'],
+  [6733,'tutien','Qua cửa đá vào Tạo hóa chi địa, chém dị thú vực sâu.'],
+  [6888,'tutien','Phá hang ổ U Minh Ma tộc, cứu Tiểu Long Long.']
 ];
 const arts=[
   ['cp','Thượng cổ Luyện Thể thuật','Bị chê là công pháp rác rưởi; tám năm mới qua cánh cửa thứ hai Thông Mạch.',[1]],

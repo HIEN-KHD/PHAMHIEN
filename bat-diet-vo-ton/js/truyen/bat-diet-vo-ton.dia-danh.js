@@ -121,7 +121,12 @@ const PL={
     ['gia','Trần Gia','Gia tộc ở Thiên Nguyên Thành có ba Tiên Quân lão tổ.',[6401,6441],'Thiên Nguyên vực',3],
     ['tong','Nhạc Tinh Tông','Tông tuyển đệ tử bằng khảo thí linh căn.',[6241,6261],null,3],
     ['thanh','Vạn Tiên Thành','Thành nơi thiên tài Mộc tộc bị giết.',[6541,6601],null,3],
-    ['thanh','Trấn Bắc Thành','Thành ở Trấn Bắc Quan chặn hải yêu Bắc Hải; Thiên tộc Tiên Đế mở hộ thành.',[6701,6721],null,4],
+    ['thanh','Trấn Bắc Thành','Thành ở Trấn Bắc Quan chặn hải yêu Bắc Hải; Thiên tộc Tiên Đế mở hộ thành; bị Ma tộc phá thành.',[6701,6714,6721],'Bắc Cương',4],
+    ['vung','Bắc Cương','Biên cương phía bắc của Nhân tộc; Ma tộc xâm phạm, chiến vân lại nổi.',[6702,6703,6707],null,4],
+    ['toc','Ma tộc (Ma Chủ Ma Linh Nhi)','Tân Ma Chủ Ma Linh Nhi, dưới trướng có tam đại ma tôn; đánh Trấn Bắc Thành.',[6702,6705,6709],null,4],
+    ['hiem','Tạo hóa chi địa','Nơi cả Tiên Tổ cũng không vào được; mở qua một tòa cửa đá, bên trong là thế giới vỡ nát.',[6708,6733,6734],null,4],
+    ['hiem','Ma điện dưới huyết nguyệt','Đại điện trên đỉnh núi cao trong thế giới vỡ nát, dưới trăng máu (chưa ghi tên).',[6873,6874],'Tạo hóa chi địa',3],
+    ['toc','U Minh','Tiểu thiên địa do cường giả mở; hang ổ U Minh Ma tộc, linh khí mỏng hơn bên ngoài.',[6888,6889],'Tạo hóa chi địa',3],
     ['vung','Bắc Hải','Biển có đại yêu đánh vào Nhân tộc.',[6641,6661],null,4],
     ['tong','Ngự Thú Tiên Tông','Tông có chí bảo Phong Lôi Sí.',[6461,6501],null,3],
     ['hiem','Hắc Minh Uyên','Vực sâu Hắc Minh Ma Quân trốn vào.',[6381],null,3]
